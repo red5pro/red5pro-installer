@@ -23,7 +23,7 @@ The script requires super user privileges to execute and carry out subtasks. Hen
 >> Script is located at : `Linux/rpro-utils.sh`
 * Copy the script to a location from where it can be executed such as : `/home/{username}/`.
 * Navigate to your `/home/{username}/` directory in the linux terminal (shell)
-* Assign executable permissions to the script by issuing the following command in terminal : `sudo +x ./rpro-utils.sh`
+* Assign executable permissions to the script by issuing the following command in terminal : `sudo chmod +x ./rpro-utils.sh`
 * Execute the script by issuing the following command : `sudo ./rpro-utils.sh`
 
 >> Use the menu driven interface sequentially and follow instructiosn carefully for best results.
