@@ -186,8 +186,8 @@ download_latest()
 
 	
 	rpro_zip="${rpro_zip}.zip"
-	echo $rpro_zip
-	sleep 15
+	# echo $rpro_zip
+	# sleep 15
 	
 }
 
