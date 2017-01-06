@@ -168,7 +168,8 @@ download_latest()
 	read rpro_email
 
 	echo "Enter Password : "
-	read -s rpro_passcode
+	read rpro_passcode
+	# read -s rpro_passcode
 
 	# TODO => simple validate
 
