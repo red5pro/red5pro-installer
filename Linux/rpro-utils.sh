@@ -190,7 +190,7 @@ download_latest()
 	cd $dir
 
 	# echo $dir
-	rpro_form_valid=0
+	rpro_form_valid=1
 	echo "Please enter your red5pro.com login details"
 	
 	echo "Enter Email : "
@@ -202,7 +202,8 @@ download_latest()
 
 	# simple validate email
 	if echo "${rpro_email}" | grep '^[a-zA-Z0-9]*@[a-zA-Z0-9]*\.[a-zA-Z0-9]*$' >/dev/null; then
-	    rpro_form_valid=1
+	    	# NO OP
+		echo "Email string ok!"		
 	else
 		rpro_form_valid=0
 		echo "Invalid email string!"		
@@ -210,7 +211,7 @@ download_latest()
 	
 	# simple validate password
 	if [ ! -z "$rpro_passcode" -a "$rpro_passcode" != " " ]; then
-		rpro_form_valid=1
+		echo "Password string ok!"		
 	else
 		rpro_form_valid=0
 		echo "Invalid password string!"
@@ -220,10 +221,19 @@ download_latest()
 	# if all params are valid
 	if [ "$rpro_form_valid" -eq "1" ]; then
 		# POST to site
-		wget_status= wget --save-cookies cookies.txt --keep-session-cookies --post-data="email=$rpro_email&password=$rpro_passcode" "https://account.red5pro.com/login" 2>&1 | grep -F HTTP | cut -d ' ' -f 6
+		wget --server-response --save-cookies cookies.txt --keep-session-cookies --post-data="email=$rpro_email&password=$rpro_passcode" "https://account.red5pro.com/login" 2>$dir/wsession.txt
+		wget_status=$(< $dir/wsession.txt)
 
-		if [ "$wget_status" == 200 ]
+		# Check http code
+		wget_status_ok=0
+		if [[ $wget_status == *"HTTP/1.1 200"* ]] 
 		then
+			wget_status_ok=1
+		fi
+		
+		# if 200 then proceed
+		if [ "$wget_status_ok" -eq "1" ]; then
+
 			wget --load-cookies cookies.txt --content-disposition -p  https://account.red5pro.com/download/red5
 			search_dir="$dir/account.red5pro.com/download"
 			for file in $search_dir/*.zip
@@ -232,10 +242,11 @@ download_latest()
 				latest_rpro_download_success=1
 				rpro_zip="${rpro_zip}.zip"
 				break	
-			done	
+			done
 		else
 			echo "Failed to authenticate with website!"
 		fi
+		
 	else
 		echo "Invalid HTTP request parameters"
 	fi
@@ -1348,5 +1359,6 @@ advance_usage_mode()
 
 
 # Start application
+# main
 main
 
