@@ -7,6 +7,10 @@ DEFAULT_RPRO_PATH=/usr/local/red5pro
 SERVICE_LOCATION=/etc/init.d
 SERVICE_NAME=red5pro 
 SERVICE_INSTALLER=/usr/sbin/update-rc.d
+MIN_JAVA_VERSION="1.8"
+IS_64_BIT=0
+OS_NAME=
+OS_VERSION=
 MODE=0
 
 
@@ -14,11 +18,37 @@ MODE=0
 
 main()
 {
-	
 	welcome_menu
 	read_welcome_menu_options
 }
 
+
+
+
+detect_system()
+{
+	# Get OS kernel bits info
+	linux_kernel_info=`echo "$(uname -mrs)"`
+
+	# Extract major version
+	distribution=$(lsb_release -si)
+	os_version=$(lsb_release -sr)
+
+	dist_lower=$(echo $distribution | awk '{print tolower($0)}')
+
+	echo -e "* Linux Distribution: \e[36m$distribution\e[m"
+	OS_NAME=$distribution
+
+	echo -e "* Version: \e[36m$os_version\e[m"
+	OS_VERSION=$os_version
+	
+	if [[ $linux_kernel_info == *"x86_64"* ]]; then
+		IS_64_BIT=1
+		os_bits="64 Bit"
+		echo -e "* Kernel: \e[36m$os_bits\e[m"
+	fi
+
+}
 
 
 
@@ -63,6 +93,7 @@ pause_license()
 check_java()
 {
 	java_check_success=0
+	has_min_java_version=0
 
 	for JAVA in "${JAVA_HOME}/bin/java" "${JAVA_HOME}/Home/bin/java" "/usr/bin/java" "/usr/local/bin/java"
 		do
@@ -74,26 +105,23 @@ check_java()
 
 
 	if [ ! -x "$JAVA" ]; then
-	  	echo "Unable to locate Java. Please set JAVA_HOME environment variable."
+	  	echo "Unable to locate Java. If you think you do have java installed, please set JAVA_HOME environment variable to point to your JDK / JRE."
 	else
 		JAVA_VER=$(java -version 2>&1 | sed 's/java version "\(.*\)\.\(.*\)\..*"/\1\2/; 1q')
 		JAVA_VERSION=`echo "$(java -version 2>&1)" | grep "java version" | awk '{ print substr($3, 2, length($3)-2); }'`
 
-		java_version_into="Your current java version is $JAVA_VERSION"
+		echo "Current java version is $JAVA_VERSION"
+		JAVA_VERSION_MAJOR=`echo "${JAVA_VERSION:0:3}"`
 
-		if [ "$JAVA_VER" -ge 17 ]; then
-		java_check_success=1
-		echo "$java_version_into , which meets Red5pro requirements."
+		if (( $(echo "$JAVA_VERSION_MAJOR < $MIN_JAVA_VERSION" |bc -l) )); then
+			has_min_java_version=1			
+			echo "You need to install a newer java version of java!"			
 		else
-		java_check_success=0
-		echo "java_version_into , which is too old..."
+			has_min_java_version=0
+			echo "Minimum java version is already installed!"
 		fi
 	fi
 
-
-	if [ $# -gt 0 ]; then
-		pause		
-	fi
 }
 
 
@@ -118,6 +146,7 @@ check_unzip()
 
 install_java()
 {
+	
 	apt-get update
 	apt-get install default-jre
 
@@ -151,7 +180,7 @@ download_latest()
 	clear
 
 	latest_rpro_download_success=0
-	rpro_zip=""
+	rpro_zip=
 
 	echo "Downloading latest Red5pro from red5pro.com"
 	
@@ -161,35 +190,55 @@ download_latest()
 	cd $dir
 
 	# echo $dir
-
+	rpro_form_valid=0
 	echo "Please enter your red5pro.com login details"
 	
 	echo "Enter Email : "
 	read rpro_email
 
 	echo "Enter Password : "
-	read rpro_passcode
-	# read -s rpro_passcode
+	# read rpro_passcode
+	read -s rpro_passcode
 
-	# TODO => simple validate
-
-	wget --save-cookies cookies.txt --keep-session-cookies --post-data="email=$rpro_email&password=$rpro_passcode" "https://account.red5pro.com/login"	
-	wget --load-cookies cookies.txt --content-disposition -p  https://account.red5pro.com/download/red5
-
-	rpro_zip=""
-	search_dir="$dir/account.red5pro.com/download"
-	for file in $search_dir/*.zip
-	do
-		rpro_zip="${file%%.zip}"
-		latest_rpro_download_success=1
-		break	
-	done
-
+	# simple validate email
+	if echo "${rpro_email}" | grep '^[a-zA-Z0-9]*@[a-zA-Z0-9]*\.[a-zA-Z0-9]*$' >/dev/null; then
+	    rpro_form_valid=1
+	else
+		rpro_form_valid=0
+		echo "Invalid email string!"		
+	fi
 	
-	rpro_zip="${rpro_zip}.zip"
-	# echo $rpro_zip
-	# sleep 15
-	
+	# simple validate password
+	if [ ! -z "$rpro_passcode" -a "$rpro_passcode" != " " ]; then
+		rpro_form_valid=1
+	else
+		rpro_form_valid=0
+		echo "Invalid password string!"
+	fi
+
+
+	# if all params are valid
+	if [ "$rpro_form_valid" -eq "1" ]; then
+		# POST to site
+		wget_status= wget --save-cookies cookies.txt --keep-session-cookies --post-data="email=$rpro_email&password=$rpro_passcode" "https://account.red5pro.com/login" 2>&1 | grep -F HTTP | cut -d ' ' -f 6
+
+		if [ "$wget_status" == 200 ]
+		then
+			wget --load-cookies cookies.txt --content-disposition -p  https://account.red5pro.com/download/red5
+			search_dir="$dir/account.red5pro.com/download"
+			for file in $search_dir/*.zip
+			do
+				rpro_zip="${file%%.zip}"
+				latest_rpro_download_success=1
+				rpro_zip="${rpro_zip}.zip"
+				break	
+			done	
+		else
+			echo "Failed to authenticate with website!"
+		fi
+	else
+		echo "Invalid HTTP request parameters"
+	fi
 }
 
 
@@ -217,7 +266,7 @@ auto_install_rpro()
 	check_unzip
 
 	if [ "$unzip_check_success" -eq 0 ]; then
-		echo "Installing latest java runtiem environment..."
+		echo "Installing latest java runtime environment..."
 		sleep 2
 
 		install_unzip
@@ -1184,7 +1233,7 @@ simple_menu()
 	echo " RED5PRO SUPER UTILS - BASIC MODE         "
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "1. CHECK EXISTING RED5PRO INSTALLATION"
-	echo "2. INSTALL RED5PRO (From red5pro.com)"
+	echo "2. INSTALL LATEST RED5PRO"
 	echo "3. INSTALL RED5PRO FROM ZIP"
 	echo "4. REMOVE RED5PRO INSTALLATION"
 	echo "5. ADD / UPDATE RED5PRO LICENSE"
@@ -1240,9 +1289,15 @@ welcome_menu()
 
 	printf "\033c"
 
+
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"	
 	echo " RED5PRO UTILITIES - W E L C O M E   M E N U"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+	detect_system
+
+	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
 	echo "                             "
 	echo "1. BASIC MODE (Recommended)"
 	echo "                             "
@@ -1258,7 +1313,7 @@ welcome_menu()
 read_welcome_menu_options()
 {
 	local choice
-	read -p "Enter choice [ 1 - 3] " choice
+	read -p "Enter choice [ 1 - 2 | 0 to exit] " choice
 	case $choice in
 		1) simple_usage_mode ;;
 		2) advance_usage_mode ;;
