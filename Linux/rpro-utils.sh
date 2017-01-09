@@ -3,6 +3,9 @@
 ## ----------------------------------
 
 alias cls='printf "\033c"'
+
+OS_UBUNTU="Ubuntu"
+
 DEFAULT_RPRO_PATH=/usr/local/red5pro
 SERVICE_LOCATION=/etc/init.d
 SERVICE_NAME=red5pro 
@@ -114,10 +117,10 @@ check_java()
 		JAVA_VERSION_MAJOR=`echo "${JAVA_VERSION:0:3}"`
 
 		if (( $(echo "$JAVA_VERSION_MAJOR < $MIN_JAVA_VERSION" |bc -l) )); then
-			has_min_java_version=1			
+			has_min_java_version=0			
 			echo "You need to install a newer java version of java!"			
 		else
-			has_min_java_version=0
+			has_min_java_version=1
 			echo "Minimum java version is already installed!"
 		fi
 	fi
@@ -146,12 +149,33 @@ check_unzip()
 
 install_java()
 {
-	
-	apt-get update
-	apt-get install default-jre
+	java_install_success=0
 
-	default_jre="$(which java)";
-	echo "JRE installed at $default_jre"	
+	if [[ $OS_NAME == *"Ubuntu"* ]]
+	then
+		echo "Installing JRE 8 for Ubuntu";
+		
+		add-apt-repository ppa:webupd8team/java
+		apt-get update
+
+		apt-get install oracle-java8-installer
+
+		check_java
+
+		has_min_java_version=1
+
+		if [ $has_min_java_version -eq 1 ]; then
+			default_jre="$(which java)";
+			echo "JRE   successfully installed at $default_jre"
+			java_install_success=1
+		else
+			echo "Could not install required version of java"
+		fi
+		
+	else
+		echo "Oops! Sorry i dont know how to install JRE 8 for $OS_NAME";
+	fi
+		
 }
 
 
@@ -1359,6 +1383,5 @@ advance_usage_mode()
 
 
 # Start application
-# main
 main
 
