@@ -772,7 +772,8 @@ stop_red5pro_service()
 
 is_red5_running()
 {	
-    PIDFILE="/var/run/red5.pid"
+	pid_info=`pgrep -f red5`
+	echo $pid_info
 }
 
 
@@ -945,197 +946,7 @@ set_red5_home()
 
 
 
-prepare_autoscale_image()
-{
 
-
-echo "Preparing to configure autoscaling image"
-sleep 1
-
-echo "This process will convert your current Red5pro installation to a autoscale image compatible installation."
-echo "WARNING : The process caanot be reversed!"
-
-read -r -p "Do you wish to continue? [y/N] " response
-
-case $response in
-[yY][eE][sS]|[yY]) 
-break;
-;;
-*)
-echo "Process cancelled"
-pause
-;;
-esac
-
-
-
-echo "[ ----------------------------------------------------------------------- ]"
-echo "[ -----------  STEP #1 : PREPARING AUTOSCALE CONFIGURATION  ------------- ]"
-echo "[ ----------------------------------------------------------------------- ]"
-echo "\n"
-
-
-echo "Enter streammanager Host / IP. \n[ For load balanced streammanagers provide load balancer IP instead ]"
-read sm_ip
-
-echo "Enter red5pro instance reporting speed \n[ How fast should Red5pro instance report statistics to streammanager. Defaults to '10000'(ms) ]"
-read sm_report_speed
-
-autoscale_xml='<?xml version="1.0" encoding="UTF-8" ?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:lang="http://www.springframework.org/schema/lang"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
-	http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-3.0.xsd 
-	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
-
-    <bean name="config" class="com.red5pro.clustering.autoscale.Configuration" >	
-        <!-- Disable plugin -->	
-        <property name="active" value="true"/> 
-        
-        <!--Stream manager hosted uri. use the host of your stream manager.  -->	
-	 	<property name="cloudWatchHost" value="http://'$sm_ip':5080/streammanager/cloudwatch"/>
-	 	
-	 	<!-- Value in milliseconds for interval to report back to cloudwatch. 
-	 	5000 to 30000 are acceptable values. 
-	 	Lower is more agressive. -->
-	 	<property name="reportingSpeed" value="'$sm_report_speed'"/>
-    </bean>
-     
-</beans>'
-
-
-	echo "Writing configuration to disk"
-	sleep 1
-
-
-	# write script to file
-	echo "$autoscale_xml" > $DEFAULT_RPRO_PATH/conf/autoscale.xml
-	
-
-	echo "Autoscale configuration written to disk"
-	echo "Step # 1 compled successfully"
-
-
-
-echo "[ ------------------------------------------------------------------- ]"
-echo "[ ----------  STEP #2 : REMOVING UNWANTED APPLICATIONS   ------------ ]"
-echo "[ ------------------------------------------------------------------- ]"
-echo "\n"
-
-
-echo "Please wait..."
-sleep 2
-
-
-
-if [ -d "$DEFAULT_RPRO_PATH/webapps/secondscreen" ]; then
-	echo "Deleting webapp secondscreen"
-	sleep 1
-	rm -rf $DEFAULT_RPRO_PATH/webapps/secondscreen
-fi
-
-
-
-if [ -d "$DEFAULT_RPRO_PATH/webapps/template" ]; then
-	echo "Deleting webapp template"
-	sleep 1
-	rm -rf $DEFAULT_RPRO_PATH/webapps/template
-fi
-
-
-
-if [ -d "$DEFAULT_RPRO_PATH/webapps/vod" ]; then
-	echo "Deleting webapp vod"
-	sleep 1
-	rm -rf $DEFAULT_RPRO_PATH/webapps/vod
-fi
-
-
-
-if [ -d "$DEFAULT_RPRO_PATH/webapps/streammanager" ]; then
-	echo "Deleting webapp streammanager"
-	sleep 1
-	rm -rf $DEFAULT_RPRO_PATH/webapps/streammanager
-fi
-
-
-
-echo "[ ------------------------------------------------------------------- ]"
-echo "[ -----------  STEP #3 : CHECKING AUTO STARTUP OPTIONS   ------------ ]"
-echo "[ ------------------------------------------------------------------- ]"
-echo "\n"
-
-echo "Checking red5pro service status..."
- 
-if [ ! -f "$SERVICE_LOCATION/$SERVICE_NAME" ]; then
-
-	register_rpro_service;
-
-	if [ "$rpro_service_install_success" -eq 1 ]; then
-		echo "Service configured successfully"
-	else
-		echo "Service could not be configured. Contact support!"
-	fi
-fi
-
-
-
-echo "Your Red5Pro instalaltion is now ready to be converted into an autoscaling image.To convert this installation to image, please refer to  your cloud platform guide. Thank you!"
-
-}
-
-
-
-
-############################ AUTOSCALING MENU ############################################
-
-
-show_autoscaling_services_menu()
-{
-	autoscaler_menu
-	autoscaler_menu_read_options
-}
-
-
-
-autoscaler_menu()
-{
-	printf "\033c"
-
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"	
-	echo " ---------- AUTOSCALE SERVICES ---------- "
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "1. PREPARE RED5PRO FOR AUTOSCALE IMAGE"
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "2. BACK TO MAIN MENU"
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "0. Exit"
-	echo "                             "
-}
-
-
-
-
-
-autoscaler_menu_read_options(){
-	local choice
-	read -p "Enter choice [ 1 - 2 | 0 to exit] " choice
-	case $choice in
-		1) prepare_autoscale_image ;;
-		# 2) rpro_to_autoscale_streammanager ;;
-		2) 
-		if [ $MODE -eq  1]; then 
-		show_advance_menu 
-		else 
-		show_simple_menu 
-		fi 
-		;;
-		0) exit 0;;
-		*) echo -e "${RED}Error...${STD}" && sleep 2
-	esac
-}
 
 
 
@@ -1208,12 +1019,10 @@ advance_menu()
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "1. WHICH JAVA AM I USING ?"
 	echo "2. ADD / UPDATE JAVA"
-	echo "3. INSTALL RED5PRO FROM URL [ EXPERIMENTAL ]"
-	echo "4. INSTALL RED5PRO SERVICE"
-	echo "5. UNINSTALL RED5PRO SERVICE"
-	echo "6. CHECK RED5 PROCESS"
+	echo "3. INSTALL RED5PRO SERVICE"
+	echo "4. UNINSTALL RED5PRO SERVICE"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "7. BACK TO MODE SELECTION"
+	echo "5. BACK TO MODE SELECTION"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "0. Exit"
 	echo "                             "
@@ -1227,15 +1036,13 @@ advance_menu()
 
 advance_menu_read_options(){
 	local choice
-	read -p "Enter choice [ 1 - 7 | 0 to exit]] " choice
+	read -p "Enter choice [ 1 - 6 | 0 to exit]] " choice
 	case $choice in
 		1) check_java 1 ;;
 		2) add_update_java ;;
-		3) install_from_url ;;
-		4) register_rpro_as_service ;;
-		5) unregister_rpro_as_service ;;
-		6) is_red5_running ;;
-		7) main ;;
+		3) register_rpro_as_service ;;
+		4) unregister_rpro_as_service ;;
+		5) main ;;
 		0) exit 0;;
 		*) echo -e "${RED}Error...${STD}" && sleep 2
 	esac
@@ -1272,14 +1079,13 @@ simple_menu()
 	echo "3. INSTALL RED5PRO FROM ZIP"
 	echo "4. REMOVE RED5PRO INSTALLATION"
 	echo "5. ADD / UPDATE RED5PRO LICENSE"
-	echo "6. RED5PRO AUTOSCALING SERVICES"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "------ RED5PRO SERVICE OPTIONS -----------"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "7. --- START RED5PRO"
-	echo "8. --- STOP RED5PRO"
+	echo "6. --- START RED5PRO"
+	echo "7. --- STOP RED5PRO"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "9. BACK TO MODE SELECTION"
+	echo "8. BACK TO MODE SELECTION"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "0. Exit"
 	echo "                             "
@@ -1295,17 +1101,16 @@ simple_menu()
 
 simple_menu_read_options(){
 	local choice
-	read -p "Enter choice [ 1 - 9 | 0 to exit] " choice
+	read -p "Enter choice [ 1 - 8 | 0 to exit] " choice
 	case $choice in
 		1) check_current_rpro ;;
 		2) auto_install_rpro ;;
 		3) install_rpro_zip ;;
 		4) remove_rpro_installation ;;
 		5) show_licence_menu ;;
-		6) show_autoscaling_services_menu ;;
-		7) start_red5pro_service ;;
-		8) stop_red5pro_service ;;
-		9) main ;;
+		6) start_red5pro_service ;;
+		7) stop_red5pro_service ;;
+		8) main ;;
 		0) exit 0;;
 		*) echo -e "${RED}Error...${STD}" && sleep 2
 	esac
