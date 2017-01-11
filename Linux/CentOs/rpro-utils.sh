@@ -1,24 +1,32 @@
-#!/bin/bash
-# A menu driven shell script sample template 
-## ----------------------------------
+#!/usr/bin/bash
+## --
+
 
 alias cls='printf "\033c"'
+
+OS_UBUNTU="Ubuntu"
+OS_CENTOS="CentOs"
 DEFAULT_RPRO_PATH=/usr/local/red5pro
 SERVICE_LOCATION=/etc/init.d
 SERVICE_NAME=red5pro 
 SERVICE_INSTALLER=/usr/sbin/update-rc.d
+MIN_JAVA_VERSION="1.8"
+IS_64_BIT=0
+OS_NAME=
+OS_VERSION=
 MODE=0
 
+JAVA_32_FILENAME="jre-8u102-linux-i586.rpm"
+JAVA_32_BIT="http://download.oracle.com/otn-pub/java/jdk/8u102-b14/$JAVA_32_FILENAME"
+
+JAVA_64_FILENAME="jre-8u102-linux-x64.rpm"
+JAVA_64_BIT="http://download.oracle.com/otn-pub/java/jdk/8u102-b14/$JAVA_64_FILENAME"
 
 
 
-main()
-{
-	
-	welcome_menu
-	read_welcome_menu_options
-}
+######################################################################################
 
+############################ MISC ----- METHODS ######################################
 
 
 
@@ -54,15 +62,16 @@ pause_license()
 
 
 
+######################################################################################
 
-
-
+############################ MISC TOOL INSTALLS ######################################
 
 
 
 check_java()
 {
 	java_check_success=0
+	has_min_java_version=0
 
 	for JAVA in "${JAVA_HOME}/bin/java" "${JAVA_HOME}/Home/bin/java" "/usr/bin/java" "/usr/local/bin/java"
 		do
@@ -74,26 +83,24 @@ check_java()
 
 
 	if [ ! -x "$JAVA" ]; then
-	  	echo "Unable to locate Java. Please set JAVA_HOME environment variable."
+	  	echo "Unable to locate Java. If you think you do have java installed, please set JAVA_HOME environment variable to point to your JDK / JRE."
 	else
 		JAVA_VER=$(java -version 2>&1 | sed 's/java version "\(.*\)\.\(.*\)\..*"/\1\2/; 1q')
-		JAVA_VERSION=`echo "$(java -version 2>&1)" | grep "java version" | awk '{ print substr($3, 2, length($3)-2); }'`
 
-		java_version_into="Your current java version is $JAVA_VERSION"
+		JAVA_VERSION=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
 
-		if [ "$JAVA_VER" -ge 17 ]; then
-		java_check_success=1
-		echo "$java_version_into , which meets Red5pro requirements."
+		echo "Current java version is $JAVA_VERSION"
+		JAVA_VERSION_MAJOR=`echo "${JAVA_VERSION:0:3}"`
+
+		if (( $(echo "$JAVA_VERSION_MAJOR < $MIN_JAVA_VERSION" |bc -l) )); then
+			has_min_java_version=0			
+			echo "You need to install a newer java version of java!"			
 		else
-		java_check_success=0
-		echo "java_version_into , which is too old..."
+			has_min_java_version=1
+			echo "Minimum java version is already installed!"
 		fi
 	fi
 
-
-	if [ $# -gt 0 ]; then
-		pause		
-	fi
 }
 
 
@@ -103,14 +110,12 @@ check_unzip()
 {
 	unzip_check_success=0
 
-	PKG_OK=$(dpkg-query -W --showformat='${Status}\n' unzip|grep "install ok installed")
-
-	if [ -z "$PKG_OK" ]; then
+	if isinstalled unzip; then
 	unzip_check_success=1
-	echo "Unzip utility found."
+	echo "Unzip utility was found"		
 	else
 	unzip_check_success=0
-	echo "Unzip utility was found"		
+	echo "Unzip utility not found."	
 	fi
 }
 
@@ -118,23 +123,85 @@ check_unzip()
 
 install_java()
 {
-	apt-get update
-	apt-get install default-jre
+	java_install_success=0
+	java_downloaded=0
 
-	default_jre="$(which java)";
-	echo "JRE installed at $default_jre"	
+	echo "Installing JRE 8 for Ubuntu";
+
+
+	if [ $IS_64_BIT -eq 1 ]; then
+		java_url=$JAVA_64_BIT
+		java_installer=$JAVA_64_FILENAME
+	else
+		java_url=$JAVA_32_BIT
+		java_installer=$JAVA_32_FILENAME
+	fi
+		
+
+	cd ~
+
+
+
+	# Remove installer if exists
+	if [ -f $java_installer ]; then
+		rm ~/$java_installer
+	fi
+
+
+
+	if [ $java_downloaded -eq 0 ]; then
+
+		
+
+		echo "Downloading $java_url"
+
+		wget --header "Cookie: oraclelicense=accept-securebackup-cookie" $java_url
+
+		# if downloaded
+		if [ -f $java_installer ]; then
+			java_downloaded=1
+		else
+			echo "Failed to download java installer package"
+		fi
+	fi
+
+
+
+	# install
+	if [ $java_downloaded -eq 1 ]; then
+		yum localinstall $java_installer
+		rm ~/$java_installer
+	fi
+
+	
+	
+	# verify
+	check_java
+
+ 
+	if [ $has_min_java_version -eq 1 ]; then
+		default_jre="$(which java)";
+		echo "JRE   successfully installed at $default_jre"
+		java_install_success=1
+	else
+		echo "Could not install required version of java"
+	fi
 }
+
+
 
 
 
 install_unzip()
 {
-	apt-get update
-	apt-get install unzip
+	# yup update
+	yum install unzip
 
 	install_unzip="$(which unzip)";
 	echo "Unzip installed at $install_unzip"
 }
+
+
 
 
 
@@ -146,12 +213,20 @@ add_update_java()
 
 
 
+
+######################################################################################
+
+############################ RED5PRO OPERATIONS ######################################
+
+
+
+
 download_latest()
 {
 	clear
 
 	latest_rpro_download_success=0
-	rpro_zip=""
+	rpro_zip=
 
 	echo "Downloading latest Red5pro from red5pro.com"
 	
@@ -161,40 +236,78 @@ download_latest()
 	cd $dir
 
 	# echo $dir
-
+	rpro_form_valid=1
 	echo "Please enter your red5pro.com login details"
 	
 	echo "Enter Email : "
 	read rpro_email
 
 	echo "Enter Password : "
+	# read rpro_passcode
 	read -s rpro_passcode
 
-	# TODO => simple validate
-
-	wget --save-cookies cookies.txt --keep-session-cookies --post-data="email=$rpro_email&password=$rpro_passcode" "https://account.red5pro.com/login"	
-	wget --load-cookies cookies.txt --content-disposition -p  https://account.red5pro.com/download/red5
-
-	rpro_zip=""
-	search_dir="$dir/account.red5pro.com/download"
-	for file in $search_dir/*.zip
-	do
-		rpro_zip="${file%%.zip}"
-		latest_rpro_download_success=1
-		break	
-	done
-
+	# simple validate email
+	if echo "${rpro_email}" | grep '^[a-zA-Z0-9]*@[a-zA-Z0-9]*\.[a-zA-Z0-9]*$' >/dev/null; then
+	    	# NO OP
+		echo "Email string ok!"		
+	else
+		rpro_form_valid=0
+		echo "Invalid email string!"		
+	fi
 	
-	rpro_zip="${rpro_zip}.zip"
-	echo $rpro_zip
-	sleep 15
-	
+	# simple validate password
+	if [ ! -z "$rpro_passcode" -a "$rpro_passcode" != " " ]; then
+		echo "Password string ok!"		
+	else
+		rpro_form_valid=0
+		echo "Invalid password string!"
+	fi
+
+
+	# if all params are valid
+	if [ "$rpro_form_valid" -eq "1" ]; then
+		# POST to site
+		wget --server-response --save-cookies cookies.txt --keep-session-cookies --post-data="email=$rpro_email&password=$rpro_passcode" "https://account.red5pro.com/login" 2>$dir/wsession.txt
+		wget_status=$(< $dir/wsession.txt)
+
+		# Check http code
+		wget_status_ok=0
+		if [[ $wget_status == *"HTTP/1.1 200"* ]] 
+		then
+			wget_status_ok=1
+		fi
+		
+		# if 200 then proceed
+		if [ "$wget_status_ok" -eq "1" ]; then
+
+			wget --load-cookies cookies.txt --content-disposition -p  https://account.red5pro.com/download/red5
+			search_dir="$dir/account.red5pro.com/download"
+			for file in $search_dir/*.zip
+			do
+				rpro_zip="${file%%.zip}"
+				latest_rpro_download_success=1
+				rpro_zip="${rpro_zip}.zip"
+				break	
+			done
+		else
+			echo "Failed to authenticate with website!"
+		fi
+		
+	else
+		echo "Invalid HTTP request parameters"
+	fi
 }
+
+
+
 
 
 
 auto_install_rpro()
 {
+	# Install prerequisites
+	prerequisites
+
 
 	# Checking java
 	echo "Checking java requirements"
@@ -202,24 +315,11 @@ auto_install_rpro()
 	check_java
 
 	
-	if [ "$java_check_success" -eq 0 ]; then
+	if [ "$has_min_java_version" -eq 0 ]; then
 		echo "Installing latest java runtime environment..."
 		sleep 2
 
 		install_java
-	fi 
-
-
-	# Checking unzip
-	echo "Checking other requirements"
-	sleep 2
-	check_unzip
-
-	if [ "$unzip_check_success" -eq 0 ]; then
-		echo "Installing latest java runtiem environment..."
-		sleep 2
-
-		install_unzip
 	fi 
 
 
@@ -240,10 +340,6 @@ auto_install_rpro()
 	fi
 
 
-        # echo $rpro_zip
-	# sleep 15
-
-
 	# Installing red5 from zip downloaded  from red5pro.com
 
 	echo "Installing Red5Pro"
@@ -257,40 +353,6 @@ auto_install_rpro()
 	
 }
 
-
-
-install_from_url()
-{
-	if [ $# -eq 0 ]; then
-		echo "Enter accessible url of Red5pro zip"	
-		read rpro_url
-	else
-		rpro_url=$1
-	fi
-	
-
-	url_rpro_download_success=0
-	echo "Attempting to download Red5pro zip from $rpro_url"
-	
-
-	# create tmp directory
-	dir=`sudo mktemp -d` && cd $dir
-	cd $dir
-
-
-	# Pull zip from url
-	wget -O $dir/rpro.zip -p --content-disposition -p  $rpro_url
-
-
-
-	if [ -f "$dir/rpro.zip" ]; then
-		url_rpro_download_success=1
-		install_rpro_zip "$dir/rpro.zip"
-	else
-		echo "Problem downloading Red5pro from $rpro_url"
-		pause
-	fi	
-}
 
 
 
@@ -341,6 +403,7 @@ unregister_rpro_as_service()
 
 	pause
 }
+
 
 
 
@@ -498,6 +561,8 @@ install_rpro_zip()
 
 
 
+
+
 register_rpro_service()
 {
 
@@ -642,6 +707,7 @@ unregister_rpro_service()
 
 
 
+
 start_red5pro_service()
 {
 
@@ -657,6 +723,7 @@ start_red5pro_service()
 
 	pause
 }
+
 
 
 
@@ -684,11 +751,12 @@ stop_red5pro_service()
 
 
 
-
 is_red5_running()
 {	
-    PIDFILE="/var/run/red5.pid"
+	pid_info=`pgrep -f red5`
+	echo $pid_info
 }
+
 
 
 
@@ -718,7 +786,7 @@ remove_rpro_installation()
 		rm -rf $DEFAULT_RPRO_PATH
 		unset RED5_HOME
 		if [ ! -d "$DEFAULT_RPRO_PATH" ]; then
-			echo "Red5 installation ws removed"
+			echo "Red5 installation was removed"
 		fi
 		;;
 		*)
@@ -735,7 +803,6 @@ remove_rpro_installation()
 
 	
 }
-
 
 
 
@@ -778,6 +845,13 @@ check_current_rpro()
 	fi
 }
 
+
+
+
+
+######################################################################################
+
+############################ LICENSE OPERATIONS ######################################
 
 
 
@@ -853,208 +927,14 @@ set_update_license()
 
 
 
-set_red5_home()
-{
-	echo "TO DO"
-}
 
 
 
-prepare_autoscale_image()
-{
-
-
-echo "Preparing to configure autoscaling image"
-sleep 1
-
-echo "This process will convert your current Red5pro installation to a autoscale image compatible installation."
-echo "WARNING : The process caanot be reversed!"
-
-read -r -p "Do you wish to continue? [y/N] " response
-
-case $response in
-[yY][eE][sS]|[yY]) 
-break;
-;;
-*)
-echo "Process cancelled"
-pause
-;;
-esac
-
-
-
-echo "[ ----------------------------------------------------------------------- ]"
-echo "[ -----------  STEP #1 : PREPARING AUTOSCALE CONFIGURATION  ------------- ]"
-echo "[ ----------------------------------------------------------------------- ]"
-echo "\n"
-
-
-echo "Enter streammanager Host / IP. \n[ For load balanced streammanagers provide load balancer IP instead ]"
-read sm_ip
-
-echo "Enter red5pro instance reporting speed \n[ How fast should Red5pro instance report statistics to streammanager. Defaults to '10000'(ms) ]"
-read sm_report_speed
-
-autoscale_xml='<?xml version="1.0" encoding="UTF-8" ?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:lang="http://www.springframework.org/schema/lang"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
-	http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-3.0.xsd 
-	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
-
-    <bean name="config" class="com.red5pro.clustering.autoscale.Configuration" >	
-        <!-- Disable plugin -->	
-        <property name="active" value="true"/> 
-        
-        <!--Stream manager hosted uri. use the host of your stream manager.  -->	
-	 	<property name="cloudWatchHost" value="http://'$sm_ip':5080/streammanager/cloudwatch"/>
-	 	
-	 	<!-- Value in milliseconds for interval to report back to cloudwatch. 
-	 	5000 to 30000 are acceptable values. 
-	 	Lower is more agressive. -->
-	 	<property name="reportingSpeed" value="'$sm_report_speed'"/>
-    </bean>
-     
-</beans>'
-
-
-	echo "Writing configuration to disk"
-	sleep 1
-
-
-	# write script to file
-	echo "$autoscale_xml" > $DEFAULT_RPRO_PATH/conf/autoscale.xml
-	
-
-	echo "Autoscale configuration written to disk"
-	echo "Step # 1 compled successfully"
-
-
-
-echo "[ ------------------------------------------------------------------- ]"
-echo "[ ----------  STEP #2 : REMOVING UNWANTED APPLICATIONS   ------------ ]"
-echo "[ ------------------------------------------------------------------- ]"
-echo "\n"
-
-
-echo "Please wait..."
-sleep 2
-
-
-
-if [ -d "$DEFAULT_RPRO_PATH/webapps/secondscreen" ]; then
-	echo "Deleting webapp secondscreen"
-	sleep 1
-	rm -rf $DEFAULT_RPRO_PATH/webapps/secondscreen
-fi
-
-
-
-if [ -d "$DEFAULT_RPRO_PATH/webapps/template" ]; then
-	echo "Deleting webapp template"
-	sleep 1
-	rm -rf $DEFAULT_RPRO_PATH/webapps/template
-fi
-
-
-
-if [ -d "$DEFAULT_RPRO_PATH/webapps/vod" ]; then
-	echo "Deleting webapp vod"
-	sleep 1
-	rm -rf $DEFAULT_RPRO_PATH/webapps/vod
-fi
-
-
-
-if [ -d "$DEFAULT_RPRO_PATH/webapps/streammanager" ]; then
-	echo "Deleting webapp streammanager"
-	sleep 1
-	rm -rf $DEFAULT_RPRO_PATH/webapps/streammanager
-fi
-
-
-
-echo "[ ------------------------------------------------------------------- ]"
-echo "[ -----------  STEP #3 : CHECKING AUTO STARTUP OPTIONS   ------------ ]"
-echo "[ ------------------------------------------------------------------- ]"
-echo "\n"
-
-echo "Checking red5pro service status..."
- 
-if [ ! -f "$SERVICE_LOCATION/$SERVICE_NAME" ]; then
-
-	register_rpro_service;
-
-	if [ "$rpro_service_install_success" -eq 1 ]; then
-		echo "Service configured successfully"
-	else
-		echo "Service could not be configured. Contact support!"
-	fi
-fi
-
-
-
-echo "Your Red5Pro instalaltion is now ready to be converted into an autoscaling image.To convert this installation to image, please refer to  your cloud platform guide. Thank you!"
-
-}
-
-
-
-
-############################ AUTOSCALING MENU ############################################
-
-
-show_autoscaling_services_menu()
-{
-	autoscaler_menu
-	autoscaler_menu_read_options
-}
-
-
-
-autoscaler_menu()
-{
-	printf "\033c"
-
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"	
-	echo " ---------- AUTOSCALE SERVICES ---------- "
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "1. PREPARE RED5PRO FOR AUTOSCALE IMAGE"
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "2. BACK TO MAIN MENU"
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "0. Exit"
-	echo "                             "
-}
-
-
-
-
-
-autoscaler_menu_read_options(){
-	local choice
-	read -p "Enter choice [ 1 - 2 | 0 to exit] " choice
-	case $choice in
-		1) prepare_autoscale_image ;;
-		# 2) rpro_to_autoscale_streammanager ;;
-		2) 
-		if [ $MODE -eq  1]; then 
-		show_advance_menu 
-		else 
-		show_simple_menu 
-		fi 
-		;;
-		0) exit 0;;
-		*) echo -e "${RED}Error...${STD}" && sleep 2
-	esac
-}
-
-
+######################################################################################
 
 ############################ LICENSE MENU ############################################
+
+
 
 
 show_licence_menu()
@@ -1102,7 +982,10 @@ license_menu_read_options(){
 
 
 
-############################ ADVANCE OPERATION METHODS ################################
+
+######################################################################################
+
+############################ ADVANCE OPERATION MENU ################################
 
 
 
@@ -1123,12 +1006,10 @@ advance_menu()
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "1. WHICH JAVA AM I USING ?"
 	echo "2. ADD / UPDATE JAVA"
-	echo "3. INSTALL RED5PRO FROM URL [ EXPERIMENTAL ]"
-	echo "4. INSTALL RED5PRO SERVICE"
-	echo "5. UNINSTALL RED5PRO SERVICE"
-	echo "6. CHECK RED5 PROCESS"
+	echo "3. INSTALL RED5PRO SERVICE"
+	echo "4. UNINSTALL RED5PRO SERVICE"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "7. BACK TO MODE SELECTION"
+	echo "5. BACK TO MODE SELECTION"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "0. Exit"
 	echo "                             "
@@ -1136,21 +1017,18 @@ advance_menu()
 }
 
 
-#add_update_rpro_license
 
 
 
 advance_menu_read_options(){
 	local choice
-	read -p "Enter choice [ 1 - 7 | 0 to exit]] " choice
+	read -p "Enter choice [ 1 - 6 | 0 to exit]] " choice
 	case $choice in
 		1) check_java 1 ;;
 		2) add_update_java ;;
-		3) install_from_url ;;
-		4) register_rpro_as_service ;;
-		5) unregister_rpro_as_service ;;
-		6) is_red5_running ;;
-		7) main ;;
+		3) register_rpro_as_service ;;
+		4) unregister_rpro_as_service ;;
+		5) main ;;
 		0) exit 0;;
 		*) echo -e "${RED}Error...${STD}" && sleep 2
 	esac
@@ -1159,7 +1037,13 @@ advance_menu_read_options(){
 
 
 
-############################ SIMPLE OPERATION METHODS ################################
+
+
+
+######################################################################################
+
+############################ SIMPLE OPERATION MENU ################################
+
 
 
 
@@ -1183,18 +1067,17 @@ simple_menu()
 	echo " RED5PRO SUPER UTILS - BASIC MODE         "
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "1. CHECK EXISTING RED5PRO INSTALLATION"
-	echo "2. INSTALL RED5PRO (From red5pro.com)"
+	echo "2. INSTALL LATEST RED5PRO"
 	echo "3. INSTALL RED5PRO FROM ZIP"
 	echo "4. REMOVE RED5PRO INSTALLATION"
 	echo "5. ADD / UPDATE RED5PRO LICENSE"
-	echo "6. RED5PRO AUTOSCALING SERVICES"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "------ RED5PRO SERVICE OPTIONS -----------"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "7. --- START RED5PRO"
-	echo "8. --- STOP RED5PRO"
+	echo "6. --- START RED5PRO"
+	echo "7. --- STOP RED5PRO"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "9. BACK TO MODE SELECTION"
+	echo "8. BACK TO MODE SELECTION"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "0. Exit"
 	echo "                             "
@@ -1210,17 +1093,16 @@ simple_menu()
 
 simple_menu_read_options(){
 	local choice
-	read -p "Enter choice [ 1 - 9 | 0 to exit] " choice
+	read -p "Enter choice [ 1 - 8 | 0 to exit] " choice
 	case $choice in
 		1) check_current_rpro ;;
 		2) auto_install_rpro ;;
 		3) install_rpro_zip ;;
 		4) remove_rpro_installation ;;
 		5) show_licence_menu ;;
-		6) show_autoscaling_services_menu ;;
-		7) start_red5pro_service ;;
-		8) stop_red5pro_service ;;
-		9) main ;;
+		6) start_red5pro_service ;;
+		7) stop_red5pro_service ;;
+		8) main ;;
 		0) exit 0;;
 		*) echo -e "${RED}Error...${STD}" && sleep 2
 	esac
@@ -1231,39 +1113,53 @@ simple_menu_read_options(){
 
 
 
+######################################################################################
+
+################################ INIT FUNCTIONS ######################################
 
 
 
-welcome_menu()
+detect_system()
 {
+	
+	ARCH=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
 
-	printf "\033c"
+	if [ -f /etc/lsb-release ]; then
+	    . /etc/lsb-release
+	    OS_NAME=$DISTRIB_ID
+	    OS_VERSION=$DISTRIB_RELEASE
+	elif [ -f /etc/debian_version ]; then
+	    OS_NAME=Debian  # XXX or Ubuntu??
+	    OS_VERSION=$(cat /etc/debian_version)
+	elif [ -f /etc/redhat-release ]; then
+	    # TODO add code for Red Hat and CentOS here
+	    OS_VERSION=$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))
+	    OS_NAME=$(rpm -q --qf "%{RELEASE}" $(rpm -q --whatprovides redhat-release))
+	else
+	    OS_NAME=$(uname -s)
+	    OS_VERSION=$(uname -r)
+	fi
 
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"	
-	echo " RED5PRO UTILITIES - W E L C O M E   M E N U"
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "                             "
-	echo "1. BASIC MODE (Recommended)"
-	echo "                             "
-	echo "2. ADVANCE MODE"
-	echo "                             "
-	echo "0. Exit"
-	echo "                             "
-}
-
-
-
-
-read_welcome_menu_options()
-{
-	local choice
-	read -p "Enter choice [ 1 - 3] " choice
-	case $choice in
-		1) simple_usage_mode ;;
-		2) advance_usage_mode ;;
-		0) exit 0;;
-		*) echo -e "${RED}Error...${STD}" && sleep 2
+	case $(uname -m) in
+	x86_64)
+	    ARCH=x64  # or AMD64 or Intel64 or whatever
+	    IS_64_BIT=1
+	    os_bits="64 Bit"
+	    ;;
+	i*86)
+	    ARCH=x86  # or IA32 or Intel32 or whatever
+	    IS_64_BIT=0
+	    os_bits="32 Bit"
+	    ;;
+	*)
+	    # leave ARCH as-is
+	    ;;
 	esac
+
+	echo -e "* Linux Distribution: \e[36m$OS_NAME\e[m"
+	echo -e "* Version: \e[36m$OS_VERSION\e[m"
+	echo -e "* Kernel: \e[36m$os_bits\e[m"
+
 }
 
 
@@ -1290,7 +1186,82 @@ advance_usage_mode()
 
 
 
+welcome_menu()
+{
+
+	printf "\033c"
+
+
+	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"	
+	echo " RED5PRO UTILITIES - W E L C O M E   M E N U"
+	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+	detect_system
+
+	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+	echo "                             "
+	echo "1. BASIC MODE (Recommended)"
+	echo "                             "
+	echo "2. ADVANCE MODE"
+	echo "                             "
+	echo "0. Exit"
+	echo "                             "
+}
+
+
+
+
+read_welcome_menu_options()
+{
+	local choice
+	read -p "Enter choice [ 1 - 2 | 0 to exit] " choice
+	case $choice in
+		1) simple_usage_mode ;;
+		2) advance_usage_mode ;;
+		0) exit 0;;
+		*) echo -e "${RED}Error...${STD}" && sleep 2
+	esac
+}
+
+
+
+main()
+{
+	welcome_menu
+	read_welcome_menu_options
+}
+
+
+
+prerequisites()
+{
+	# Checking unzip
+	echo "Checking for unzip"
+	sleep 2
+	
+	check_unzip
+
+
+	if [ "$unzip_check_success" -eq 0 ]; then
+		echo "Installing unzip..."
+		sleep 2
+
+		install_unzip
+	fi 
+}
+
+
+
+function isinstalled {
+  if yum list installed "$@" >/dev/null 2>&1; then
+    true
+  else
+    false
+  fi
+}
+
+
 
 # Start application
 main
-
