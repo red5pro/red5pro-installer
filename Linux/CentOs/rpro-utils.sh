@@ -2,8 +2,6 @@
 ## --
 
 
-alias cls='printf "\033c"'
-
 OS_UBUNTU="Ubuntu"
 OS_CENTOS="CentOs"
 DEFAULT_RPRO_PATH=/usr/local/red5pro
@@ -15,6 +13,7 @@ IS_64_BIT=0
 OS_NAME=
 OS_VERSION=
 MODE=0
+
 
 JAVA_32_FILENAME="jre-8u102-linux-i586.rpm"
 JAVA_32_BIT="http://download.oracle.com/otn-pub/java/jdk/8u102-b14/$JAVA_32_FILENAME"
@@ -28,6 +27,13 @@ JAVA_64_BIT="http://download.oracle.com/otn-pub/java/jdk/8u102-b14/$JAVA_64_FILE
 
 ############################ MISC ----- METHODS ######################################
 
+
+
+
+cls()
+{
+	printf "\033c"
+}
 
 
 
@@ -57,6 +63,21 @@ pause_license()
 
 	show_licence_menu
 }
+
+
+
+empty_pause()
+{
+	printf "\n"
+	read -r -p 'Press any + [ Enter ] key to continue...' key
+}
+
+
+empty_line()
+{
+	printf "\n\n"
+}
+
 
 
 
@@ -305,9 +326,10 @@ download_latest()
 
 auto_install_rpro()
 {
+	red5_zip_install_success=0
+
 	# Install prerequisites
 	prerequisites
-
 
 	# Checking java
 	echo "Checking java requirements"
@@ -348,7 +370,12 @@ auto_install_rpro()
 
 	if [ "$red5_zip_install_success" -eq 0 ]; then
 		echo "Failed to install Red5pro distribution. Something went wrong!! Try again or contact support!"
-		pause
+	fi
+
+	
+	if [ $# -eq 0 ]
+	  then
+	    pause
 	fi
 	
 }
@@ -524,11 +551,16 @@ install_rpro_zip()
 
 	if [ ! -d "$rpro_loc" ]; then
 		echo "Could not install Red5pro at $rpro_loc"
+		pause
 	else
 		echo "All done! ----"
 		echo "Red5pro installed at  $rpro_loc"
 		red5_zip_install_success=1
 	fi
+
+	
+	# Install additional libraries
+	postrequisites 
 
 
 	# Installing red5 service
@@ -554,10 +586,15 @@ install_rpro_zip()
 	
 	# All Done
 	echo "Red5pro service is now installed on your system. You can start / stop it with from the menu".
-	pause;
+
+	if [ $# -eq 0 ]
+	  then
+	    pause
+	fi
 	
 
 }
+
 
 
 
@@ -851,6 +888,348 @@ check_current_rpro()
 
 ######################################################################################
 
+####################### RED5PRO UPGRADE OPERATION MENU ###############################
+
+
+## PRIVATE ###
+restore_rpro()
+{
+	cls
+
+	rpro_backup_restore_wizard=0
+
+	RPRO_BACKUP_FOLDER=$1
+
+	echo "Initializing restore procedure..."
+
+	echo "##########################################################################"
+	echo "This interactive wizard will help you with some basic backup restore steps."
+	echo "If you wish to skip a step you can always restore it manually later. Please" 
+	echo "note that the restore actions cannot be undone!!"
+	echo "##########################################################################"
+
+	empty_pause
+	
+	empty_line
+	
+	echo "Attempting to restore from $RPRO_BACKUP_FOLDER into $DEFAULT_RPRO_PATH. Please follow on-screen instructions carefully"
+
+	sleep 2
+
+	
+	##################################################################################################
+	################################### RESTORE LICENSE ##############################################
+	empty_line
+	echo "----------- STEP - 1 - LICENSE RESTORE -----------"
+	empty_line
+	read -r -p "Did you have a active Red5pro license in your backup that you wish to restore ? [y/N] " response
+	LICENCE_KEY_FILE="$RPRO_BACKUP_FOLDER/LICENSE.KEY"
+	case $response in
+	[yY][eE][sS]|[yY]) 
+
+	if [ -f "$LICENCE_KEY_FILE" ]; then
+		cp -rf $LICENCE_KEY_FILE "$DEFAULT_RPRO_PATH/LICENSE.KEY"
+		if [ -f "$DEFAULT_RPRO_PATH/LICENSE.KEY" ]; then
+			echo "License file restored!"
+		fi
+	else
+		echo "No license file found to restore!"
+	fi
+
+	;;
+	*)
+	echo "Skipping..."
+	sleep 1
+	;;
+	esac
+
+
+	##################################################################################################
+	################################### RESTORE CLUSTERING ###########################################
+	empty_line
+	echo "----------- STEP - 2 - CLUSTERING CONFIGURATION RESTORE -----------"
+	empty_line
+	read -r -p "Did you have active clustering configuration (in red5-default.xml) that you wish to restore ? [y/N] " response
+	CLUSTER_CONF_FILE="$RPRO_BACKUP_FOLDER/webapps/red5-default.xml"
+	case $response in
+	[yY][eE][sS]|[yY]) 
+
+	if [ -f "$CLUSTER_CONF_FILE" ]; then
+		cp -rf $CLUSTER_CONF_FILE "$DEFAULT_RPRO_PATH/webapps/red5-default.xml"
+		if [ -f "$DEFAULT_RPRO_PATH/webapps/red5-default.xml" ]; then
+			echo "Cluster configuration restored!"
+		fi
+	else
+		echo "No Cluster configuration file found to restore!"
+	fi
+
+	;;
+	*)
+	echo "Skipping..."
+	sleep 1
+	;;
+	esac
+
+
+	##################################################################################################
+	################################### RESTORE APPLICATIONS #########################################
+	empty_line
+	echo "----------- STEP - 3 - WEBAPPS RESTORE -----------"
+	empty_line
+	read -r -p "Do you wish to restore applications ? [y/N] " response
+	BACKUP_WEBAPPS_FOLDER="$RPRO_BACKUP_FOLDER/webapps"
+	case $response in
+	[yY][eE][sS]|[yY]) 
+
+		echo "Scanning for applications in backup...."
+		apps_to_restore=0
+		for i in $(ls -d "$BACKUP_WEBAPPS_FOLDER/"*/); 
+			do 
+				webapp=${i%%/}
+				webapp="$(basename $webapp)"
+				echo "Found $webapp"
+				apps_to_restore=$((apps_to_restore+1))
+			done
+
+		echo "Total applications found = $apps_to_restore"
+		sleep 2
+
+
+	#################################################################################################
+	
+		apps_to_restore=0
+		for i in $(ls -d "$BACKUP_WEBAPPS_FOLDER/"*/); 
+		do 
+			WEBAPP_PATH=${i}
+			webapp=${i%%/}
+			webapp="$(basename $webapp)"
+			
+			read -r -p "Do you wish to restore application $webapp : ? [y/N] " response
+			case $response in
+			[yY][eE][sS]|[yY]) 
+
+			# Eval path
+			DEST_WEBAPP_PATH="$DEFAULT_RPRO_PATH/webapps/$webapp"
+
+			# Remove old
+			echo "Clearing target.. $DEST_WEBAPP_PATH"
+			rm -rf $DEST_WEBAPP_PATH
+
+			# Restore backup
+			echo "Copying files from $WEBAPP_PATH to $DEST_WEBAPP_PATH"
+			cp -R $WEBAPP_PATH $DEST_WEBAPP_PATH
+			chmod -R ugo+w $DEST_WEBAPP_PATH
+			;;
+			*)
+			echo "Skipping..."
+			sleep 1
+			;;
+			esac
+			
+		done
+
+	;;
+	*)
+	echo "Skipping..."
+	sleep 1
+	;;
+	esac
+
+
+	#################################################################################################
+	empty_line
+	rpro_backup_restore_wizard=1	
+	echo "Restore wizard steps completed! IF your red5pro installation does not work as expected please try restoring manually instead. - Thank you";
+	empty_pause
+	
+}
+
+
+
+## PRIVATE ###
+backup_rpro()
+{
+	rpro_backup_success=0
+
+
+	if [ ! -d "$RPRO_BACKUP_HOME" ]; then
+	  mkdir -p $RPRO_BACKUP_HOME
+	  chmod ugo+w $RPRO_BACKUP_HOME
+	fi
+
+	
+	if [ -d "$RPRO_BACKUP_HOME" ]; then
+	  
+		echo "Starting backup procedure..."
+		sleep 2
+
+		# echo "Stopping Red5pro if it was running..."
+		#stop_red5pro_service 1
+		#sleep 10
+
+		echo "Backing up... "
+		sleep 5
+
+		# Create backup folder
+		t_now=`date +%Y-%m-%d-%H-%M-%S`
+		RPRO_BACKUP_FOLDER="$RPRO_BACKUP_HOME/$t_now"
+
+		# Copy all files to backup folder
+		cp -R $DEFAULT_RPRO_PATH $RPRO_BACKUP_FOLDER
+		sleep 2
+
+		# Show notice to user that back up was saved
+		if [ -d "$RPRO_BACKUP_FOLDER" ]; then
+			if [ -f $red5pro_ini ]; then
+				echo "Your active red5pro installation was backed up successfully to $RPRO_BACKUP_FOLDER"
+				echo "After upgrade completes, you can restore any necessary file(s) manually if you wish to do so."
+				chmod -R ugo+w $RPRO_BACKUP_FOLDER
+				rpro_backup_success=1
+			else
+				echo "Something went wrong!! Perhaps files were not copied properly"
+			fi
+		else
+			echo "WARNING! Could not create backup destination directory"
+		fi
+
+		empty_pause
+
+	else
+		echo "Failed to create backup directory. Backup will be skipped..."
+
+	fi
+
+	
+}
+
+
+
+
+
+upgrade()
+{
+	upgrade_rpro_success=0
+
+	# Determine upgrade type
+	upgrade_from_zip=0
+
+
+	if [ $# -eq 1 ]; then
+		upgrade_from_zip=1
+	else
+		upgrade_from_zip=0		
+	fi
+
+
+	# Start process
+	echo "Initializing upgrade process..."
+	sleep 2
+
+	check_current_rpro 1
+
+	if [ "$rpro_exists" -eq "1" ]; then
+		upgrade_mode=1
+		echo "It is recommended that you make a backup of your old server files. "
+		read -r -p "Do you wish to create a backup now? [y/N] " response
+
+		case $response in
+		[yY][eE][sS]|[yY]) 
+		
+		# backup red5pro
+		backup_rpro
+
+		if [ $rpro_backup_success -eq 1 ]; then
+			echo "Preparing to install red5pro"
+			# proceed to install new red5pro 
+			if [ $upgrade_from_zip -eq 1 ]; then
+			install_rpro_zip
+			else
+			auto_install_rpro 1
+			fi
+		else
+			echo "Failed to create a backup of your existing red5pro installation"
+			upgrade_clean $upgrade_from_zip
+			# check install state here
+			pause
+		fi
+		;;
+		*)
+		echo "Upgrade cancelled"
+		;;
+		esac
+	else
+		upgrade_mode=1
+		upgrade_clean $upgrade_from_zip
+		# check install state here
+	fi
+
+
+	# If install is successful try restore....
+	if [ "$red5_zip_install_success" -eq 1 ]; then
+
+		if [ "$upgrade_mode" -eq 1 ]; then
+			
+			echo "Congratulations!! You have successfully installed a new version of red5pro" 
+			read -r -p "Do you need any help with restoring your previous settings? [y/N] " response
+
+			case $response in
+			[yY][eE][sS]|[yY]) 		
+				# start restore wizard
+				if [ -d $RPRO_BACKUP_FOLDER ]; then
+				restore_rpro $RPRO_BACKUP_FOLDER
+				fi
+			;;
+			*)
+			;;
+			esac
+
+		fi
+	fi
+
+
+	pause
+
+}
+
+
+
+
+
+## PRIVATE ###
+upgrade_clean()
+{
+	# Determine upgrade type
+	upgrade_from_zip=0
+
+	if [ $# -eq 1 ]; then
+		upgrade_from_zip=1
+	else
+		upgrade_from_zip=0		
+	fi
+
+	read -r -p "Do you wish to proceed with a clean installation? [y/N] " response
+
+	case $response in
+	[yY][eE][sS]|[yY]) 
+	if [ $upgrade_from_zip -eq 1 ]; then
+	install_rpro_zip
+	else
+	auto_install_rpro
+	fi
+	;;
+	*)
+	echo "Upgrade cancelled"
+	;;
+	esac
+}
+
+
+
+
+
+
+######################################################################################
+
 ############################ LICENSE OPERATIONS ######################################
 
 
@@ -1008,8 +1387,10 @@ advance_menu()
 	echo "2. ADD / UPDATE JAVA"
 	echo "3. INSTALL RED5PRO SERVICE"
 	echo "4. UNINSTALL RED5PRO SERVICE"
+	echo "5. UPGRADE RED5PRO FROM ZIP"
+	echo "6. UPGRADE RED5PRO FROM LATEST"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "5. BACK TO MODE SELECTION"
+	echo "7. BACK TO MODE SELECTION"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "0. Exit"
 	echo "                             "
@@ -1022,13 +1403,15 @@ advance_menu()
 
 advance_menu_read_options(){
 	local choice
-	read -p "Enter choice [ 1 - 6 | 0 to exit]] " choice
+	read -p "Enter choice [ 1 - 7 | 0 to exit]] " choice
 	case $choice in
 		1) check_java 1 ;;
 		2) add_update_java ;;
 		3) register_rpro_as_service ;;
 		4) unregister_rpro_as_service ;;
-		5) main ;;
+		5) upgrade 1 ;;
+		6) upgrade ;;
+		7) main ;;
 		0) exit 0;;
 		*) echo -e "${RED}Error...${STD}" && sleep 2
 	esac
@@ -1121,6 +1504,15 @@ simple_menu_read_options(){
 
 detect_system()
 {
+	USER_HOME=$(getent passwd $SUDO_USER | cut -d: -f6)
+	echo -e "* Home directory: \e[36m$USER_HOME\e[m"
+
+
+	RPRO_BACKUP_HOME="$USER_HOME/red5pro_backups"
+	echo -e "* BackUp directory: \e[36m$RPRO_BACKUP_HOME\e[m"
+
+	empty_line
+
 	
 	ARCH=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
 
@@ -1249,6 +1641,20 @@ prerequisites()
 
 		install_unzip
 	fi 
+}
+
+
+
+
+postrequisites()
+{
+	echo "Resolving and installing additional dependencies.." 
+	sleep 2
+
+	rpm --import http://packages.atrpms.net/RPM-GPG-KEY.atrpms
+	rpm -ivh http://dl.atrpms.net/all/atrpms-repo-6-7.el6.x86_64.rpm
+	yum -y update --skip-broken
+	yum -y --enablerepo=atrpms install libva libvdpau1
 }
 
 
