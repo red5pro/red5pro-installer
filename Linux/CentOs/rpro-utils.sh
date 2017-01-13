@@ -686,12 +686,13 @@ esac"
 	echo "Registering service \"$SERVICE_NAME\""
 	sleep 1
 
-	$SERVICE_INSTALLER $SERVICE_NAME -f defaults
+	systemctl daemon-reload
+	
 
 	echo "Enabling service \"$SERVICE_NAME\""
 	sleep 1
 
-	$SERVICE_INSTALLER $SERVICE_NAME enable
+	systemctl enable red5pro.service
 
 
 	echo "Red5Pro service installed successfully!"
@@ -723,14 +724,13 @@ unregister_rpro_service()
 		echo "Disabling service \"$SERVICE_NAME\""
 		sleep 1
 
-		update-rc.d $SERVICE_NAME disable
+		systemctl disable red5pro.service
+
+
+		rm $SERVICE_LOCATION/$SERVICE_NAME
 
 		echo "Removing service \"$SERVICE_NAME\""
 		sleep 1
-
-		update-rc.d $SERVICE_NAME remove
-
-		rm $SERVICE_LOCATION/$SERVICE_NAME
 
 		echo "Service removed successfully"
 		rpro_service_remove_success=0
@@ -1659,7 +1659,8 @@ postrequisites()
 
 
 
-function isinstalled {
+isinstalled ()
+{
   if yum list installed "$@" >/dev/null 2>&1; then
     true
   else
