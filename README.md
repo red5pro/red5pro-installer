@@ -25,11 +25,11 @@ The script requires super user privileges to execute and carry out subtasks. Hen
 * Navigate to directory location in the linux terminal (shell)
 * Assign executable permissions to the script by issuing the following command in terminal : `sudo chmod +x ./rpro-utils.sh`
 
-UBUNTU
+##### UBUNTU
 =======
 * Execute the script by issuing the following command : `sudo ./rpro-utils.sh`
 
-CENTOS
+##### CENTOS
 =======
 * Execute the script by issuing the following command : `sudo  bash./rpro-utils.sh`
 
