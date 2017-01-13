@@ -1770,12 +1770,6 @@ detect_system()
 	OS_TYPE=$OS_RHL
 	fi
 
-
-	if isinstalled unzip; then
-	echo "unzip found"
-	else
-	echo "not found"
-	fi
 }
 
 
@@ -1972,6 +1966,8 @@ isDebian()
 
 # Start application
 main
+
+
 
 
 
