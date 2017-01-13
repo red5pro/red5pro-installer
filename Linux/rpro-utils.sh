@@ -2,33 +2,29 @@
 #!/usr/bin/bash 
 ## --
 
-OS_TYPE=
+# Configuration file
+CONFIGURATION_FILE=conf.ini
 
+# DEFAULT_RPRO_PATH=/usr/local/red5pro
+# MIN_JAVA_VERSION="1.8"
+
+OS_TYPE=
 OS_DEB="DEBIAN"
 OS_RHL="REDHAT"
 
-DEFAULT_RPRO_PATH=/usr/local/red5pro
 SERVICE_LOCATION=/etc/init.d
 SERVICE_NAME=red5pro 
 SERVICE_INSTALLER=/usr/sbin/update-rc.d
-MIN_JAVA_VERSION="1.8"
 IS_64_BIT=0
 OS_NAME=
 OS_VERSION=
 MODE=0
 
 
-
-######################################################################################
-
-############################ RHLE ----- SPECIFIC ######################################
-
+JAVA_JRE_DOWNLOAD_URL="http://download.oracle.com/otn-pub/java/jdk/8u102-b14/"
 
 JAVA_32_FILENAME="jre-8u102-linux-i586.rpm"
-JAVA_32_BIT="http://download.oracle.com/otn-pub/java/jdk/8u102-b14/$JAVA_32_FILENAME"
-
 JAVA_64_FILENAME="jre-8u102-linux-x64.rpm"
-JAVA_64_BIT="http://download.oracle.com/otn-pub/java/jdk/8u102-b14/$JAVA_64_FILENAME"
 
 
 
@@ -1662,10 +1658,28 @@ simple_menu_read_options(){
 ################################ INIT FUNCTIONS ######################################
 
 
+load_configuration()
+{
+	if [ ! -f "$CONFIGURATION_FILE" ]; then
+		echo "CRITICAL ERROR!! - Configuration file not found!"
+		echo "Exiting..."
+		exit 0
+	fi
+
+
+	# Load config values
+	source "$CONFIGURATION_FILE"
+
+	JAVA_32_BIT="$JAVA_JRE_DOWNLOAD_URL/$JAVA_32_FILENAME"
+	JAVA_64_BIT="$JAVA_JRE_DOWNLOAD_URL/$JAVA_64_FILENAME"
+}
+
+
 
 detect_system()
 {
-	
+	load_configuration
+
 	
 	ARCH=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
 
@@ -1712,7 +1726,7 @@ detect_system()
 	echo -e "* Home directory: \e[36m$USER_HOME\e[m"
 
 
-	RPRO_BACKUP_HOME="$USER_HOME/red5pro_backups"
+	RPRO_BACKUP_HOME="$USER_HOME/$DEFAULT_BACKUP_FOLDER"
 	echo -e "* BackUp directory: \e[36m$RPRO_BACKUP_HOME\e[m"
 	
 	
