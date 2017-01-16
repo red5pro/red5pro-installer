@@ -20,6 +20,8 @@ OS_NAME=
 OS_VERSION=
 MODE=0
 
+PIDFILE=/var/run/red5.pid
+
 
 JAVA_JRE_DOWNLOAD_URL="http://download.oracle.com/otn-pub/java/jdk/8u102-b14/"
 
@@ -700,7 +702,6 @@ start() {
   echo \"Starting Red5pro..\"
   # check to see if the server is already running
   if netstat -an | grep ':5080' > /dev/null 2>&1 ; then
-    echo \"Red5 is already started...\"
     while netstat -an | grep ':5080' > /dev/null 2>&1 ; do
       # wait 5 seconds and test again
       sleep 5
@@ -711,7 +712,6 @@ start() {
 
 stop() {
   cd \${RED5_HOME} && ./red5-shutdown.sh > /dev/null 2>&1 &
-  echo \"Shutting down Red5pro... It may take upto 30 seconds for shutdown to complete...\"
 }
 
 
@@ -908,12 +908,23 @@ start_red5pro_service()
 	if [ ! -f "$SERVICE_LOCATION/$SERVICE_NAME" ];	then
 		echo "It seems Red5Pro service was not installed. Please register Red5pro service from the menu for best results."
 		echo " Attempting to start using \"red5.sh\""
-		exec $DEFAULT_RPRO_PATH/red5.sh &
+
+		cd $DEFAULT_RPRO_PATH && exec $DEFAULT_RPRO_PATH/red5.sh > /dev/null 2>&1 &
+
+		RETVAL=$?
+		PID=$!
+
+		if [ $RETVAL -eq 0 ]; then
+			echo $PID > "$PIDFILE"
+		fi
 	else
 		echo "Red5Pro service was found at $SERVICE_LOCATION/$SERVICE_NAME"
 		echo " Attempting to start service"
 		"$SERVICE_LOCATION/$SERVICE_NAME" start /dev/null 2>&1 &
 	fi
+
+	echo "[ NOTE: It may take ~20 seconds for service startup ]"
+	sleep 5
 
 	if [ $# -eq 0 ]
 	  then
@@ -924,22 +935,26 @@ start_red5pro_service()
 
 
 
-# needs repair
+
 stop_red5pro_service()
 {
-	$proc="red5"
+	proc="red5"
 
 	if [ ! -f "$SERVICE_LOCATION/$SERVICE_NAME" ];	then
 		echo "It seems Red5Pro service was not installed. Please register Red5pro service from the menu for best results."
-		echo " Attempting to start using \"red5-shutdown.sh\""
+		echo " Attempting to stop using \"red5-shutdown.sh\""
 
-		exec $DEFAULT_RPRO_PATH/red5-shutdown.sh /dev/null 2>&1 &
+		cd $DEFAULT_RPRO_PATH && exec $DEFAULT_RPRO_PATH/red5-shutdown.sh > /dev/null 2>&1 &
+		rm -rf $PIDFILE		
 	else
 		echo "Red5Pro service was found at $SERVICE_LOCATION/$SERVICE_NAME."
 		echo " Attempting to stop service"
 
 		"$SERVICE_LOCATION/$SERVICE_NAME" stop /dev/null 2>&1 &
 	fi
+
+	echo "[ NOTE: It may take ~20 seconds for service shutdown ]"
+	sleep 5
 
 	if [ $# -eq 0 ]
 	  then
