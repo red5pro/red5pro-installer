@@ -11,7 +11,7 @@ CONFIGURATION_FILE=conf.ini
 OS_TYPE=
 OS_DEB="DEBIAN"
 OS_RHL="REDHAT"
-
+ 
 SERVICE_LOCATION=/etc/init.d
 SERVICE_NAME=red5pro 
 SERVICE_INSTALLER=/usr/sbin/update-rc.d
@@ -185,7 +185,7 @@ install_java()
 # Private
 install_java_deb()
 {
-	echo "Installing JRE 8 for Ubuntu";
+	echo "Installing Java 8 for Ubuntu";
 		
 	add-apt-repository ppa:webupd8team/java
 	apt-get update
@@ -198,7 +198,7 @@ install_java_deb()
 # Private
 install_java_rhl()
 {
-	echo "Installing JRE 8 for CentOs";
+	echo "Installing Java 8 for CentOs";
 	
 
 	if [ $IS_64_BIT -eq 1 ]; then
@@ -741,14 +741,13 @@ esac"
 	echo "Writing service script"
 	sleep 1
 
-	touch $SERVICE_LOCATION/$SERVICE_NAME
+	touch /etc/init.d/red5pro
 
 	# write script to file
 	echo "$service_script" > /etc/init.d/red5pro
 
 	# make service file executable
-	chmod +x $SERVICE_LOCATION/$SERVICE_NAME
-
+	chmod 777 /etc/init.d/red5pro
 
 	if isDebian; then
 	register_rpro_service_deb	
@@ -769,12 +768,12 @@ register_rpro_service_deb()
 	echo "Registering service \"$SERVICE_NAME\""
 	sleep 1
 
-	$SERVICE_INSTALLER $SERVICE_NAME -f defaults
+	/usr/sbin/update-rc.d red5pro defaults
 
 	echo "Enabling service \"$SERVICE_NAME\""
 	sleep 1
 
-	$SERVICE_INSTALLER $SERVICE_NAME enable
+	/usr/sbin/update-rc.d red5pro enable
 }
 
 
@@ -817,16 +816,13 @@ unregister_rpro_service()
 		# 2. check PID file and check pid
 		
 
-		
-
 		if isDebian; then
 		unregister_rpro_service_deb	
 		else
 		unregister_rpro_service_rhl
 		fi
 
-		
-		
+		rm -rf /etc/init.d/red5pro
 
 		echo "Service removed successfully"
 		rpro_service_remove_success=0
@@ -851,8 +847,6 @@ unregister_rpro_service_deb()
 	sleep 1
 
 	/usr/sbin/update-rc.d $SERVICE_NAME remove
-
-	rm $SERVICE_LOCATION/$SERVICE_NAME
 }
 
 
@@ -869,9 +863,6 @@ unregister_rpro_service_rhl()
 
 	echo "Removing service \"$SERVICE_NAME\""
 	sleep 1
-
-
-	rm $SERVICE_LOCATION/$SERVICE_NAME
 }
 
 
@@ -923,7 +914,7 @@ start_red5pro_service()
 		"$SERVICE_LOCATION/$SERVICE_NAME" start /dev/null 2>&1 &
 	fi
 
-	echo "[ NOTE: It may take ~20 seconds for service startup ]"
+	# echo "[ NOTE: It may take a few seconds for service startup to complete ]"
 	sleep 5
 
 	if [ $# -eq 0 ]
@@ -953,7 +944,7 @@ stop_red5pro_service()
 		"$SERVICE_LOCATION/$SERVICE_NAME" stop /dev/null 2>&1 &
 	fi
 
-	echo "[ NOTE: It may take ~20 seconds for service shutdown ]"
+	echo "[ NOTE: It may take a few seconds for service shutdown to complete ]"
 	sleep 5
 
 	if [ $# -eq 0 ]
@@ -967,8 +958,10 @@ stop_red5pro_service()
 # TO DO
 is_red5_running()
 {	
-	pid_info=`pgrep -f red5`
-	echo $pid_info
+	if [ -f $PIDFILE ]; then
+		echo "hi"	
+	fi
+	
 }
 
 
@@ -1099,12 +1092,13 @@ restore_rpro()
 	empty_line
 	read -r -p "Did you have a active Red5pro license in your backup that you wish to restore ? [y/N] " response
 	LICENCE_KEY_FILE=$RPRO_BACKUP_FOLDER/LICENSE.KEY
+	LICENCE_KEY_DEST_FILE=$DEFAULT_RPRO_PATH/LICENSE.KEY
 	case $response in
 	[yY][eE][sS]|[yY]) 
 
-	if [ -f "$LICENCE_KEY_FILE" ]; then
-		cp -rf $LICENCE_KEY_FILE "$DEFAULT_RPRO_PATH/LICENSE.KEY"
-		if [ -f "$DEFAULT_RPRO_PATH/LICENSE.KEY" ]; then
+	if [ -f $LICENCE_KEY_FILE ]; then
+		cp -rf $LICENCE_KEY_FILE $LICENCE_KEY_DEST_FILE
+		if [ -f $LICENCE_KEY_DEST_FILE ]; then
 			echo "License file restored!"
 		fi
 	else
@@ -1119,19 +1113,22 @@ restore_rpro()
 	esac
 
 
+
+
 	##################################################################################################
 	################################### RESTORE CLUSTERING ###########################################
 	empty_line
 	echo "----------- STEP - 2 - CLUSTERING CONFIGURATION RESTORE -----------"
 	empty_line
 	read -r -p "Did you have active clustering configuration (in red5-default.xml) that you wish to restore ? [y/N] " response
-	CLUSTER_CONF_FILE="$RPRO_BACKUP_FOLDER/webapps/red5-default.xml"
+	CLUSTER_CONF_FILE=$RPRO_BACKUP_FOLDER/webapps/red5-default.xml
+	CLUSTER_CONF_DEST_FILE=$DEFAULT_RPRO_PATH/webapps/red5-default.xml
 	case $response in
 	[yY][eE][sS]|[yY]) 
 
-	if [ -f "$CLUSTER_CONF_FILE" ]; then
-		cp -rf $CLUSTER_CONF_FILE "$DEFAULT_RPRO_PATH/webapps/red5-default.xml"
-		if [ -f "$DEFAULT_RPRO_PATH/webapps/red5-default.xml" ]; then
+	if [ -f $CLUSTER_CONF_FILE ]; then
+		cp -rf $CLUSTER_CONF_FILE $CLUSTER_CONF_DEST_FILE
+		if [ -f $CLUSTER_CONF_DEST_FILE ]; then
 			echo "Cluster configuration restored!"
 		fi
 	else
@@ -1559,10 +1556,10 @@ advance_menu()
 	echo "2. ADD / UPDATE JAVA"
 	echo "3. INSTALL RED5PRO SERVICE"
 	echo "4. UNINSTALL RED5PRO SERVICE"
-	echo "5. UPGRADE RED5PRO FROM ZIP"
-	echo "6. UPGRADE RED5PRO FROM LATEST"
+	#echo "5. UPGRADE RED5PRO FROM ZIP"
+	echo "5. UPGRADE RED5PRO FROM LATEST"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "7. BACK TO MODE SELECTION"
+	echo "6. BACK TO MODE SELECTION"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "0. Exit"
 	echo "                             "
@@ -1575,15 +1572,15 @@ advance_menu()
 
 advance_menu_read_options(){
 	local choice
-	read -p "Enter choice [ 1 - 7 | 0 to exit]] " choice
+	read -p "Enter choice [ 1 - 6 | 0 to exit]] " choice
 	case $choice in
 		1) check_java 1 ;;
 		2) add_update_java ;;
 		3) register_rpro_as_service ;;
 		4) unregister_rpro_as_service ;;
-		5) upgrade 1 ;;
-		6) upgrade ;;
-		7) main ;;
+		# 5) upgrade 1 ;;
+		5) upgrade ;;
+		6) main ;;
 		0) exit 0;;
 		*) echo -e "${RED}Error...${STD}" && sleep 2
 	esac
@@ -1675,7 +1672,7 @@ simple_menu_read_options(){
 
 load_configuration()
 {
-	if [ ! -f "$CONFIGURATION_FILE" ]; then
+	if [ ! -f $CONFIGURATION_FILE ]; then
 		echo "CRITICAL ERROR!! - Configuration file not found!"
 		echo "Exiting..."
 		exit 0
