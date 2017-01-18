@@ -15,6 +15,11 @@ The service can then be configured and started / stopped using toosl built into 
 
 The first requirement the Red5 service is that your `RED5_HOME` must be set and should point to your Red5 home folder where your red5.bat and red5-shutdown.bat are located.
 
+__SCREENSHOT__
+
+![RED5 HOME VARIABLE](images/red5_home_windows.png?raw=true "Red5 Home Environment Variable")
+
+
 The second vital requirement for installing this service on windows is the `installutil.exe` utility which is provided with Microsoft.Net runtime. 
 
 
