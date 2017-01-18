@@ -77,6 +77,11 @@ __UNINSTALL SERVICE:__
 
 [ Where installutil is sourced from the DotNet runtime folder ]
 
+
+__SCREENSHOT__
+
+![Service UnInstall](images/uninstall_service.png?raw=true "Service UnInstall")
+
 ---
 
 __START SERVICE:__
