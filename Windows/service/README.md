@@ -52,6 +52,7 @@ __INSTALL SERVICE:__
 
 
 `C:\Windows\Microsoft.NET\Framework64\v4.0.30319\installutil Red5Service.exe`
+
 [ Where installutil is sourced from the DotNet runtime folder ]
 
 
@@ -62,6 +63,7 @@ __Once service si installed you can see it in the windows services list from `Co
 __UNINSTALL SERVICE:__
 
 `C:\Windows\Microsoft.NET\Framework64\v4.0.30319\installutil /U Red5Service.exe`
+
 [ Where installutil is sourced from the DotNet runtime folder ]
 
 ---
@@ -83,9 +85,11 @@ __CONFIGURE SERVICE AUTOSTART:__
 
 `sc config "Red5" start=auto`
 
+For more info visit: https://technet.microsoft.com/en-us/library/cc990290(v=ws.11).aspx
+
+
 ---
 
-For more info visit: https://technet.microsoft.com/en-us/library/cc990290(v=ws.11).aspx
 
 
 __CONFIGURE SERVICE MANUAL:__
