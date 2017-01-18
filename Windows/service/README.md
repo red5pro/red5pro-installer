@@ -61,7 +61,12 @@ __INSTALL SERVICE:__
 [ Where installutil is sourced from the DotNet runtime folder ]
 
 
-__Once service si installed you can see it in the windows services list from `Computer Management -> Services`__
+__SCREENSHOT__
+
+[Service Install](/images/install_service.png?raw=true "Service Install")
+
+
+__Once service is installed you can see it in the windows services list from `Computer Management -> Services`__
 
 ---
 
