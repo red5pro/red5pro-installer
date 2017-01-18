@@ -15,8 +15,13 @@ The service can then be configured and started / stopped using toosl built into 
 
 The first requirement the Red5 service is that your `RED5_HOME` must be set and should point to your Red5 home folder where your red5.bat and red5-shutdown.bat are located.
 
+The second vital requirement for installing this service on windows is the `installutil.exe` utility which is provided with Microsoft.Net runtime. 
 
-The second vital requirement for installing this service on windows is the `installutil.exe` utility which is provided with Microsoft.Net runtimes and Visual Studio. 
+
+[ FROM [MICROSOFT WEBSITE](https://msdn.microsoft.com/en-us/library/sd8zc8ha(v=vs.110).aspx) ]
+
+`If you’re using the Visual Studio command prompt, InstallUtil.exe should be on the system path. If not, you can add it to the path, or use the fully qualified path to invoke it. This tool is installed with the .NET Framework, and its path is %WINDIR%\Microsoft.NET\Framework[64]\<framework_version>. For example, for the 32-bit version of the .NET Framework 4 or 4.5.*, if your Windows installation directory is C:\Windows, the path is C:\Windows\Microsoft.NET\Framework\v4.0.30319\InstallUtil.exe. For the 64-bit version of the .NET Framework 4 or 4.5.*, the default path is C:\Windows\Microsoft.NET\Framework64\v4.0.30319\InstallUtil.exe.`
+
 
 Most windows systems that Red5pro is designed to run on already have some version of Dot Net installed. If a particular system does not have Dot net or has a version older than `3.5`, You can always install version `4.5` or newer the latest runtiem from its [official page](https://www.microsoft.com/en-in/download/details.aspx?id=42642)
 
