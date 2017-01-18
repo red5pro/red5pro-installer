@@ -5,7 +5,7 @@
 ## INTRODUCTION
 ---
 
-This artifact is a windows service for Red5 / Red5pro developed / designed in visual studio 2015. Thsi can be used to register Red5pro as a standard service in windows.
+This project artifact is about windows service for Red5 / Red5pro developed / designed in visual studio 2015. Thsi can be used to register Red5pro as a standard service in windows.
 
 The service can then be configured and started / stopped using toosl built into windows. The program is developed in Windows 10 Pro, but can run on any modern windows desktop / server running Microsoft Dot Net.
 
