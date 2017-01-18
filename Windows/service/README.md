@@ -85,7 +85,11 @@ __CONFIGURE SERVICE AUTOSTART:__
 
 ---
 
+For more info visit: https://technet.microsoft.com/en-us/library/cc990290(v=ws.11).aspx
+
 
 __CONFIGURE SERVICE MANUAL:__
 
 `sc config "Red5" start=demand`
+
+For more info visit: https://technet.microsoft.com/en-us/library/cc990290(v=ws.11).aspx
