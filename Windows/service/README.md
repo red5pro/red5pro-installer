@@ -63,7 +63,8 @@ __INSTALL SERVICE:__
 
 __SCREENSHOT__
 
-[Service Install](images/install_service.png?raw=true "Service Install")
+![Service Install](images/install_service.png?raw=true "Service Install")
+
 
 
 __Once service is installed you can see it in the windows services list from `Computer Management -> Services`__
