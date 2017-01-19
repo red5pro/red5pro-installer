@@ -20,6 +20,23 @@ namespace Red5Service
         public Service1()
         {
             InitializeComponent();
+
+            //Setup Service
+            this.ServiceName = "Red5";
+            this.CanStop = true;
+
+            //Setup logging
+            this.AutoLog = false;
+
+            ((ISupportInitialize)this.EventLog).BeginInit();
+            if (!EventLog.SourceExists(this.ServiceName))
+            {
+            EventLog.CreateEventSource(this.ServiceName, "Application");
+            }
+            ((ISupportInitialize)this.EventLog).EndInit();
+
+            this.EventLog.Source = this.ServiceName;
+            this.EventLog.Log = "Application";
         }
 
         protected override void OnStart(string[] args)
@@ -29,21 +46,35 @@ namespace Red5Service
             
             if (home_exists)
             {
-                startRed5 = new Process(); // Declare New Process
-                startRed5.StartInfo.WorkingDirectory = RED5_HOME;
-                startRed5.StartInfo.FileName = "red5.bat";
-                startRed5.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                startRed5.StartInfo.CreateNoWindow = true;
-                startRed5.Start();
+                try
+                {
+                    startRed5 = new Process(); // Declare New Process
+                    startRed5.StartInfo.WorkingDirectory = RED5_HOME;
+                    startRed5.StartInfo.FileName = "red5.bat";
+                    startRed5.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                    startRed5.StartInfo.CreateNoWindow = true;
+                    startRed5.EnableRaisingEvents = true;
+                    startRed5.Exited += new EventHandler(red5__Exited);
+                    startRed5.Start();
+                    
+                    PID = startRed5.Id;
 
-                PID = startRed5.Id;
-
-                string lines = PID.ToString();
-                System.IO.StreamWriter file = new System.IO.StreamWriter(RED5_HOME + "\\PID.txt");
-                file.WriteLine(lines);
-                file.Close();
+                    this.EventLog.WriteEntry("Starting process with PID " + PID);
+                }
+                catch(Exception e)
+                {
+                    this.EventLog.WriteEntry("Error starting Red5: " + e.Message);
+                    return;
+                }
             }
         }
+
+        
+        private void red5__Exited(object sender, System.EventArgs e)
+        {
+            this.Stop();
+        }
+
 
         protected override void OnStop()
         {
@@ -53,45 +84,54 @@ namespace Red5Service
 
             if (home_exists)
             {
-                /******************************************/
-                /* First try to kill red5 process */
-
                 try
                 {
-                    if (startRed5 != null)
+
+                    /******************************************/
+                    /* First try to kill red5 process */
+
+                    try
                     {
-                        startRed5.CloseMainWindow();
-                        startRed5.Kill();
+                        if (startRed5 != null)
+                        {
+                            this.EventLog.WriteEntry("Terminating Red5 process");
+                            startRed5.CloseMainWindow();
+                            startRed5.Kill();
+                        }
+                        else
+                        {
+                            Process.GetProcessById(PID).Kill();
+                        }
+
                     }
-                    else
+                    catch (Exception e)
                     {
-                        Process.GetProcessById(PID).Kill();
+                        this.EventLog.WriteEntry("Error killing Red5 process: " + e.Message);
                     }
-                    
+                    finally
+                    {
+                        startRed5 = null;
+                    }
+
+
+                    /******************************************/
+                    /* Try to run shutdown script */
+
+                    stopRed5 = new Process();
+                    stopRed5.StartInfo.WorkingDirectory = RED5_HOME;
+                    stopRed5.StartInfo.FileName = "red5-shutdown.bat";
+                    stopRed5.StartInfo.Arguments = "force";
+                    stopRed5.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                    stopRed5.StartInfo.CreateNoWindow = true;
+                    stopRed5.Start();
+
+                    this.EventLog.WriteEntry("Stopping process");
                 }
-                catch (Exception e)
+                catch(Exception e)
                 {
-                    string lines = e.Message;
-                    System.IO.StreamWriter file = new System.IO.StreamWriter(RED5_HOME + "\\service_error.log");
-                    file.WriteLine(lines);
-                    file.Close();
+                    this.EventLog.WriteEntry("Error stopping Red5: " + e.Message);
+                    return;
                 }
-                finally
-                {
-                    startRed5 = null;
-                }
-
-
-                /******************************************/
-                /* Try to run shutdown script */
-
-                stopRed5 = new Process();
-                stopRed5.StartInfo.WorkingDirectory = RED5_HOME;
-                stopRed5.StartInfo.FileName = "red5-shutdown.bat";
-                stopRed5.StartInfo.Arguments = "force";
-                stopRed5.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                stopRed5.StartInfo.CreateNoWindow = true;
-                stopRed5.Start();
             }
         }
     }
