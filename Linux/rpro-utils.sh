@@ -693,6 +693,11 @@ register_rpro_service()
 
 #######################################################
 
+PROG="red5"
+RED5_HOME=$DEFAULT_RPRO_PATH
+DAEMON="$RED5_HOME/$PROG.sh"
+PIDFILE="/var/run/$PROG.pid"
+
 service_script="#!/bin/sh
 ### BEGIN INIT INFO
 # chkconfig: 2345 85 85
@@ -707,9 +712,9 @@ service_script="#!/bin/sh
 ### END INIT INFO
 
 PROG=red5
-RED5_HOME=/usr/local/red5pro 
-DAEMON=\$RED5_HOME/\$PROG.sh
-PIDFILE=/var/run/\$PROG.pid
+RED5_HOME=$RED5_HOME
+DAEMON=$DAEMON
+PIDFILE=$PIDFILE
 
 start() {
   echo \"Starting Red5pro..\"
@@ -720,11 +725,11 @@ start() {
       sleep 5
     done
   fi
-  cd \${RED5_HOME} && ./red5.sh > /dev/null 2>&1 &
+  cd $RED5_HOME && ./red5.sh > /dev/null 2>&1 &
 }
 
 stop() {
-  cd \${RED5_HOME} && ./red5-shutdown.sh > /dev/null 2>&1 &
+  cd $RED5_HOME && ./red5-shutdown.sh > /dev/null 2>&1 &
 }
 
 
