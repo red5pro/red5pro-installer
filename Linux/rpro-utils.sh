@@ -553,17 +553,30 @@ install_rpro_zip()
 	
 	if [ "$rpro_exists" -eq 1 ]; then
 	
-		echo "Seems like an existing Red5pro installation was found. If you continue this will be replaced"
+		echo "An existing Red5pro installation was found at install destination.If you continue this will be replaced. The old installation will be backed up to $RPRO_BACKUP_HOME"
+
 		sleep 1
 		echo "Warning! All file(s) and folder(s) at $DEFAULT_RPRO_PATH will be removed permanently"
-		read -r -p "Are you sure? [y/N] " response
+		read -r -p "Do you wish to continue? [y/N] " response
 
 		case $response in
-		[yY][eE][sS]|[yY]) 
+		[yY][eE][sS]|[yY])
+
+		# backup red5pro
+		backup_rpro
+
+		if [ $rpro_backup_success -eq 0 ]; then
+			# proceed to install new red5pro
+			echo "Failed to create a backup of your existing red5pro installation"
+			pause
+		fi	
+
 		# remove rpro service
 		unregister_rpro_service
+
 		# check remove folder
 		rm -rf $DEFAULT_RPRO_PATH
+
 		;;
 		*)
 		echo "Uninstall cancelled"
@@ -1254,7 +1267,7 @@ backup_rpro()
 		if [ -d "$RPRO_BACKUP_FOLDER" ]; then
 			if [ -f $red5pro_ini ]; then
 				echo "Your active red5pro installation was backed up successfully to $RPRO_BACKUP_FOLDER"
-				echo "After upgrade completes, you can restore any necessary file(s) manually if you wish to do so."
+				echo "You can restore any necessary file(s) later from the backup manually."
 				chmod -R ugo+w $RPRO_BACKUP_FOLDER
 				rpro_backup_success=1
 			else
@@ -1301,8 +1314,9 @@ upgrade()
 
 	if [ "$rpro_exists" -eq "1" ]; then
 		upgrade_mode=1
-		echo "It is recommended that you make a backup of your old server files. "
-		read -r -p "Do you wish to create a backup now? [y/N] " response
+		# echo "It is recommended that you make a backup of your old server files. "
+		echo "An existing Red5pro installation was found at install destination.If you continue this will be replaced. The old installation will be backed up to $RPRO_BACKUP_HOME"
+		read -r -p "Do you wish to create a continue ? [y/N] " response
 
 		case $response in
 		[yY][eE][sS]|[yY]) 
@@ -1330,16 +1344,17 @@ upgrade()
 		;;
 		esac
 	else
-		upgrade_mode=1
-		upgrade_clean $upgrade_from_zip
+		upgrade_mode=0
+		echo "This option is invalid since there is no red5pro installation to upgrade. You can upgrade only after a clean install!"
+		# upgrade_clean $upgrade_from_zip
 		# check install state here
 	fi
 
 
 	# If install is successful try restore....
-	if [ "$red5_zip_install_success" -eq 1 ]; then
+	if [[ $red5_zip_install_success -eq 1 ]]; then
 
-		if [ "$upgrade_mode" -eq 1 ]; then
+		if [[ $upgrade_mode -eq 1 ]]; then
 			
 			echo "Congratulations!! You have successfully installed a new version of red5pro" 
 			read -r -p "Do you need any help with restoring your previous settings? [y/N] " response
@@ -1378,6 +1393,8 @@ upgrade_clean()
 	else
 		upgrade_from_zip=0		
 	fi
+
+echo $upgrade_from_zip
 
 	read -r -p "Do you wish to proceed with a clean installation? [y/N] " response
 
@@ -1618,18 +1635,18 @@ simple_menu()
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"	
 	echo " RED5PRO SUPER UTILS - BASIC MODE         "
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "1. CHECK EXISTING RED5PRO INSTALLATION"
-	echo "2. INSTALL LATEST RED5PRO"
-	echo "3. INSTALL RED5PRO FROM ZIP"
-	echo "4. REMOVE RED5PRO INSTALLATION"
-	echo "5. ADD / UPDATE RED5PRO LICENSE"
+#	echo "1. CHECK EXISTING RED5PRO INSTALLATION"
+	echo "1. INSTALL LATEST RED5PRO"
+	echo "2. INSTALL RED5PRO FROM ZIP"
+	echo "3. REMOVE RED5PRO INSTALLATION"
+	echo "4. ADD / UPDATE RED5PRO LICENSE"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "------ RED5PRO SERVICE OPTIONS -----------"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "6. --- START RED5PRO"
-	echo "7. --- STOP RED5PRO"
+	echo "5. --- START RED5PRO"
+	echo "6. --- STOP RED5PRO"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "8. BACK TO MODE SELECTION"
+	echo "7. BACK TO MODE SELECTION"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "0. Exit"
 	echo "                             "
@@ -1645,16 +1662,16 @@ simple_menu()
 
 simple_menu_read_options(){
 	local choice
-	read -p "Enter choice [ 1 - 8 | 0 to exit] " choice
+	read -p "Enter choice [ 1 - 7 | 0 to exit] " choice
 	case $choice in
-		1) check_current_rpro ;;
-		2) auto_install_rpro ;;
-		3) install_rpro_zip ;;
-		4) remove_rpro_installation ;;
-		5) show_licence_menu ;;
-		6) start_red5pro_service ;;
-		7) stop_red5pro_service ;;
-		8) main ;;
+		# 1) check_current_rpro ;;
+		1) auto_install_rpro ;;
+		2) install_rpro_zip ;;
+		3) remove_rpro_installation ;;
+		4) show_licence_menu ;;
+		5) start_red5pro_service ;;
+		6) stop_red5pro_service ;;
+		7) main ;;
 		0) exit 0;;
 		*) echo -e "${RED}Error...${STD}" && sleep 2
 	esac
@@ -1684,6 +1701,18 @@ load_configuration()
 
 	JAVA_32_BIT="$JAVA_JRE_DOWNLOAD_URL/$JAVA_32_FILENAME"
 	JAVA_64_BIT="$JAVA_JRE_DOWNLOAD_URL/$JAVA_64_FILENAME"
+
+
+	# Set install location if not set
+
+	CURRENT_DIRECTORY=$PWD
+
+	if [ -z ${DEFAULT_RPRO_INSTALL_LOCATION+x} ]; then 
+		DEFAULT_RPRO_PATH="$CURRENT_DIRECTORY/$DEFAULT_RPRO_FOLDER_NAME"
+	else
+		DEFAULT_RPRO_PATH="$DEFAULT_RPRO_INSTALL_LOCATION/$DEFAULT_RPRO_FOLDER_NAME"			
+	fi
+	
 }
 
 
@@ -1737,10 +1766,12 @@ detect_system()
 	USER_HOME=$(getent passwd $SUDO_USER | cut -d: -f6)
 	echo -e "* Home directory: \e[36m$USER_HOME\e[m"
 
-
 	RPRO_BACKUP_HOME="$USER_HOME/$DEFAULT_BACKUP_FOLDER"
 	echo -e "* BackUp directory: \e[36m$RPRO_BACKUP_HOME\e[m"
+
 	
+	echo -e "* Install directory: \e[36m$DEFAULT_RPRO_PATH\e[m"
+
 	
 	if [[ $OS_NAME == *"Ubuntu"* ]]; then
 	OS_TYPE=$OS_DEB
