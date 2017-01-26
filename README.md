@@ -45,7 +45,7 @@ The script requires super user privileges to execute and carry out subtasks. Hen
 ## PROGRAM OPTIONS
 ===
 
-#### INITIALIZTION
+### INITIALIZTION
 
 As the script runs in the terminal, it detects the operating system details such as Distribution (OS name), Version (OS version), Kernel type (64/32 bit), User's hoem directory, Red5pro default backup directory (located inside the home directory) and the default install location (the current directory).
 
@@ -61,7 +61,10 @@ The detected information is printed on screen an d then the menu which allows yo
 __You can select a menu option by typing the number that represents that option and pressing [ ENTER ]__
 
 
-#### BASIC MODE
+===
+
+
+### BASIC MODE
 
 
 The basic mode provides all the options, commonly required to setup a new red5pro installation and other operatison such as starting / stopping red5.  Thew basic menu option allows you to:
@@ -147,3 +150,13 @@ __NOTE: This does not check to see if you have installed red5pro or not. It is a
 
 
 
+===
+
+
+### ADVANCE MODE
+
+
+TO DO
+
+
+![Advance Mode](Linux/images/advance_mode.png?raw=true "Advance Mode")
