@@ -39,3 +39,22 @@ The script requires super user privileges to execute and carry out subtasks. Hen
 * Execute the script by issuing the following command : `sudo  bash./rpro-utils.sh`
 
 >> Use the menu driven interface sequentially and follow instructiosn carefully for best results.
+
+---
+
+### PROGRAM OPTIONS
+===
+
+###### INITIALIZTION
+
+As the script runs in the terminal, it detects the operating system details such as Distribution (OS name), Version (OS version), Kernel type (64/32 bit), User's hoem directory, Red5pro default backup directory (located inside the home directory) and the default install location (the current directory).
+
+The detected information is printed on screen an d then the menu which allows you to select a operation mode is rendered. The program supports two modes of operation : 
+
+* Basic Mode: Provides most of the options for new installations.
+* Advance Mode: Provides advance options for managing a existing red5pro installation.
+
+
+![Main Menu creenshot](Screenshots/Screenshots/Screenshot%20from%202017-01-24%2014_46_52.png?raw=true "Main Menu")
+
+
