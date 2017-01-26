@@ -55,6 +55,6 @@ The detected information is printed on screen an d then the menu which allows yo
 * Advance Mode: Provides advance options for managing a existing red5pro installation.
 
 
-![Main Menu creenshot](Screenshots/Screenshots/Screenshot%20from%202017-01-24%2014_46_52.png?raw=true "Main Menu")
+![Main Menu creenshot](Screenshots/main_menu.png?raw=true "Main Menu")
 
 
