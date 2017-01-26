@@ -587,6 +587,9 @@ install_rpro_zip()
 
 
 	echo "Unpacking archive to install location -------"
+
+	mkdir -p $rpro_loc
+	chmod -R ugo+w $rpro_loc
 	
 	
 	if ! unzip $rpro_zip_path -d $unzip_dest; then
@@ -610,9 +613,7 @@ install_rpro_zip()
 	echo "Setting permissions -----------"
 	sleep 1
 
-	# chmod 755 $rpro_loc
-
-	chmod -R ugo+w $$DEFAULT_RPRO_PATH
+	chmod -R chmod 755 $rpro_loc	
 	
 	chmod +x $rpro_loc/red5.sh
 
