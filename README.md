@@ -7,7 +7,8 @@ Installer for Red5 Pro Server
 
 The Red5pro install is a shell script, designed to make Red5pro installation simple and more efficient by automating most of the tasks related to getting a new Red5pro installation running.
 
-The script presents a collection menu driven options to help achieve various red5pro setup tasks. Additionally it also takes care of installing the software depencencies required to get Red5pro working. The script in intended to work on supported linux flavors and mac.
+The script presents a collection menu driven options to help achieve various red5pro setup tasks. Additionally it also takes care of installing the software dependencies required to get Red5pro working. The script in intended to work on supported linux flavors.
+
 
 
 
@@ -45,7 +46,7 @@ The script requires super user privileges to execute and carry out subtasks. Hen
 ## PROGRAM CONFIGURATION FILE -> CONF.INI
 ===
 
-The configuration file `conf.ini` is located in the same location as the program itself. It contaisn the basic configuration information needed for the installer script to run. Some of the configuration can be changed and some are fixed. Given below is the content of the `conf.ini` file.
+The configuration file `conf.ini` is located in the same location as the program itself. It contains the basic configuration information needed for the installer script to run. Some of the configuration can be changed and some are fixed. Given below is the content of the `conf.ini` file.
 
 ```
 
@@ -98,11 +99,13 @@ DEFAULT_RPRO_FOLDER_NAME=rpro
 ## PROGRAM OPTIONS
 ===
 
+<br>
 ### INITIALIZATION
 
-As the script runs in the terminal, it detects the operating system details such as Distribution (OS name), Version (OS version), Kernel type (64/32 bit), User's hoem directory, Red5pro default backup directory (located inside the home directory) and the default install location (the current directory).
+As the script runs in the terminal, it detects the operating system details such as Distribution (OS name), Version (OS version), Kernel type (64/32 bit), User's home directory, Red5pro default backup directory (located inside the home directory) and the default install location (the current directory).
 
-The detected information is printed on screen an d then the menu which allows you to select a operation mode is rendered. The program supports two modes of operation : 
+The detected information is printed on screen and then the menu which allows you to select a operation mode is rendered. The program supports two modes of operation : 
+
 
 * Basic Mode: Provides most of the options for new installations.
 * Advance Mode: Provides advance options for managing a existing red5pro installation.
@@ -120,7 +123,7 @@ __You can select a menu option by typing the number that represents that option 
 ### BASIC MODE
 
 
-The basic mode provides all the options, commonly required to setup a new red5pro installation and other operatison such as starting / stopping red5.  Thew basic menu option allows you to:
+The basic mode provides all the options, commonly required to setup a new red5pro installation and other operations such as starting / stopping red5.  The basic menu option allows you to:
 
 
 ![Basic Mode](Linux/images/basic_mode.png?raw=true "Basic Mode")
@@ -152,9 +155,9 @@ The script prompts to determine if a autostart service is required for the red5p
 
 #### 2. INSTALL RED5PRO FROM ZIP
 
-This option lets you install Red5pro from a pre downlaoded zip. In case you have a older Red5pro that you wish to install or if you do not want to have the program download the latest red5pro for you.
+This option lets you install Red5pro from a pre downloaded zip. In case you have a older Red5pro that you wish to install or if you do not want to have the program download the latest red5pro for you.
 
-The script checks the basic red5pro requirements as with the first option (INSTALL LATEST RED5PRO). Once requiremenst are met, it prommpts you for the full absolute path of the red5pro zip file. 
+The script checks the basic red5pro requirements as with the first option (INSTALL LATEST RED5PRO). Once requirements are met, it prompts you for the full absolute path of the red5pro zip file. 
 
 __The archive should have been downloaded from red5pro.com. Using a archive from a different source will not work__
 
@@ -166,7 +169,7 @@ The program extracts the archive file's content and copies the red5pro files int
 
 This option lets you remove an existing red5pro installation. Removal deletes all the files and removes red5pro startup script if it exists.
 
-On selection of this option, the program loosk for existing red5pro installation in the install location. If an installation is found, the user will be prompted to confirm the removal action. If user confirms it (by pressing Y + [ ENTER ] ), the script deletes the red5pro installation as well as any red5pro service installed on the OS.
+On selection of this option, the program looks for existing red5pro installation in the install location. If an installation is found, the user will be prompted to confirm the removal action. If user confirms it (by pressing Y + [ ENTER ] ), the script deletes the red5pro installation as well as any red5pro service installed on the OS.
 
 
 
@@ -186,7 +189,8 @@ __2. VIEW LICENSE :__  Provides option to view an existing red5pro license via t
 
 #### 5. START RED5PRO
 
-This option allows you to start Red5pro. On selecting this option, the program first checks to see if a Red5pro service is installed on the system or not. If a red5pro service is found, it attempts to start red5 usign the service. If no service is found it attempts to start red5 using 'red5.sh' script located at the red5 install location.
+This option allows you to start Red5pro. On selecting this option, the program first checks to see if a Red5pro service is installed on the system or not. If a red5pro service is found, it attempts to start red5 using the service. If no service is found it attempts to start red5 using 'red5.sh' script located at the red5 install location.
+
 
 __The program doe snot check the running state of red5pro. If it is started, starting it again will have no effect._
 
@@ -195,7 +199,7 @@ __NOTE: This does not check to see if you have installed red5pro or not. It is a
 
 #### 6. STOP RED5PRO
 
-This option allows you to stop Red5pro. On selecting this option, the program first checks to see if a Red5pro service is installed on the system or not. If a red5pro service is found, it attempts to stop red5 usign the service. If no service is found it attempts to stop red5 using 'red5.sh' script located at the red5 install location.
+This option allows you to stop Red5pro. On selecting this option, the program first checks to see if a Red5pro service is installed on the system or not. If a red5pro service is found, it attempts to stop red5 using the service. If no service is found it attempts to stop red5 using 'red5.sh' script located at the red5 install location.
 
 __The program doe snot check the running state of red5pro. If it is stopped, stopping it again will have no effect._
 
@@ -228,7 +232,7 @@ This option lets you install red5 service. On selecting this option, the program
 
 #### 3. UNINSTALL RED5PRO SERVICE
 
-This option lets you uninstall red5 service. On selecting this option, the program first checks to see if red5pro in installed. Next it shecks to see if service is installed. If red5pro is not installed the operation exits. If red5pro installation is found the program attempts to unregister it as a service. If red5pro service does not exist on the OS, the operation exits. If service is found it is removed.
+This option lets you uninstall red5 service. On selecting this option, the program first checks to see if red5pro in installed. Next it checks to see if service is installed. If red5pro is not installed the operation exits. If red5pro installation is found the program attempts to unregister it as a service. If red5pro service does not exist on the OS, the operation exits. If service is found it is removed.
 
 
 #### 4. UPGRADE RED5PRO FROM LATEST
@@ -236,18 +240,22 @@ This option lets you uninstall red5 service. On selecting this option, the progr
 The upgrade option allows you to install the latest red5pro over an existing installation. Although this is fairly a complex process, the program simplifies it for the user by providing step by step onscreen instructions.
 
 
-Selecting this option, the program checks for an existing red5pro installation. If an existing installation is not found the operation exits.If an installation is found at install location, the program will create a backup of the existing red5pro instalaltion into the default red5pro backup location automatically before installing the new copy. 
+Selecting this option, the program checks for an existing red5pro installation. If an existing installation is not found the operation exits.If an installation is found at install location, the program will create a backup of the existing red5pro installation into the default red5pro backup location automatically before installing the new copy. 
 
-The program prompts the user for confirmation to follow through. On confirmation, it creates a backup of existing red5pro instalaltion and displays the path of the backup location.
+The program prompts the user for confirmation to follow through. On confirmation, it creates a backup of existing red5pro installation and displays the path of the backup location.
 
-The program then follows through the new red5pro instalaltion by downloading the latets red5pro from red5pro.com. (__Similar to Basic Mode -> Install Latest Red5pro__) .  
+
+
+The program then follows through the new red5pro installation by downloading the latest red5pro from red5pro.com. (__Similar to Basic Mode -> Install Latest Red5pro__) .  
 
 After the installation is complete the program prompts the user for optional restoration help. If the user accepts, the program switches to restore wizard. If user does not accept the operation exists.
 
 The restore wizard helps the user restore some of the common items that can be restored such as :
 
+
 * License - RED5_HOME/LICENSE.KEY
 * Cluster configuration - RED5_HOME/webapps/root/red5-default.xml
 * Web applications - RED5_HOME/webapps/*
 
-The restore wizard prompts the user for each restoreable item. If user accepts the item is automatically restored from the backup into the new installation. If the user rejects the wizard skips that item. Restoration can be re-done anytime manually as well. At the end of the wizard the operation exits automatically.
+
+The restore wizard prompts the user for each restorable item. If user accepts the item is automatically restored from the backup into the new installation. If the user rejects the wizard skips that item. Restoration can be re-done anytime manually as well. At the end of the wizard the operation exits automatically.
