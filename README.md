@@ -66,22 +66,32 @@ __You can select a menu option by typing the number that represents that option 
 
 The basic mode provides all the options, commonly required to setup a new red5pro installation and other operatison such as starting / stopping red5.  Thew basic menu option allows you to:
 
+
+![Basic Mode](Linux/images/basic_mode.png?raw=true "Basic Mode")
+
+
+
 __* INSTALL LATEST RED5PRO__
 
 Allows you to install Red5pro from red5pro.com website. You must have an existing account on red5pro.com to use this option. Before proceesding, the script checks for a few basic requirements : 
 
-* Java : Java (JRE / JDK 1.8 or greater si required to install Red5pro)
+* Java : Java (JRE / JDK 1.8 or greater is required to install Red5pro)
 * unzip : Unzip utility is required to unpack zip archives.
 
 Depending on whether the softwares are found in the os distribution, the script helps you install them using the platform specific installation method. (ie: Ubuntu uses apt-get, where as CentOS uses yum to install softwares. )
 
 Once the requirements are met the script proceeds to 'obtaining the latest Red5pro from Red5pro.com'. At this point, it prompts you for site credentials (email  & password). This information is posted to the website to help authenticate your download. If authentication succeeds, it begins downloading the latest red5pro archive file from red5pro.com. 
 
+
+__* If an existing script is found, the script tried to stop red5 in case it was running before it can continue.__
+
+__* If there is an existing red5pro installation found at the location, the files wil be backed up to the default backup location__
+
+
 Once the download completes, the program extracts the archive file's content and copies the red5pro files into the install location. It prompts for a confirmation before starting the install.
 
-__If there is an existing red5pro installation found at the location, the files wil be backed up to the default backup location__
+The script prompts to determine if a autostart service is required for the red5pro installation. If user selects 'yes', The program creates a linux startup script for the current OS platform. Thsi script helsp red5pro start automatically with operating system startup.
 
-If an existing script is found, the script tried to stop red5 in case it was running before it can continue.
 
 
 * Install Red5pro from zip
@@ -91,5 +101,5 @@ If an existing script is found, the script tried to stop red5 in case it was run
 
 
 
-![Main Menu](Linux/images/basic_menu.png?raw=true "Basic Menu")
+
 
