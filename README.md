@@ -115,9 +115,14 @@ On selection of this option, the program loosk for existing red5pro installation
 
 
 
-#### 3. ADD / UPDATE RED5PRO LICENSE
+#### 4. ADD / UPDATE RED5PRO LICENSE
 
-This option navigates to a sub-menu which allws us to install a new red5pro license or update an existing one.
+This option navigates to a sub-menu which allows us to view, install and update a red5pro license.
 
 ![License Menu](Linux/images/license_menu.png?raw=true "License Menu")
+
+
+__1. ADD / UPDATE LICENSE :__  Provides option to add a new license or update one if it already exists. The program looks for an existing red5pro installation and then the LICENSE.KEY file at expected location. If a file is found it allows you to enter a red5pro license code from the terminal interface.
+
+__2. VIEW LICENSE :__  Provides option to view an existing red5pro license via the LICENSE.KEY file. The program looks for an existing red5pro installation and then the LICENSE.KEY file at expected location. If a file is found it displays the content of the file on terminal.
 
