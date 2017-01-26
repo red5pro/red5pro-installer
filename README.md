@@ -250,4 +250,4 @@ The restore wizard helps the user restore some of the common items that can be r
 * Cluster configuration - RED5_HOME/webapps/root/red5-default.xml
 * Web applications - RED5_HOME/webapps/*
 
-The restore wizard prompts the user for each restoreable item. If user accepts the item is automatically restored from the backup into the new installation. If the user rejects the wizard skosp that item. Restoration can be re-done anytime manually as well. At the end of the wizard the operation exits automatically.
+The restore wizard prompts the user for each restoreable item. If user accepts the item is automatically restored from the backup into the new installation. If the user rejects the wizard skips that item. Restoration can be re-done anytime manually as well. At the end of the wizard the operation exits automatically.
