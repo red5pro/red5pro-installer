@@ -207,9 +207,9 @@ __NOTE: This does not check to see if you have installed red5pro or not. It is a
 
 This option allows you to stop Red5pro. On selecting this option, the program first checks to see if a Red5pro service is installed on the system or not. If a red5pro service is found, it attempts to stop red5 using the service. If no service is found it attempts to stop red5 using 'red5.sh' script located at the red5 install location.
 
-__The program doe snot check the running state of red5pro. If it is stopped, stopping it again will have no effect._
+__The program doe snot check the running state of red5pro. If it is stopped, stopping it again will have no effect.__
 
-__NOTE: This does not check to see if you have installed red5pro or not. It is assumed that you have a valid red5pro instalaltion before attempting to stop it.
+__NOTE: This does not check to see if you have installed red5pro or not. It is assumed that you have a valid red5pro instalaltion before attempting to stop it.__
 
 
 
