@@ -42,10 +42,10 @@ The script requires super user privileges to execute and carry out subtasks. Hen
 
 ---
 
-### PROGRAM OPTIONS
+## PROGRAM OPTIONS
 ===
 
-###### INITIALIZTION
+##### INITIALIZTION
 
 As the script runs in the terminal, it detects the operating system details such as Distribution (OS name), Version (OS version), Kernel type (64/32 bit), User's hoem directory, Red5pro default backup directory (located inside the home directory) and the default install location (the current directory).
 
