@@ -71,7 +71,7 @@ The basic mode provides all the options, commonly required to setup a new red5pr
 
 
 
-#### INSTALL LATEST RED5PRO
+#### 1. INSTALL LATEST RED5PRO
 
 
 Allows you to install Red5pro from red5pro.com website. You must have an existing account on red5pro.com to use this option. Before proceesding, the script checks for a few basic requirements : 
@@ -94,7 +94,7 @@ Once the download completes, the program extracts the archive file's content and
 The script prompts to determine if a autostart service is required for the red5pro installation. If user selects 'yes', The program creates a linux startup script for the current OS platform. Thsi script helsp red5pro start automatically with operating system startup.
 
 
-#### INSTALL RED5PRO FROM ZIP
+#### 2. INSTALL RED5PRO FROM ZIP
 
 This option lets you install Red5pro from a pre downlaoded zip. In case you have a older Red5pro that you wish to install or if you do not want to have the program download the latest red5pro for you.
 
@@ -106,7 +106,7 @@ The program extracts the archive file's content and copies the red5pro files int
 
 
 
-#### REMOVE RED5PRO INSTALLATION
+#### 3. REMOVE RED5PRO INSTALLATION
 
 This option lets you remove an existing red5pro installation. Removal deletes all the files and removes red5pro startup script if it exists.
 
@@ -115,4 +115,9 @@ On selection of this option, the program loosk for existing red5pro installation
 
 
 
+#### 3. ADD / UPDATE RED5PRO LICENSE
+
+This option navigates to a sub-menu which allws us to install a new red5pro license or update an existing one.
+
+![License Menu](Linux/images/license_menu.png?raw=true "License Menu")
 
