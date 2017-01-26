@@ -42,10 +42,63 @@ The script requires super user privileges to execute and carry out subtasks. Hen
 
 ---
 
+## PROGRAM CONFIGURATION FILE -> CONF.INI
+===
+
+The configuration file `conf.ini` is located in the same location as the program itself. It contaisn the basic configuration information needed for the installer script to run. Some of the configuration can be changed and some are fixed. Given below is the content of the `conf.ini` file.
+
+```
+
+# JAVA REQUIREMENTS
+# -------------------
+MIN_JAVA_VERSION="1.8"
+
+
+# JAVA DOWNLOAD LOCATIONS FOR CENTOS
+# ---------------------------------------------------------------------------
+JAVA_JRE_DOWNLOAD_URL="http://download.oracle.com/otn-pub/java/jdk/8u102-b14/"
+JAVA_32_FILENAME="jre-8u102-linux-i586.rpm"
+JAVA_64_FILENAME="jre-8u102-linux-x64.rpm"
+
+
+# Backup Folder => [ located in home directory ]
+# ----------------------------------------------
+DEFAULT_BACKUP_FOLDER=red5pro_backups
+
+
+# Red5pro install location
+# ----------------------------------------
+DEFAULT_RPRO_FOLDER_NAME=rpro
+
+
+```
+
+
+##### CONFIGURAION OPTIONS:
+
+* MIN_JAVA_VERSION : Minimim version of java (JRE/JDK) that is required by the installer to install Red5pro on the system. This value should not be changed by the user.
+
+
+* JAVA_JRE_DOWNLOAD_URL : Base url of the latest rpm package(s) required for java installation on CentOs. This value should not be changed by the user.
+
+
+* JAVA_32_FILENAME : Filename of the 32 bit java rpm package for CentOs.
+
+
+* JAVA_64_FILENAME : Filename of the 64 bit java rpm package for CentOs.
+
+
+* DEFAULT_BACKUP_FOLDER : Name of the default red5pro backup directory. This is always expected to be inside the hoem directory.The program creates the directory if it does not exist.
+
+
+* DEFAULT_RPRO_FOLDER_NAME : Name of the default red5pro install directory (install location). The program always installs red5pro in the current directory, where the script is run from.
+
+---
+
 ## PROGRAM OPTIONS
 ===
 
-### INITIALIZTION
+### INITIALIZATION
 
 As the script runs in the terminal, it detects the operating system details such as Distribution (OS name), Version (OS version), Kernel type (64/32 bit), User's hoem directory, Red5pro default backup directory (located inside the home directory) and the default install location (the current directory).
 
