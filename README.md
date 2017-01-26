@@ -45,7 +45,7 @@ The script requires super user privileges to execute and carry out subtasks. Hen
 ## PROGRAM OPTIONS
 ===
 
-##### INITIALIZTION
+#### INITIALIZTION
 
 As the script runs in the terminal, it detects the operating system details such as Distribution (OS name), Version (OS version), Kernel type (64/32 bit), User's hoem directory, Red5pro default backup directory (located inside the home directory) and the default install location (the current directory).
 
@@ -58,4 +58,38 @@ The detected information is printed on screen an d then the menu which allows yo
 ![Main Menu](Linux/images/main_menu.png?raw=true "Main Menu")
 
 
+__You can select a menu option by typing the number that represents that option and pressing [ ENTER ]__
+
+
+#### BASIC MODE
+
+
+The basic mode provides all the options, commonly required to setup a new red5pro installation and other operatison such as starting / stopping red5.  Thew basic menu option allows you to:
+
+__* INSTALL LATEST RED5PRO__
+
+Allows you to install Red5pro from red5pro.com website. You must have an existing account on red5pro.com to use this option. Before proceesding, the script checks for a few basic requirements : 
+
+* Java : Java (JRE / JDK 1.8 or greater si required to install Red5pro)
+* unzip : Unzip utility is required to unpack zip archives.
+
+Depending on whether the softwares are found in the os distribution, the script helps you install them using the platform specific installation method. (ie: Ubuntu uses apt-get, where as CentOS uses yum to install softwares. )
+
+Once the requirements are met the script proceeds to 'obtaining the latest Red5pro from Red5pro.com'. At this point, it prompts you for site credentials (email  & password). This information is posted to the website to help authenticate your download. If authentication succeeds, it begins downloading the latest red5pro archive file from red5pro.com. 
+
+Once the download completes, the program extracts the archive file's content and copies the red5pro files into the install location. It prompts for a confirmation before starting the install.
+
+__If there is an existing red5pro installation found at the location, the files wil be backed up to the default backup location__
+
+If an existing script is found, the script tried to stop red5 in case it was running before it can continue.
+
+
+* Install Red5pro from zip
+* Remove Red5pro installation
+* Remove Red5pro installation
+
+
+
+
+![Main Menu](Linux/images/basic_menu.png?raw=true "Basic Menu")
 
