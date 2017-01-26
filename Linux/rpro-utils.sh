@@ -582,12 +582,12 @@ install_rpro_zip()
 		echo "Uninstall cancelled"
 		pause
 		;;
-		esac
+		esac	
 	fi
 
 
-		
 	echo "Unpacking archive to install location -------"
+	
 	
 	if ! unzip $rpro_zip_path -d $unzip_dest; then
 		echo "Failed to extract zip. Possible invalid archive"
@@ -610,7 +610,9 @@ install_rpro_zip()
 	echo "Setting permissions -----------"
 	sleep 1
 
-	chmod 755 $rpro_loc
+	# chmod 755 $rpro_loc
+
+	chmod -R ugo+w $$DEFAULT_RPRO_PATH
 	
 	chmod +x $rpro_loc/red5.sh
 
@@ -693,11 +695,6 @@ register_rpro_service()
 
 #######################################################
 
-PROG="red5"
-RED5_HOME=$DEFAULT_RPRO_PATH
-DAEMON="$RED5_HOME/$PROG.sh"
-PIDFILE="/var/run/$PROG.pid"
-
 service_script="#!/bin/sh
 ### BEGIN INIT INFO
 # chkconfig: 2345 85 85
@@ -712,9 +709,9 @@ service_script="#!/bin/sh
 ### END INIT INFO
 
 PROG=red5
-RED5_HOME=$RED5_HOME
-DAEMON=$DAEMON
-PIDFILE=$PIDFILE
+RED5_HOME=$DEFAULT_RPRO_PATH
+DAEMON=\$RED5_HOME/\$PROG.sh
+PIDFILE=/var/run/\$PROG.pid
 
 start() {
   echo \"Starting Red5pro..\"
@@ -725,11 +722,11 @@ start() {
       sleep 5
     done
   fi
-  cd $RED5_HOME && ./red5.sh > /dev/null 2>&1 &
+  cd \${RED5_HOME} && ./red5.sh > /dev/null 2>&1 &
 }
 
 stop() {
-  cd $RED5_HOME && ./red5-shutdown.sh > /dev/null 2>&1 &
+  cd \${RED5_HOME} && ./red5-shutdown.sh > /dev/null 2>&1 &
 }
 
 
@@ -889,47 +886,25 @@ unregister_rpro_service_rhl()
 
 
 
-restart_red5pro_service()
-{
-	if [ ! -f "$SERVICE_LOCATION/$SERVICE_NAME" ];	then
-		echo "It seems Red5Pro service was not installed. Please register Red5pro service from the menu for best results."
-		echo " Attempting to start using \"red5.sh\""
-		exec $DEFAULT_RPRO_PATH/red5.sh &
-	else
-		echo "Red5Pro service was found at $SERVICE_LOCATION/$SERVICE_NAME"
-		echo " Attempting to restart service"
-		"$SERVICE_LOCATION/$SERVICE_NAME" restart /dev/null 2>&1 &
-	fi
-
-	if [ $# -eq 0 ]
-	  then
-	    pause
-	fi
-}
-
-
-
-
-
 start_red5pro_service()
 {
 
 	if [ ! -f "$SERVICE_LOCATION/$SERVICE_NAME" ];	then
 		echo "It seems Red5Pro service was not installed. Please register Red5pro service from the menu for best results."
 		echo " Attempting to start using \"red5.sh\""
-
+		
 		cd $DEFAULT_RPRO_PATH && exec $DEFAULT_RPRO_PATH/red5.sh > /dev/null 2>&1 &
 
-		RETVAL=$?
-		PID=$!
+		# RETVAL=$?
+		# PID=$!
 
-		if [ $RETVAL -eq 0 ]; then
-			echo $PID > "$PIDFILE"
-		fi
+		# if [ $RETVAL -eq 0 ]; then
+		# 	echo $PID > "$PIDFILE"
+		# fi
 	else
 		echo "Red5Pro service was found at $SERVICE_LOCATION/$SERVICE_NAME"
 		echo " Attempting to start service"
-		"$SERVICE_LOCATION/$SERVICE_NAME" start /dev/null 2>&1 &
+		/etc/init.d/red5pro start /dev/null 2>&1 &
 	fi
 
 	# echo "[ NOTE: It may take a few seconds for service startup to complete ]"
@@ -959,7 +934,7 @@ stop_red5pro_service()
 		echo "Red5Pro service was found at $SERVICE_LOCATION/$SERVICE_NAME."
 		echo " Attempting to stop service"
 
-		"$SERVICE_LOCATION/$SERVICE_NAME" stop /dev/null 2>&1 &
+		/etc/init.d/red5pro stop /dev/null 2>&1 &
 	fi
 
 	echo "[ NOTE: It may take a few seconds for service shutdown to complete ]"
@@ -1321,7 +1296,7 @@ upgrade()
 		upgrade_mode=1
 		# echo "It is recommended that you make a backup of your old server files. "
 		echo "An existing Red5pro installation was found at install destination.If you continue this will be replaced. The old installation will be backed up to $RPRO_BACKUP_HOME"
-		read -r -p "Do you wish to create a continue ? [y/N] " response
+		read -r -p "Do you wish to continue ? [y/N] " response
 
 		case $response in
 		[yY][eE][sS]|[yY]) 
@@ -1399,7 +1374,6 @@ upgrade_clean()
 		upgrade_from_zip=0		
 	fi
 
-echo $upgrade_from_zip
 
 	read -r -p "Do you wish to proceed with a clean installation? [y/N] " response
 
@@ -1428,7 +1402,7 @@ echo $upgrade_from_zip
 
 check_license()
 {
-	if [ $1 -eq 1]; then
+	if [[ $1 -eq 1 ]]; then
 		echo "Enter the full path to Red5pro installation"
 		read rpro_path
 	else
@@ -1436,14 +1410,17 @@ check_license()
 	fi
 
 
+	check_current_rpro 1
+	if [[ $rpro_exists -eq 1 ]]; then
 
-	lic_file=$rpro_path/LICENSE.KEY
+		lic_file=$rpro_path/LICENSE.KEY
 
-	if [ ! -f $lic_file ]; then
-  		echo "No license file found!. Please install a license."
-	else
-		value=`cat $lic_file`
-		echo "Current license : $value"
+		if [ ! -f $lic_file ]; then
+	  		echo "No license file found!. Please install a license."
+		else
+			value=`cat $lic_file`
+			echo "Current license : $value"
+		fi
 	fi
 	
 	pause_license;	
@@ -1455,7 +1432,7 @@ check_license()
 set_update_license()
 {
 
-	if [ $1 -eq 1 ]; then
+	if [[ $1 -eq 1 ]]; then
 		echo "Enter the full path to Red5pro installation"
 		read rpro_path
 	else
@@ -1463,35 +1440,40 @@ set_update_license()
 	fi
 	
 
-	lic_file=$rpro_path/LICENSE.KEY
-	lic_new=1
+	check_current_rpro 1
+	if [[ $rpro_exists -eq 1 ]]; then
 
-	if [ ! -f $lic_file ]; then
-  		echo "Installing license code : Please enter new license code and press [ Enter ]."
-		if [ ! -f "$lic_file" ] ; then
-         		# if not create the file
-         		touch "$lic_file"
-	     	fi
-	else
-		lic_new=0
-		cat $lic_file | while read line
-		do
-		echo "a line: $line"
-		done
-		echo "Updating license : Please enter new license code and press [ Enter ]."
-	fi
+		lic_file=$rpro_path/LICENSE.KEY
+		lic_new=1
 
-	read license_code
+		if [ ! -f $lic_file ]; then
+	  		echo "Installing license code : Please enter new license code and press [ Enter ]."
+			if [ ! -f "$lic_file" ] ; then
+		 		# if not create the file
+		 		touch "$lic_file"
+		     	fi
+		else
+			lic_new=0
+			cat $lic_file | while read line
+			do
+			echo "a line: $line"
+			done
+			echo "Updating license : Please enter new license code and press [ Enter ]."
+		fi
 
-	license_code=$(echo $license_code | tr '[a-z]' '[A-Z]')
-	printf $license_code > $lic_file;
+		read license_code
 
-	if [ $lic_new -eq 1 ]; then
-	echo "license installed"
-	else
-	echo "License updated"
+		license_code=$(echo $license_code | tr '[a-z]' '[A-Z]')
+		printf $license_code > $lic_file;
+
+		if [ $lic_new -eq 1 ]; then
+		echo "license installed"
+		else
+		echo "License updated"
+		fi
 	fi
 	
+
 	pause_license;	
 }
 
