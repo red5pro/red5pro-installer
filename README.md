@@ -173,6 +173,28 @@ Selecting this option lets you see the current java version on your system. If j
 This option lets you install red5 service. On selecting this option, the program first checks to see if red5pro in installed. If red5pro is not installed the operation exits. If red5pro installation is found the program attempts to register it as a service. If red5pro service is already installed on the OS, it prompts the user to overwrite it. If user selects to overwrite (By selecting 'y' + ENTER), the service will be re-installed else the operation exists.
 
 
-#### 2. UNINSTALL RED5PRO SERVICE
+#### 3. UNINSTALL RED5PRO SERVICE
 
 This option lets you uninstall red5 service. On selecting this option, the program first checks to see if red5pro in installed. Next it shecks to see if service is installed. If red5pro is not installed the operation exits. If red5pro installation is found the program attempts to unregister it as a service. If red5pro service does not exist on the OS, the operation exits. If service is found it is removed.
+
+
+#### 4. UPGRADE RED5PRO FROM LATEST
+
+The upgrade option allows you to install the latest red5pro over an existing installation. Although this is fairly a complex process, the program simplifies it for the user by providing step by step onscreen instructions.
+
+
+Selecting this option, the program checks for an existing red5pro installation. If an existing installation is not found the operation exits.If an installation is found at install location, the program will create a backup of the existing red5pro instalaltion into the default red5pro backup location automatically before installing the new copy. 
+
+The program prompts the user for confirmation to follow through. On confirmation, it creates a backup of existing red5pro instalaltion and displays the path of the backup location.
+
+The program then follows through the new red5pro instalaltion by downloading the latets red5pro from red5pro.com. (__Similar to Basic Mode -> Install Latest Red5pro__) .  
+
+After the installation is complete the program prompts the user for optional restoration help. If the user accepts, the program switches to restore wizard. If user does not accept the operation exists.
+
+The restore wizard helps the user restore some of the common items that can be restored such as :
+
+* License - RED5_HOME/LICENSE.KEY
+* Cluster configuration - RED5_HOME/webapps/root/red5-default.xml
+* Web applications - RED5_HOME/webapps/*
+
+The restore wizard prompts the user for each restoreable item. If user accepts the item is automatically restored from the backup into the new installation. If the user rejects the wizard skosp that item. Restoration can be re-done anytime manually as well. At the end of the wizard the operation exits automatically.
