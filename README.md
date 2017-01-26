@@ -71,7 +71,8 @@ The basic mode provides all the options, commonly required to setup a new red5pr
 
 
 
-__* INSTALL LATEST RED5PRO__
+#### INSTALL LATEST RED5PRO
+
 
 Allows you to install Red5pro from red5pro.com website. You must have an existing account on red5pro.com to use this option. Before proceesding, the script checks for a few basic requirements : 
 
@@ -93,7 +94,7 @@ Once the download completes, the program extracts the archive file's content and
 The script prompts to determine if a autostart service is required for the red5pro installation. If user selects 'yes', The program creates a linux startup script for the current OS platform. Thsi script helsp red5pro start automatically with operating system startup.
 
 
-__* INSTALL RED5PRO FROM ZIP__
+#### INSTALL RED5PRO FROM ZIP
 
 This option lets you install Red5pro from a pre downlaoded zip. In case you have a older Red5pro that you wish to install or if you do not want to have the program download the latest red5pro for you.
 
@@ -104,10 +105,12 @@ __The archive should have been downloaded from red5pro.com. Using a archive from
 The program extracts the archive file's content and copies the red5pro files into the install location. The rest of the process is exactly the same as for the first option (INSTALL LATEST RED5PRO).
 
 
-* Install Red5pro from zip
-* Remove Red5pro installation
-* Remove Red5pro installation
 
+#### REMOVE RED5PRO INSTALLATION
+
+This option lets you remove an existing red5pro installation. Removal deletes all the files and removes red5pro startup script if it exists.
+
+On selection of this option, the program loosk for existing red5pro installation in the install location. If an installation is found, the user will be prompted to confirm the removal action. If user confirms it (by pressing Y + [ ENTER ] ), the script deletes the red5pro installation as well as any red5pro service installed on the OS.
 
 
 
