@@ -1575,13 +1575,13 @@ advance_menu()
 	echo "-------------- ADVANCE MODE --------------"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "1. WHICH JAVA AM I USING ?"
-	echo "2. ADD / UPDATE JAVA"
-	echo "3. INSTALL RED5PRO SERVICE"
-	echo "4. UNINSTALL RED5PRO SERVICE"
-	#echo "5. UPGRADE RED5PRO FROM ZIP"
-	echo "5. UPGRADE RED5PRO FROM LATEST"
+	# echo "2. ADD / UPDATE JAVA"
+	echo "2. INSTALL RED5PRO SERVICE"
+	echo "3. UNINSTALL RED5PRO SERVICE"
+	# echo "5. UPGRADE RED5PRO FROM ZIP"
+	echo "4. UPGRADE RED5PRO FROM LATEST"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "6. BACK TO MODE SELECTION"
+	echo "5. BACK TO MODE SELECTION"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "0. Exit"
 	echo "                             "
@@ -1594,15 +1594,15 @@ advance_menu()
 
 advance_menu_read_options(){
 	local choice
-	read -p "Enter choice [ 1 - 6 | 0 to exit]] " choice
+	read -p "Enter choice [ 1 - 5 | 0 to exit]] " choice
 	case $choice in
 		1) check_java 1 ;;
-		2) add_update_java ;;
-		3) register_rpro_as_service ;;
-		4) unregister_rpro_as_service ;;
+		# 2) add_update_java ;;
+		2) register_rpro_as_service ;;
+		3) unregister_rpro_as_service ;;
 		# 5) upgrade 1 ;;
-		5) upgrade ;;
-		6) main ;;
+		4) upgrade ;;
+		5) main ;;
 		0) exit 0;;
 		*) echo -e "${RED}Error...${STD}" && sleep 2
 	esac
