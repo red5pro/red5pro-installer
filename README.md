@@ -160,3 +160,19 @@ TO DO
 
 
 ![Advance Mode](Linux/images/advance_mode.png?raw=true "Advance Mode")
+
+
+
+#### 1. WHICH JAVA AM I USING ?
+
+Selecting this option lets you see the current java version on your system. If java is not found, the program will print a message to notify the same.
+
+
+#### 2. INSTALL RED5PRO SERVICE
+
+This option lets you install red5 service. On selecting this option, the program first checks to see if red5pro in installed. If red5pro is not installed the operation exits. If red5pro installation is found the program attempts to register it as a service. If red5pro service is already installed on the OS, it prompts the user to overwrite it. If user selects to overwrite (By selecting 'y' + ENTER), the service will be re-installed else the operation exists.
+
+
+#### 2. UNINSTALL RED5PRO SERVICE
+
+This option lets you uninstall red5 service. On selecting this option, the program first checks to see if red5pro in installed. Next it shecks to see if service is installed. If red5pro is not installed the operation exits. If red5pro installation is found the program attempts to unregister it as a service. If red5pro service does not exist on the OS, the operation exits. If service is found it is removed.
