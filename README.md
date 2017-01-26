@@ -126,3 +126,24 @@ __1. ADD / UPDATE LICENSE :__  Provides option to add a new license or update on
 
 __2. VIEW LICENSE :__  Provides option to view an existing red5pro license via the LICENSE.KEY file. The program looks for an existing red5pro installation and then the LICENSE.KEY file at expected location. If a file is found it displays the content of the file on terminal.
 
+
+
+#### 5. START RED5PRO
+
+This option allows you to start Red5pro. On selecting this option, the program first checks to see if a Red5pro service is installed on the system or not. If a red5pro service is found, it attempts to start red5 usign the service. If no service is found it attempts to start red5 using 'red5.sh' script located at the red5 install location.
+
+__The program doe snot check the running state of red5pro. If it is started, starting it again will have no effect._
+
+__NOTE: This does not check to see if you have installed red5pro or not. It is assumed that you have a valid red5pro instalaltion before attempting to start it.
+
+
+#### 6. STOP RED5PRO
+
+This option allows you to stop Red5pro. On selecting this option, the program first checks to see if a Red5pro service is installed on the system or not. If a red5pro service is found, it attempts to stop red5 usign the service. If no service is found it attempts to stop red5 using 'red5.sh' script located at the red5 install location.
+
+__The program doe snot check the running state of red5pro. If it is stopped, stopping it again will have no effect._
+
+__NOTE: This does not check to see if you have installed red5pro or not. It is assumed that you have a valid red5pro instalaltion before attempting to stop it.
+
+
+
