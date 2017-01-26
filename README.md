@@ -41,6 +41,12 @@ The script requires super user privileges to execute and carry out subtasks. Hen
 
 >> Use the menu driven interface sequentially and follow instructiosn carefully for best results.
 
+
+##### SPECIAL NOTE
+
+__On linux you can hit `CTRL + C` in the terminal at anytiem to interrupt/abort a script execution.__
+
+
 ---
 
 ## PROGRAM CONFIGURATION FILE -> CONF.INI
