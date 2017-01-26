@@ -144,19 +144,20 @@ Allows you to install Red5pro from red5pro.com website. You must have an existin
 * Java : Java (JRE / JDK 1.8 or greater is required to install Red5pro)
 * unzip : Unzip utility is required to unpack zip archives.
 
-Depending on whether the softwares are found in the os distribution, the script helps you install them using the platform specific installation method. (ie: Ubuntu uses apt-get, where as CentOS uses yum to install softwares. )
 
 Once the requirements are met the script proceeds to 'obtaining the latest Red5pro from Red5pro.com'. At this point, it prompts you for site credentials (email  & password). This information is posted to the website to help authenticate your download. If authentication succeeds, it begins downloading the latest red5pro archive file from red5pro.com. 
 
 
 __* If an existing script is found, the script tried to stop red5 in case it was running before it can continue.__
 
-__* If there is an existing red5pro installation found at the location, the files wil be backed up to the default backup location__
+__* If there is an existing red5pro installation found at the location, the files will be backed up to the default backup location__
 
 
-Once the download completes, the program extracts the archive file's content and copies the red5pro files into the install location. It prompts for a confirmation before starting the install.
+The program then  extracts the archive file's content and copies the red5pro files into the install location.
 
-The script prompts to determine if a autostart service is required for the red5pro installation. If user selects 'yes', The program creates a linux startup script for the current OS platform. Thsi script helsp red5pro start automatically with operating system startup.
+Depending on whether the softwares are found in the os distribution, the script helps you install them using the platform specific installation method. (ie: Ubuntu uses apt-get, where as CentOS uses yum to install softwares. )
+
+The script prompts to determine if a autostart service is required for the red5pro installation. If user accepts, The program creates a linux startup script for the current OS platform. This script helps red5pro start automatically with operating system.
 
 
 #### 2. INSTALL RED5PRO FROM ZIP
