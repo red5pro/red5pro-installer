@@ -5,7 +5,10 @@ Installer for Red5 Pro Server
 ## INTRODUCTION
 ---
 
-TO DO
+The Red5pro install is a shell script, designed to make Red5pro installation simple and more efficient by automating most of the tasks related to getting a new Red5pro installation running.
+
+The script presents a collection menu driven options to help achieve various red5pro setup tasks. Additionally it also takes care of installing the software depencencies required to get Red5pro working. The script in intended to work on supported linux flavors and mac.
+
 
 
 ## REQUIREMENTS
