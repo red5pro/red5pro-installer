@@ -93,6 +93,16 @@ Once the download completes, the program extracts the archive file's content and
 The script prompts to determine if a autostart service is required for the red5pro installation. If user selects 'yes', The program creates a linux startup script for the current OS platform. Thsi script helsp red5pro start automatically with operating system startup.
 
 
+__* INSTALL RED5PRO FROM ZIP__
+
+This option lets you install Red5pro from a pre downlaoded zip. In case you have a older Red5pro that you wish to install or if you do not want to have the program download the latest red5pro for you.
+
+The script checks the basic red5pro requirements as with the first option (INSTALL LATEST RED5PRO). Once requiremenst are met, it prommpts you for the full absolute path of the red5pro zip file. 
+
+__The archive should have been downloaded from red5pro.com. Using a archive from a different source will not work__
+
+The program extracts the archive file's content and copies the red5pro files into the install location. The rest of the process is exactly the same as for the first option (INSTALL LATEST RED5PRO).
+
 
 * Install Red5pro from zip
 * Remove Red5pro installation
