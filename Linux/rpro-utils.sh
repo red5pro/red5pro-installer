@@ -587,9 +587,6 @@ install_rpro_zip()
 
 
 	echo "Unpacking archive to install location -------"
-
-	mkdir -p $rpro_loc
-	chmod -R ugo+w $rpro_loc
 	
 	
 	if ! unzip $rpro_zip_path -d $unzip_dest; then
@@ -613,7 +610,9 @@ install_rpro_zip()
 	echo "Setting permissions -----------"
 	sleep 1
 
-	chmod -R chmod 755 $rpro_loc	
+	chmod -R 755 $rpro_loc	
+
+	chmod -R ugo+w $rpro_loc
 	
 	chmod +x $rpro_loc/red5.sh
 
@@ -672,6 +671,9 @@ install_rpro_zip()
 	
 	# All Done
 	echo "Red5pro service is now installed on your system. You can start / stop it with from the menu".
+
+	# Moving to home directory	
+	cd ~
 
 	if [ $# -eq 0 ]
 	  then
@@ -889,6 +891,7 @@ unregister_rpro_service_rhl()
 
 start_red5pro_service()
 {
+	cd ~
 
 	if [ ! -f "$SERVICE_LOCATION/$SERVICE_NAME" ];	then
 		echo "It seems Red5Pro service was not installed. Please register Red5pro service from the menu for best results."
@@ -923,7 +926,7 @@ start_red5pro_service()
 
 stop_red5pro_service()
 {
-	proc="red5"
+	cd ~
 
 	if [ ! -f "$SERVICE_LOCATION/$SERVICE_NAME" ];	then
 		echo "It seems Red5Pro service was not installed. Please register Red5pro service from the menu for best results."
