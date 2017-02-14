@@ -143,10 +143,27 @@ check_unzip()
 
 	if isinstalled unzip; then
 	unzip_check_success=1
-	echo "Unzip utility was found"		
+	echo "unzip utility was found"		
 	else
 	unzip_check_success=0
-	echo "Unzip utility not found."	
+	echo "unzip utility not found."	
+	fi
+}
+
+
+
+
+# Public
+check_wget()
+{
+	wget_check_success=0
+
+	if isinstalled wget; then
+	wget_check_success=1
+	echo "wget utility was found"		
+	else
+	wget_check_success=0
+	echo "wget utility not found."	
 	fi
 }
 
@@ -221,9 +238,7 @@ install_java_rhl()
 
 
 
-	if [ $java_downloaded -eq 0 ]; then
-
-		
+	if [[ $java_downloaded -eq 0 ]]; then
 
 		echo "Downloading $java_url"
 
@@ -240,7 +255,7 @@ install_java_rhl()
 
 
 	# install
-	if [ $java_downloaded -eq 1 ]; then
+	if [[ $java_downloaded -eq 1 ]]; then
 		yum localinstall $java_installer
 		rm ~/$java_installer
 	fi
@@ -278,6 +293,43 @@ install_unzip_rhl()
 {
 	# yup update
 	yum install unzip
+
+	install_unzip="$(which unzip)";
+	echo "Unzip installed at $install_unzip"
+}
+
+
+
+
+# Public
+install_wget()
+{
+	if isDebian; then
+	install_wget_deb	
+	else
+	install_wget_rhl
+	fi		
+}
+
+
+
+# Private
+install_wget_deb()
+{
+	apt-get update
+	apt-get install wget
+
+	install_unzip="$(which unzip)";
+	echo "Unzip installed at $install_unzip"
+}
+
+
+
+# Private
+install_wget_rhl()
+{
+	# yup update
+	yum install wget
 
 	install_unzip="$(which unzip)";
 	echo "Unzip installed at $install_unzip"
@@ -395,7 +447,7 @@ auto_install_rpro()
 	red5_zip_install_success=0
 
 	# Install prerequisites
-	prerequisites
+	prerequisites_wget
 
 	# Checking java
 	echo "Checking java requirements"
@@ -513,6 +565,8 @@ unregister_rpro_as_service()
 install_rpro_zip()
 {
 	red5_zip_install_success=0
+
+	prerequisites_unzip
 
 			
 	clear
@@ -1856,7 +1910,7 @@ main()
 
 
 
-prerequisites()
+prerequisites_unzip()
 {
 	# Checking unzip
 	echo "Checking for unzip"
@@ -1865,11 +1919,32 @@ prerequisites()
 	check_unzip
 
 
-	if [ "$unzip_check_success" -eq 0 ]; then
+	if [[ $unzip_check_success -eq 0 ]]; then
 		echo "Installing unzip..."
 		sleep 2
 
 		install_unzip
+	fi 
+}
+
+
+
+
+prerequisites_wget()
+{
+
+	# Checking wget
+	echo "Checking for wget"
+	sleep 2
+	
+	check_wget
+
+
+	if [[ $wget_check_success -eq 0 ]]; then
+		echo "Installing wget..."
+		sleep 2
+
+		install_wget
 	fi 
 }
 
