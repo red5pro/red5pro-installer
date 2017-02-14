@@ -1767,7 +1767,14 @@ detect_system()
 	if [[ $OS_NAME == *"Ubuntu"* ]]; then
 	OS_TYPE=$OS_DEB
 	else
-	OS_TYPE=OS_RHL
+	OS_TYPE=$OS_RHL
+	fi
+
+
+	if isinstalled unzip; then
+	echo "unzip found"
+	else
+	echo "not found"
 	fi
 }
 
@@ -1920,9 +1927,9 @@ postrequisites_deb()
 isinstalled()
 {
 	if isDebian; then
-	isinstalled_deb 
+	isinstalled_deb $1 
 	else
-	isinstalled_rhl
+	isinstalled_rhl $1
 	fi
 }
 
@@ -1965,4 +1972,6 @@ isDebian()
 
 # Start application
 main
+
+
 
