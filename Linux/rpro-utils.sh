@@ -307,6 +307,9 @@ download_latest()
 {
 	clear
 
+	rpro_email_valid=0
+	rpro_password_valid=0
+
 	latest_rpro_download_success=0
 	rpro_zip=
 
@@ -330,8 +333,7 @@ download_latest()
 
 	# simple validate email
 	if echo "${rpro_email}" | grep '^[a-zA-Z0-9]*@[a-zA-Z0-9]*\.[a-zA-Z0-9]*$' >/dev/null; then
-	    	# NO OP
-		# echo "Email string ok!"		
+		rpro_email_valid=1		
 	else
 		rpro_form_valid=0
 		echo "Invalid email string!"		
@@ -339,7 +341,7 @@ download_latest()
 	
 	# simple validate password
 	if [ ! -z "$rpro_passcode" -a "$rpro_passcode" != " " ]; then
-		# echo "Password string ok!"		
+		rpro_password_valid=1		
 	else
 		rpro_form_valid=0
 		echo "Invalid password string!"
