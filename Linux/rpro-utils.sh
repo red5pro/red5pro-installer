@@ -331,7 +331,7 @@ download_latest()
 	# simple validate email
 	if echo "${rpro_email}" | grep '^[a-zA-Z0-9]*@[a-zA-Z0-9]*\.[a-zA-Z0-9]*$' >/dev/null; then
 	    	# NO OP
-		echo "Email string ok!"		
+		# echo "Email string ok!"		
 	else
 		rpro_form_valid=0
 		echo "Invalid email string!"		
@@ -339,7 +339,7 @@ download_latest()
 	
 	# simple validate password
 	if [ ! -z "$rpro_passcode" -a "$rpro_passcode" != " " ]; then
-		echo "Password string ok!"		
+		# echo "Password string ok!"		
 	else
 		rpro_form_valid=0
 		echo "Invalid password string!"
@@ -348,6 +348,9 @@ download_latest()
 
 	# if all params are valid
 	if [ "$rpro_form_valid" -eq "1" ]; then
+	
+		echo "Attempting to log in with your credentials"
+
 		# POST to site
 		wget --server-response --save-cookies cookies.txt --keep-session-cookies --post-data="email=$rpro_email&password=$rpro_passcode" "https://account.red5pro.com/login" 2>$dir/wsession.txt
 		wget_status=$(< $dir/wsession.txt)
