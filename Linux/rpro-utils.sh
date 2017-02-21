@@ -880,7 +880,7 @@ register_rpro_service()
 	rpro_service_install_success=0
 
 	echo "Preparing to install service..."
-	write_log "Preparing to install service..."
+	write_log "Preparing to install service"
 	sleep 2
 
 
@@ -1017,7 +1017,7 @@ unregister_rpro_service()
 	prog="red5"
 
 	echo "Preparing to remove service..."
-	write_log "Preparing to remove service..."
+	write_log "Preparing to remove service"
 	sleep 2
 
 
@@ -1281,7 +1281,7 @@ restore_rpro()
 	RPRO_BACKUP_FOLDER=$1
 
 	echo "Initializing restore procedure..."
-	write_log "Initializing restore procedure..."
+	write_log "Initializing restore procedure"
 
 	echo "##########################################################################"
 	echo "This interactive wizard will help you with some basic backup restore steps."
@@ -1324,7 +1324,7 @@ restore_rpro()
 	;;
 	*)
 	echo "Skipping..."
-	write_log "Skipping..."
+	write_log "Skipping"
 	sleep 1
 	;;
 	esac
@@ -1357,7 +1357,7 @@ restore_rpro()
 	;;
 	*)
 	echo "Skipping..."
-	write_log "Skipping..."
+	write_log "Skipping"
 	sleep 1
 	;;
 	esac
@@ -1374,7 +1374,7 @@ restore_rpro()
 	[yY][eE][sS]|[yY]) 
 
 		echo "Scanning for applications in backup...."
-		write_log "Scanning for applications in backup...."
+		write_log "Scanning for applications in backup"
 		apps_to_restore=0
 		for i in $(ls -d "$BACKUP_WEBAPPS_FOLDER/"*/); 
 			do 
@@ -1417,7 +1417,7 @@ restore_rpro()
 			;;
 			*)
 			echo "Skipping..."
-			write_log "Skipping..."
+			write_log "Skipping"
 			sleep 1
 			;;
 			esac
@@ -1427,7 +1427,7 @@ restore_rpro()
 	;;
 	*)
 	echo "Skipping..."
-	write_log "Skipping..."
+	write_log "Skipping"
 	sleep 1
 	;;
 	esac
@@ -1459,7 +1459,7 @@ backup_rpro()
 	if [ -d "$RPRO_BACKUP_HOME" ]; then
 	  
 		echo "Starting backup procedure..."
-		write_log "Starting backup procedure..."
+		write_log "Starting backup procedure"
 		sleep 2
 
 		# echo "Stopping Red5pro if it was running..."
@@ -1467,7 +1467,7 @@ backup_rpro()
 		sleep 10
 
 		echo "Backing up... "
-		write_log "Backing up... "
+		write_log "Backing up"
 		sleep 5
 
 		# Create backup folder
@@ -1499,7 +1499,7 @@ backup_rpro()
 
 	else
 		echo "Failed to create backup directory. Backup will be skipped..."
-		write_log "Failed to create backup directory. Backup will be skipped..."
+		write_log "Failed to create backup directory. Backup will be skipped"
 
 	fi
 
@@ -1527,7 +1527,7 @@ upgrade()
 
 	# Start process
 	echo "Initializing upgrade process..."
-	write_log "Initializing upgrade process..."
+	write_log "Initializing upgrade process"
 	sleep 2
 
 	check_current_rpro 1
@@ -1756,7 +1756,6 @@ show_licence_menu()
 
 licence_menu()
 {
-	write_log "Rendering license menu"
 
 	cls
 
@@ -1776,7 +1775,6 @@ licence_menu()
 
 license_menu_read_options(){
 
-	write_log "Reading advance menu option"
 
 	local choice
 	read -p "Enter choice [ 1 - 3] " choice
@@ -1813,12 +1811,10 @@ show_advance_menu()
 advance_menu()
 {
 
-	write_log "Rendering advance menu"
-
 	cls
 
-	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-	echo "-------------- ADVANCE MODE --------------"
+	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"	
+	echo " RED5PRO INSTALLER - ADVANCE MODE         	"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 	echo "1. WHICH JAVA AM I USING ?"
 	# echo "2. ADD / UPDATE JAVA"
@@ -1840,7 +1836,6 @@ advance_menu()
 
 advance_menu_read_options(){
 
-	write_log "Reading advance menu option"
 
 	local choice
 	read -p "Enter choice [ 1 - 5 | 0 to exit]] " choice
@@ -1883,12 +1878,11 @@ show_simple_menu()
 
 simple_menu()
 {
-	write_log "Rendering simple menu"
 
 	cls
 
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"	
-	echo " RED5PRO SUPER UTILS - BASIC MODE         "
+	echo " RED5PRO INSTALLER - BASIC MODE         	"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 #	echo "1. CHECK EXISTING RED5PRO INSTALLATION"
 	echo "1. INSTALL LATEST RED5PRO"
@@ -1917,7 +1911,6 @@ simple_menu()
 
 simple_menu_read_options(){
 
-	write_log "Reading simple menu option"
 
 	local choice
 	read -p "Enter choice [ 1 - 7 | 0 to exit] " choice
@@ -1947,7 +1940,6 @@ simple_menu_read_options(){
 
 load_configuration()
 {
-	write_log "Loading configuration"
 
 	if [ ! -f $CONFIGURATION_FILE ]; then
 		echo "CRITICAL ERROR!! - Configuration file not found!"
@@ -1960,7 +1952,6 @@ load_configuration()
 	# Load config values
 	source "$CONFIGURATION_FILE"
 
-	write_log "Configuration loaded"
 
 	JAVA_32_BIT="$JAVA_JRE_DOWNLOAD_URL/$JAVA_32_FILENAME"
 	JAVA_64_BIT="$JAVA_JRE_DOWNLOAD_URL/$JAVA_64_FILENAME"
@@ -1982,12 +1973,7 @@ load_configuration()
 
 detect_system()
 {
-	write_log "Detecting system"
 
-	
-	load_configuration
-
-	
 	ARCH=$(uname -m | sed 's/x86_//;s/i[3-6]86/32/')
 
 	if [ -f /etc/lsb-release ]; then
@@ -2085,14 +2071,12 @@ advance_usage_mode()
 
 
 welcome_menu()
-{
-	write_log "Rendering welcome menu"
-
+{	
 	cls
 
 
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"	
-	echo " RED5PRO UTILITIES - W E L C O M E   M E N U"
+	echo " RED5PRO INSTALLER - W E L C O M E   M E N U"
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 	detect_system
@@ -2113,8 +2097,7 @@ welcome_menu()
 
 read_welcome_menu_options()
 {
-	write_log "Reading welcome menu option"
-
+	
 	local choice
 	read -p "Enter choice [ 1 - 2 | 0 to exit] " choice
 	case $choice in
@@ -2283,9 +2266,7 @@ isDebian()
 
 
 # Start application
-write_log "==========================================="
-write_log "===== STARTING NEW INSTALLER SESSION ======"
-
+load_configuration
 main
 
 
