@@ -7,6 +7,9 @@ CONFIGURATION_FILE=conf.ini
 
 # DEFAULT_RPRO_PATH=/usr/local/red5pro
 # MIN_JAVA_VERSION="1.8"
+LOGGING=true
+LOG_FILE_NAME=rpro_installer.log
+LOG_FILE=$PWD/$LOG_FILE_NAME
 
 OS_TYPE=
 OS_DEB="DEBIAN"
@@ -29,6 +32,50 @@ JAVA_32_FILENAME="jre-8u102-linux-i586.rpm"
 JAVA_64_FILENAME="jre-8u102-linux-x64.rpm"
 
 
+######################################################################################
+
+################################## LOGGER ############################################
+
+
+
+write_log()
+{
+	if [ $# -eq 0 ]; then
+		return
+	else
+		if $LOGGING; then
+			logger -s $1 2>> $LOG_FILE
+		fi
+	fi
+}
+
+
+
+
+echo_log()
+{
+	if [ $# -eq 0 ]; then
+		return
+	else
+		echo $1
+		logger -s $1 2>> $LOG_FILE
+	fi
+}
+
+
+
+
+clear_log()
+{
+	> $LOG_FILE
+}
+
+
+
+delete_log()
+{
+	rm $LOG_FILE
+}
 
 
 ######################################################################################
@@ -57,6 +104,7 @@ pause()
  	show_simple_menu
 	fi
 }
+
 
 
 
@@ -95,6 +143,8 @@ empty_line()
 # Public
 check_java()
 {
+	write_log "Checking java requirements"
+
 	java_check_success=0
 	has_min_java_version=0
 
@@ -109,20 +159,26 @@ check_java()
 
 	if [ ! -x "$JAVA" ]; then
 	  	echo "Unable to locate Java. If you think you do have java installed, please set JAVA_HOME environment variable to point to your JDK / JRE."
+		write_log "Unable to locate Java"
 	else
 		JAVA_VER=$(java -version 2>&1 | sed 's/java version "\(.*\)\.\(.*\)\..*"/\1\2/; 1q')
 
 		JAVA_VERSION=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
 
 		echo "Current java version is $JAVA_VERSION"
+
+		write_log "Current java version is $JAVA_VERSION"
+
 		JAVA_VERSION_MAJOR=`echo "${JAVA_VERSION:0:3}"`
 
 		if (( $(echo "$JAVA_VERSION_MAJOR < $MIN_JAVA_VERSION" |bc -l) )); then
 			has_min_java_version=0			
-			echo "You need to install a newer java version of java!"			
+			echo "You need to install a newer java version of java!"
+			write_log "A newer version of java is required"			
 		else
 			has_min_java_version=1
 			echo "Minimum java version is already installed!"
+			write_log "Minimum required version of java already installed"
 		fi
 	fi
 
@@ -139,14 +195,17 @@ check_java()
 # Public
 check_unzip()
 {
+	write_log "Checking for unzip utility"			
 	unzip_check_success=0
 
 	if isinstalled unzip; then
 	unzip_check_success=1
-	echo "unzip utility was found"		
+	echo "unzip utility was found"
+	write_log "unzip found"			
 	else
 	unzip_check_success=0
 	echo "unzip utility not found."	
+	write_log "unzip not found"			
 	fi
 }
 
@@ -156,14 +215,17 @@ check_unzip()
 # Public
 check_wget()
 {
+	write_log "Checking for wget utility"	
 	wget_check_success=0
 
 	if isinstalled wget; then
 	wget_check_success=1
-	echo "wget utility was found"		
+	echo "wget utility was found"	
+	write_log "wget found"		
 	else
 	wget_check_success=0
 	echo "wget utility not found."	
+	write_log "wget not found"	
 	fi
 }
 
@@ -172,6 +234,7 @@ check_wget()
 # Public
 install_java()
 {
+	write_log "Installing java"	
 	java_install_success=0
 
 
@@ -185,14 +248,16 @@ install_java()
 	# verify
 	check_java
 
-	has_min_java_version=1
+	# has_min_java_version=1
 
 	if [ $has_min_java_version -eq 1 ]; then
-		default_jre="$(which java)";
-		echo "JRE   successfully installed at $default_jre"
+		local default_jre="$(which java)";
+		echo "Java successfully installed at $default_jre"
+		write_log "Java installed at $default_jre"
 		java_install_success=1
 	else
 		echo "Could not install required version of java"
+		write_log "Could not install required version of java"
 	fi
 		
 }
@@ -202,7 +267,8 @@ install_java()
 # Private
 install_java_deb()
 {
-	echo "Installing Java 8 for Ubuntu";
+	write_log "Installing Java for Debian"
+	echo "Installing Java for Debian";
 		
 	add-apt-repository ppa:webupd8team/java
 	apt-get update
@@ -215,6 +281,7 @@ install_java_deb()
 # Private
 install_java_rhl()
 {
+	write_log "Installing Java for RHLE"
 	echo "Installing Java 8 for CentOs";
 	
 
@@ -240,6 +307,7 @@ install_java_rhl()
 
 	if [[ $java_downloaded -eq 0 ]]; then
 
+		write_log "Downloading $java_url"
 		echo "Downloading $java_url"
 
 		wget --header "Cookie: oraclelicense=accept-securebackup-cookie" $java_url
@@ -247,8 +315,10 @@ install_java_rhl()
 		# if downloaded
 		if [ -f $java_installer ]; then
 			java_downloaded=1
+			write_log "Downloading successful"
 		else
 			echo "Failed to download java installer package"
+			write_log "Failed to download java installer package"
 		fi
 	fi
 
@@ -256,6 +326,7 @@ install_java_rhl()
 
 	# install
 	if [[ $java_downloaded -eq 1 ]]; then
+		write_log "Installing package $java_installer"
 		yum localinstall $java_installer
 		rm ~/$java_installer
 	fi
@@ -267,6 +338,8 @@ install_java_rhl()
 # Public
 install_unzip()
 {
+	write_log "Installing unzip"
+
 	if isDebian; then
 	install_unzip_deb	
 	else
@@ -279,11 +352,14 @@ install_unzip()
 # Private
 install_unzip_deb()
 {
+	write_log "Installing unzip on debian"
+
 	apt-get update
 	apt-get install unzip
 
 	install_unzip="$(which unzip)";
 	echo "Unzip installed at $install_unzip"
+	write_log "Unzip installed at $install_unzip"
 }
 
 
@@ -291,11 +367,14 @@ install_unzip_deb()
 # Private
 install_unzip_rhl()
 {
+	write_log "Installing unzip on rhle"
+
 	# yup update
 	yum install unzip
 
 	install_unzip="$(which unzip)";
 	echo "Unzip installed at $install_unzip"
+	write_log "Unzip installed at $install_unzip"
 }
 
 
@@ -304,6 +383,8 @@ install_unzip_rhl()
 # Public
 install_wget()
 {
+	write_log "Installing wget"
+
 	if isDebian; then
 	install_wget_deb	
 	else
@@ -316,11 +397,14 @@ install_wget()
 # Private
 install_wget_deb()
 {
+	write_log "Installing wget on debian"
+
 	apt-get update
 	apt-get install wget
 
-	install_unzip="$(which unzip)";
-	echo "Unzip installed at $install_unzip"
+	install_wget="$(which unzip)";
+	echo "wget installed at $install_wget"
+	write_log "wget installed at $install_wget"
 }
 
 
@@ -328,11 +412,14 @@ install_wget_deb()
 # Private
 install_wget_rhl()
 {
+	write_log "Installing wget on rhle"
+
 	# yup update
 	yum install wget
 
-	install_unzip="$(which unzip)";
-	echo "Unzip installed at $install_unzip"
+	install_wget="$(which unzip)";
+	echo "wget installed at $install_wget"
+	write_log "wget installed at $install_wget"
 }
 
 
@@ -358,6 +445,7 @@ add_update_java()
 download_latest()
 {
 	clear
+	
 
 	rpro_email_valid=0
 	rpro_password_valid=0
@@ -366,6 +454,7 @@ download_latest()
 	rpro_zip=
 
 	echo "Downloading latest Red5pro from red5pro.com"
+	write_log "Downloading latest red5pro from red5pro.com"
 	
 	# create tmp directory
 	dir=`sudo mktemp -d` && cd $dir
@@ -388,7 +477,8 @@ download_latest()
 		rpro_email_valid=1		
 	else
 		rpro_form_valid=0
-		echo "Invalid email string!"		
+		echo "Invalid email string!"	
+		write_log "Invalid email address format"	
 	fi
 	
 	# simple validate password
@@ -397,6 +487,7 @@ download_latest()
 	else
 		rpro_form_valid=0
 		echo "Invalid password string!"
+		write_log "Invalid password string"	
 	fi
 
 
@@ -404,10 +495,13 @@ download_latest()
 	if [ "$rpro_form_valid" -eq "1" ]; then
 	
 		echo "Attempting to log in with your credentials"
+		write_log "Attempting to log in with your credentials"	
 
 		# POST to site
 		wget --server-response --save-cookies cookies.txt --keep-session-cookies --post-data="email=$rpro_email&password=$rpro_passcode" "https://account.red5pro.com/login" 2>$dir/wsession.txt
 		wget_status=$(< $dir/wsession.txt)
+	
+		# write_log "HTTP Status code: $wget_status"
 
 		# Check http code
 		wget_status_ok=0
@@ -430,10 +524,12 @@ download_latest()
 			done
 		else
 			echo "Failed to authenticate with website!"
+			write_log "Failed to authenticate with website!"
 		fi
 		
 	else
 		echo "Invalid HTTP request parameters"
+		write_log "Invalid request parameters"
 	fi
 }
 
@@ -444,6 +540,8 @@ download_latest()
 # Public
 auto_install_rpro()
 {
+	write_log "Starting red5pro auto-installer"
+
 	red5_zip_install_success=0
 
 	# Install prerequisites
@@ -483,11 +581,13 @@ auto_install_rpro()
 	# Installing red5 from zip downloaded  from red5pro.com
 
 	echo "Installing Red5Pro"
+	write_log "Installing red5pro from $rpro_zip"
 	sleep 2
 	install_rpro_zip $rpro_zip
 
-	if [ "$red5_zip_install_success" -eq 0 ]; then
+	if [ "$red5_zip_install_success" -eq 0 ]; then		
 		echo "Failed to install Red5pro distribution. Something went wrong!! Try again or contact support!"
+		write_log "Failed to install red5pro $rpro_zip"
 	fi
 
 	
@@ -508,9 +608,11 @@ register_rpro_as_service()
 
 	if [ "$rpro_exists" -eq 1 ]; then
 
+		write_log "Registering service for red5pro"
 
 		if [ -f "$SERVICE_LOCATION/$SERVICE_NAME" ]; then
 		echo "Service already exists. Do you wish to re-install ?" 
+		write_log "Service already exists"
 		read -r -p "Are you sure? [y/N] " response
 
 		case $response in
@@ -518,7 +620,8 @@ register_rpro_as_service()
 		register_rpro_service
 		;;
 		*)
-		echo "Install cancelled"
+		echo "Service installation cancelled"
+		write_log "Service installation cancelled"
 		;;
 		esac
 
@@ -545,6 +648,7 @@ unregister_rpro_as_service()
 
 		if [ ! -f "$SERVICE_LOCATION/$SERVICE_NAME" ]; then
 			echo "Service does not exists. Nothing to remove" 
+			write_log "Service does not exists. Nothing to remove"
 		else
 			unregister_rpro_service
 		fi
@@ -571,6 +675,7 @@ install_rpro_zip()
 			
 	clear
 	echo "Installing red5pro from zip"
+	
 
 	if [ $# -eq 0 ]; then
 		echo "Enter the full path to Red5pro zip"
@@ -578,10 +683,13 @@ install_rpro_zip()
 	else 
 		rpro_zip_path=$1
 	fi
+
+	write_log "Installing red5pro from zip $rpro_zip_path"
 	
 
 	if [ ! -f "$rpro_zip_path" ]; then
 		echo "Invalid archive file path $rpro_zip_path"
+		write_log "Invalid archive file path $rpro_zip_path"
 		pause;
 	fi
 
@@ -597,6 +705,7 @@ install_rpro_zip()
 	    ;;	
 	*)
 	    echo "Invalid archive type $extension"
+	    write_log "Invalid archive type $extension"
 	    pause
 	    ;;
 	esac
@@ -604,6 +713,8 @@ install_rpro_zip()
 
 
 	echo "Attempting to install red5pro from zip"
+	write_log "Attempting to install red5pro from zip"
+
 	dir=`mktemp -d` && cd $dir
 	unzip_dest="$dir/$filename"
 
@@ -611,6 +722,8 @@ install_rpro_zip()
 	check_current_rpro 1
 	
 	if [ "$rpro_exists" -eq 1 ]; then
+
+		write_log "Existing red5pro installation found in install location. files will be backed up and nthen new instalaltion will proceed."
 	
 		echo "An existing Red5pro installation was found at install destination.If you continue this will be replaced. The old installation will be backed up to $RPRO_BACKUP_HOME"
 
@@ -627,6 +740,7 @@ install_rpro_zip()
 		if [ $rpro_backup_success -eq 0 ]; then
 			# proceed to install new red5pro
 			echo "Failed to create a backup of your existing red5pro installation"
+			write_log "Failed to create a backup of your existing red5pro installation"
 			pause
 		fi	
 
@@ -639,6 +753,7 @@ install_rpro_zip()
 		;;
 		*)
 		echo "Uninstall cancelled"
+		write_log "Uninstall cancelled"
 		pause
 		;;
 		esac	
@@ -646,16 +761,19 @@ install_rpro_zip()
 
 
 	echo "Unpacking archive to install location -------"
+	write_log "Unpacking archive to install location"
 	
 	
 	if ! unzip $rpro_zip_path -d $unzip_dest; then
 		echo "Failed to extract zip. Possible invalid archive"
+		write_log "Failed to extract zip. Possible invalid archive"
 		pause;
 	fi
 
 
 	if [ ! -d "$unzip_dest" ]; then
 		echo "Could not create output directory."
+		write_log "Could not create output directory."
 		pause;
 	fi
 
@@ -667,6 +785,8 @@ install_rpro_zip()
 	# DEFAULT_RPRO_PATH=/usr/local/red5pro
 
 	echo "Setting permissions -----------"
+	write_log "Setting permissions"
+
 	sleep 1
 
 	chmod -R 755 $rpro_loc	
@@ -680,12 +800,14 @@ install_rpro_zip()
 
 	# set path
 	echo "Setting RED5_HOME"
+	write_log "Setting RED5_HOME env variable to $rpro"
 	sleep 1
 	export RED5_HOME=$rpro
  
 
 	# clear tmp directories - IMPORTANT
 	echo "cleaning up ----"
+	write_log "cleaning up ----"
 	sleep 1
 
 	rm -rf $dir
@@ -695,10 +817,12 @@ install_rpro_zip()
 
 	if [ ! -d "$rpro_loc" ]; then
 		echo "Could not install Red5pro at $rpro_loc"
+		write_log "Could not install Red5pro at $rpro_loc"
 		pause
 	else
 		echo "All done! ----"
 		echo "Red5pro installed at  $rpro_loc"
+		write_log "Red5pro installed at  $rpro_loc"
 		red5_zip_install_success=1
 	fi
 
@@ -715,11 +839,14 @@ install_rpro_zip()
 	[yY][eE][sS]|[yY]) 
 		
 		echo "Registering Red5pro as a service"
+		write_log  "Attempting to register Red5pro as a service"
+
 		sleep 2
 		register_rpro_service
 		
 		if [ "$rpro_service_install_success" -eq 0 ]; then
 		echo "Failed to register Red5pro service. Something went wrong!! Try again or contact support!"
+		write_log  "Failed to register Red5pro service. Something went wrong!! Try again or contact support!"
 		pause
 		fi
 	;;
@@ -730,6 +857,7 @@ install_rpro_zip()
 	
 	# All Done
 	echo "Red5pro service is now installed on your system. You can start / stop it with from the menu".
+	write_log "Red5pro service is now installed on your system. You can start / stop it with from the menu".
 
 	# Moving to home directory	
 	cd ~
@@ -752,6 +880,7 @@ register_rpro_service()
 	rpro_service_install_success=0
 
 	echo "Preparing to install service..."
+	write_log "Preparing to install service..."
 	sleep 2
 
 
@@ -816,6 +945,7 @@ esac"
 #######################################################
 
 	echo "Writing service script"
+	write_log "Writing service script"
 	sleep 1
 
 	touch /etc/init.d/red5pro
@@ -834,6 +964,7 @@ esac"
 
 
 	echo "Red5Pro service installed successfully!"
+	write_log "Red5Pro service installed successfully!"
 	rpro_service_install_success=1
 }
 
@@ -843,11 +974,13 @@ esac"
 register_rpro_service_deb()
 {
 	echo "Registering service \"$SERVICE_NAME\""
+	write_log "Registering service \"$SERVICE_NAME\""
 	sleep 1
 
 	/usr/sbin/update-rc.d red5pro defaults
 
 	echo "Enabling service \"$SERVICE_NAME\""
+	write_log "Enabling service \"$SERVICE_NAME\""
 	sleep 1
 
 	/usr/sbin/update-rc.d red5pro enable
@@ -859,12 +992,14 @@ register_rpro_service_deb()
 register_rpro_service_rhl()
 {
 	echo "Registering service \"$SERVICE_NAME\""
+	write_log "Registering service \"$SERVICE_NAME\""
 	sleep 1
 
 	systemctl daemon-reload
 	
 
 	echo "Enabling service \"$SERVICE_NAME\""
+	write_log "Enabling service \"$SERVICE_NAME\""
 	sleep 1
 
 	systemctl enable red5pro.service
@@ -882,6 +1017,7 @@ unregister_rpro_service()
 	prog="red5"
 
 	echo "Preparing to remove service..."
+	write_log "Preparing to remove service..."
 	sleep 2
 
 
@@ -902,10 +1038,12 @@ unregister_rpro_service()
 		rm -rf /etc/init.d/red5pro
 
 		echo "Service removed successfully"
+		write_log "Service removed successfully"
 		rpro_service_remove_success=0
 	
 	else
 		echo "Red5pro service was not found"
+		write_log "Red5pro service was not found"
 	fi
 }
 
@@ -916,11 +1054,13 @@ unregister_rpro_service()
 unregister_rpro_service_deb()
 {
 	echo "Disabling service \"$SERVICE_NAME\""
+	write_log "Disabling service \"$SERVICE_NAME\""
 	sleep 1
 
 	/usr/sbin/update-rc.d $SERVICE_NAME disable
 
 	echo "Removing service \"$SERVICE_NAME\""
+	write_log "Removing service \"$SERVICE_NAME\""
 	sleep 1
 
 	/usr/sbin/update-rc.d $SERVICE_NAME remove
@@ -933,12 +1073,14 @@ unregister_rpro_service_deb()
 unregister_rpro_service_rhl()
 {
 	echo "Disabling service \"$SERVICE_NAME\""
+	write_log "Disabling service \"$SERVICE_NAME\""
 	sleep 1
 
 	systemctl disable red5pro.service
 
 
 	echo "Removing service \"$SERVICE_NAME\""
+	write_log "Removing service \"$SERVICE_NAME\""
 	sleep 1
 }
 
@@ -955,6 +1097,7 @@ start_red5pro_service()
 	if [ ! -f "$SERVICE_LOCATION/$SERVICE_NAME" ];	then
 		echo "It seems Red5Pro service was not installed. Please register Red5pro service from the menu for best results."
 		echo " Attempting to start using \"red5.sh\""
+		write_log " Attempting to start red5pro using \"red5.sh\""
 		
 		cd $DEFAULT_RPRO_PATH && exec $DEFAULT_RPRO_PATH/red5.sh > /dev/null 2>&1 &
 
@@ -967,6 +1110,7 @@ start_red5pro_service()
 	else
 		echo "Red5Pro service was found at $SERVICE_LOCATION/$SERVICE_NAME"
 		echo " Attempting to start service"
+		write_log " Attempting to start red5pro service"
 		/etc/init.d/red5pro start /dev/null 2>&1 &
 	fi
 
@@ -990,12 +1134,14 @@ stop_red5pro_service()
 	if [ ! -f "$SERVICE_LOCATION/$SERVICE_NAME" ];	then
 		echo "It seems Red5Pro service was not installed. Please register Red5pro service from the menu for best results."
 		echo " Attempting to stop using \"red5-shutdown.sh\""
+		write_log " Attempting to stop red5pro using \"red5-shutdown.sh\""
 
 		cd $DEFAULT_RPRO_PATH && exec $DEFAULT_RPRO_PATH/red5-shutdown.sh > /dev/null 2>&1 &
 		rm -rf $PIDFILE		
 	else
 		echo "Red5Pro service was found at $SERVICE_LOCATION/$SERVICE_NAME."
-		echo " Attempting to stop service"
+		echo "Attempting to stop red5pro service"
+		write_log "Attempting to stop red5pro service"
 
 		/etc/init.d/red5pro stop /dev/null 2>&1 &
 	fi
@@ -1015,7 +1161,7 @@ stop_red5pro_service()
 is_red5_running()
 {	
 	if [ -f $PIDFILE ]; then
-		echo "hi"	
+		echo ""	
 	fi
 	
 }
@@ -1026,16 +1172,19 @@ is_red5_running()
 
 remove_rpro_installation()
 {
+	write_log "Attempting to remove red5pro installation"
 	echo "Looking for Red5Pro at default location..."
 	sleep 2
 
 	if [ ! -d $DEFAULT_RPRO_PATH ]; then
   		echo "No Red5pro installation found at default location : $DEFAULT_RPRO_PATH"
+		write_log "No Red5pro installation found at default location : $DEFAULT_RPRO_PATH"
 	else
 		red5pro_ini="$DEFAULT_RPRO_PATH/conf/red5.ini" 
 
 		if [ ! -f $red5pro_ini ]; then
 		echo "There were files found at default location : $DEFAULT_RPRO_PATH, but the installation might be broken !. I could not locate version information"
+		write_log "There were files found at default location : $DEFAULT_RPRO_PATH, but the installation might be broken !. I could not locate version information"
 		else
 		echo "Red5pro installation found at default location : $DEFAULT_RPRO_PATH"
 		echo "Warning! All file(s) and folder(s) at $DEFAULT_RPRO_PATH will be removed permanently"
@@ -1050,10 +1199,12 @@ remove_rpro_installation()
 		unset RED5_HOME
 		if [ ! -d "$DEFAULT_RPRO_PATH" ]; then
 			echo "Red5 installation was removed"
+			write_log "Red5 installation was removed"
 		fi
 		;;
 		*)
 		echo "Uninstall cancelled"
+		write_log "Uninstall cancelled"
 		;;
 		esac
 		fi
@@ -1073,21 +1224,26 @@ remove_rpro_installation()
 
 check_current_rpro()
 {
+	write_log "Checking for existing Red5Pro installation at install location"
+
 	rpro_exists=0
 	echo "Looking for Red5Pro at default location..."
 	sleep 2
 
 	if [ ! -d $DEFAULT_RPRO_PATH ]; then
   		echo "No Red5pro installation found at default location : $DEFAULT_RPRO_PATH"
+		write_log "No Red5pro installation found at default location : $DEFAULT_RPRO_PATH"
 	else
 		red5pro_ini="$DEFAULT_RPRO_PATH/conf/red5.ini" 
 
 		if [ ! -f $red5pro_ini ]; then
 		echo "There were files found at default location : $DEFAULT_RPRO_PATH, but the installation might be broken !. I could not locate version information"
+		write_log "There were files found at default location : $DEFAULT_RPRO_PATH, but the installation might be broken !. I could not locate version information"
 		rpro_exists=1
 		else
 		rpro_exists=1
 		echo "Red5pro installation found at default location : $DEFAULT_RPRO_PATH"
+		write_log "Red5pro installation found at default location : $DEFAULT_RPRO_PATH"
 
 		pattern='server.version*'
 		replace=""
@@ -1125,6 +1281,7 @@ restore_rpro()
 	RPRO_BACKUP_FOLDER=$1
 
 	echo "Initializing restore procedure..."
+	write_log "Initializing restore procedure..."
 
 	echo "##########################################################################"
 	echo "This interactive wizard will help you with some basic backup restore steps."
@@ -1137,6 +1294,7 @@ restore_rpro()
 	empty_line
 	
 	echo "Attempting to restore from $RPRO_BACKUP_FOLDER into $DEFAULT_RPRO_PATH. Please follow on-screen instructions carefully"
+	write_log "Attempting to restore from $RPRO_BACKUP_FOLDER into $DEFAULT_RPRO_PATH"
 
 	sleep 2
 
@@ -1156,14 +1314,17 @@ restore_rpro()
 		cp -rf $LICENCE_KEY_FILE $LICENCE_KEY_DEST_FILE
 		if [ -f $LICENCE_KEY_DEST_FILE ]; then
 			echo "License file restored!"
+			write_log "License file restored!"
 		fi
 	else
 		echo "No license file found to restore!"
+		write_log "No license file found to restore!"
 	fi
 
 	;;
 	*)
 	echo "Skipping..."
+	write_log "Skipping..."
 	sleep 1
 	;;
 	esac
@@ -1186,14 +1347,17 @@ restore_rpro()
 		cp -rf $CLUSTER_CONF_FILE $CLUSTER_CONF_DEST_FILE
 		if [ -f $CLUSTER_CONF_DEST_FILE ]; then
 			echo "Cluster configuration restored!"
+			write_log "Cluster configuration restored!"
 		fi
 	else
 		echo "No Cluster configuration file found to restore!"
+		write_log "No Cluster configuration file found to restore!"
 	fi
 
 	;;
 	*)
 	echo "Skipping..."
+	write_log "Skipping..."
 	sleep 1
 	;;
 	esac
@@ -1210,6 +1374,7 @@ restore_rpro()
 	[yY][eE][sS]|[yY]) 
 
 		echo "Scanning for applications in backup...."
+		write_log "Scanning for applications in backup...."
 		apps_to_restore=0
 		for i in $(ls -d "$BACKUP_WEBAPPS_FOLDER/"*/); 
 			do 
@@ -1241,15 +1406,18 @@ restore_rpro()
 
 			# Remove old
 			echo "Clearing target.. $DEST_WEBAPP_PATH"
+			write_log "Clearing target.. $DEST_WEBAPP_PATH"
 			rm -rf $DEST_WEBAPP_PATH
 
 			# Restore backup
 			echo "Copying files from $WEBAPP_PATH to $DEST_WEBAPP_PATH"
+			write_log "Copying files from $WEBAPP_PATH to $DEST_WEBAPP_PATH"
 			cp -R $WEBAPP_PATH $DEST_WEBAPP_PATH
 			chmod -R ugo+w $DEST_WEBAPP_PATH
 			;;
 			*)
 			echo "Skipping..."
+			write_log "Skipping..."
 			sleep 1
 			;;
 			esac
@@ -1259,6 +1427,7 @@ restore_rpro()
 	;;
 	*)
 	echo "Skipping..."
+	write_log "Skipping..."
 	sleep 1
 	;;
 	esac
@@ -1268,6 +1437,7 @@ restore_rpro()
 	empty_line
 	rpro_backup_restore_wizard=1	
 	echo "Restore wizard steps completed! IF your red5pro installation does not work as expected please try restoring manually instead. - Thank you";
+	write_log "Restore wizard steps completed!"
 	empty_pause
 	
 }
@@ -1289,6 +1459,7 @@ backup_rpro()
 	if [ -d "$RPRO_BACKUP_HOME" ]; then
 	  
 		echo "Starting backup procedure..."
+		write_log "Starting backup procedure..."
 		sleep 2
 
 		# echo "Stopping Red5pro if it was running..."
@@ -1296,6 +1467,7 @@ backup_rpro()
 		sleep 10
 
 		echo "Backing up... "
+		write_log "Backing up... "
 		sleep 5
 
 		# Create backup folder
@@ -1309,21 +1481,25 @@ backup_rpro()
 		# Show notice to user that back up was saved
 		if [ -d "$RPRO_BACKUP_FOLDER" ]; then
 			if [ -f $red5pro_ini ]; then
+				write_log "Backup completed"
 				echo "Your active red5pro installation was backed up successfully to $RPRO_BACKUP_FOLDER"
 				echo "You can restore any necessary file(s) later from the backup manually."
 				chmod -R ugo+w $RPRO_BACKUP_FOLDER
 				rpro_backup_success=1
 			else
 				echo "Something went wrong!! Perhaps files were not copied properly"
+				write_log "Something went wrong!! Perhaps files were not copied properly"
 			fi
 		else
 			echo "WARNING! Could not create backup destination directory"
+			write_log "WARNING! Could not create backup destination directory"
 		fi
 
 		empty_pause
 
 	else
 		echo "Failed to create backup directory. Backup will be skipped..."
+		write_log "Failed to create backup directory. Backup will be skipped..."
 
 	fi
 
@@ -1351,6 +1527,7 @@ upgrade()
 
 	# Start process
 	echo "Initializing upgrade process..."
+	write_log "Initializing upgrade process..."
 	sleep 2
 
 	check_current_rpro 1
@@ -1359,6 +1536,7 @@ upgrade()
 		upgrade_mode=1
 		# echo "It is recommended that you make a backup of your old server files. "
 		echo "An existing Red5pro installation was found at install destination.If you continue this will be replaced. The old installation will be backed up to $RPRO_BACKUP_HOME"
+		write_log "An existing Red5pro installation was found at install destination.If you continue this will be replaced. The old installation will be backed up to $RPRO_BACKUP_HOME"
 		read -r -p "Do you wish to continue ? [y/N] " response
 
 		case $response in
@@ -1369,6 +1547,7 @@ upgrade()
 
 		if [ $rpro_backup_success -eq 1 ]; then
 			echo "Preparing to install red5pro"
+			write_log "Preparing to install red5pro"
 			# proceed to install new red5pro 
 			if [ $upgrade_from_zip -eq 1 ]; then
 			install_rpro_zip
@@ -1377,6 +1556,7 @@ upgrade()
 			fi
 		else
 			echo "Failed to create a backup of your existing red5pro installation"
+			write_log "Failed to create a backup of your existing red5pro installation"
 			upgrade_clean $upgrade_from_zip
 			# check install state here
 			pause
@@ -1384,11 +1564,13 @@ upgrade()
 		;;
 		*)
 		echo "Upgrade cancelled"
+		write_log "Upgrade cancelled"
 		;;
 		esac
 	else
 		upgrade_mode=0
 		echo "This option is invalid since there is no red5pro installation to upgrade. You can upgrade only after a clean install!"
+		write_log "This option is invalid since there is no red5pro installation to upgrade. You can upgrade only after a clean install!"
 		# upgrade_clean $upgrade_from_zip
 		# check install state here
 	fi
@@ -1400,6 +1582,7 @@ upgrade()
 		if [[ $upgrade_mode -eq 1 ]]; then
 			
 			echo "Congratulations!! You have successfully installed a new version of red5pro" 
+			write_log "Congratulations!! You have successfully installed a new version of red5pro" 
 			read -r -p "Do you need any help with restoring your previous settings? [y/N] " response
 
 			case $response in
@@ -1437,7 +1620,7 @@ upgrade_clean()
 		upgrade_from_zip=0		
 	fi
 
-
+	write_log "Initiating clean upgrade"
 	read -r -p "Do you wish to proceed with a clean installation? [y/N] " response
 
 	case $response in
@@ -1450,6 +1633,7 @@ upgrade_clean()
 	;;
 	*)
 	echo "Upgrade cancelled"
+	write_log "Upgrade cancelled"
 	;;
 	esac
 }
@@ -1478,11 +1662,15 @@ check_license()
 
 		lic_file=$rpro_path/LICENSE.KEY
 
+		write_log "Checking license"
+
 		if [ ! -f $lic_file ]; then
 	  		echo "No license file found!. Please install a license."
+			write_log "No license found!"
 		else
 			value=`cat $lic_file`
 			echo "Current license : $value"
+			write_log "license found!"
 		fi
 	fi
 	
@@ -1511,8 +1699,10 @@ set_update_license()
 
 		if [ ! -f $lic_file ]; then
 	  		echo "Installing license code : Please enter new license code and press [ Enter ]."
+			write_log "Installing license code"
 			if [ ! -f "$lic_file" ] ; then
 		 		# if not create the file
+				write_log "Creating license file $lic_file"
 		 		touch "$lic_file"
 		     	fi
 		else
@@ -1522,17 +1712,21 @@ set_update_license()
 			echo "a line: $line"
 			done
 			echo "Updating license : Please enter new license code and press [ Enter ]."
+			read license_code			
 		fi
 
-		read license_code
+		
 
 		license_code=$(echo $license_code | tr '[a-z]' '[A-Z]')
+		write_log "Writing license code to file $license_code"
 		printf $license_code > $lic_file;
 
 		if [ $lic_new -eq 1 ]; then
-		echo "license installed"
+		echo "License installed"
+		write_log "License installed"
 		else
 		echo "License updated"
+		write_log "License installed"
 		fi
 	fi
 	
@@ -1562,6 +1756,8 @@ show_licence_menu()
 
 licence_menu()
 {
+	write_log "Rendering license menu"
+
 	cls
 
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"	
@@ -1579,6 +1775,9 @@ licence_menu()
 
 
 license_menu_read_options(){
+
+	write_log "Reading advance menu option"
+
 	local choice
 	read -p "Enter choice [ 1 - 3] " choice
 	case $choice in
@@ -1614,6 +1813,8 @@ show_advance_menu()
 advance_menu()
 {
 
+	write_log "Rendering advance menu"
+
 	cls
 
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -1638,6 +1839,9 @@ advance_menu()
 
 
 advance_menu_read_options(){
+
+	write_log "Reading advance menu option"
+
 	local choice
 	read -p "Enter choice [ 1 - 5 | 0 to exit]] " choice
 	case $choice in
@@ -1679,6 +1883,7 @@ show_simple_menu()
 
 simple_menu()
 {
+	write_log "Rendering simple menu"
 
 	cls
 
@@ -1711,6 +1916,9 @@ simple_menu()
 
 
 simple_menu_read_options(){
+
+	write_log "Reading simple menu option"
+
 	local choice
 	read -p "Enter choice [ 1 - 7 | 0 to exit] " choice
 	case $choice in
@@ -1739,8 +1947,11 @@ simple_menu_read_options(){
 
 load_configuration()
 {
+	write_log "Loading configuration"
+
 	if [ ! -f $CONFIGURATION_FILE ]; then
 		echo "CRITICAL ERROR!! - Configuration file not found!"
+		write_log "CRITICAL ERROR!! - Configuration file not found!"
 		echo "Exiting..."
 		exit 0
 	fi
@@ -1748,6 +1959,8 @@ load_configuration()
 
 	# Load config values
 	source "$CONFIGURATION_FILE"
+
+	write_log "Configuration loaded"
 
 	JAVA_32_BIT="$JAVA_JRE_DOWNLOAD_URL/$JAVA_32_FILENAME"
 	JAVA_64_BIT="$JAVA_JRE_DOWNLOAD_URL/$JAVA_64_FILENAME"
@@ -1769,6 +1982,9 @@ load_configuration()
 
 detect_system()
 {
+	write_log "Detecting system"
+
+	
 	load_configuration
 
 	
@@ -1806,21 +2022,29 @@ detect_system()
 	    ;;
 	esac
 
-	echo -e "* Linux Distribution: \e[36m$OS_NAME\e[m"
+	echo -e "* Distribution: \e[36m$OS_NAME\e[m"
+	write_log "Distribution: $OS_NAME"
+
 	echo -e "* Version: \e[36m$OS_VERSION\e[m"
+	write_log "Version: $OS_VERSION"
+
 	echo -e "* Kernel: \e[36m$os_bits\e[m"
+	write_log "Kernel: $os_bits"
 
 
 	empty_line
 
 	USER_HOME=$(getent passwd $SUDO_USER | cut -d: -f6)
 	echo -e "* Home directory: \e[36m$USER_HOME\e[m"
+	write_log "Home directory: $USER_HOME"
 
 	RPRO_BACKUP_HOME="$USER_HOME/$DEFAULT_BACKUP_FOLDER"
 	echo -e "* BackUp directory: \e[36m$RPRO_BACKUP_HOME\e[m"
+	write_log "BackUp directory: $RPRO_BACKUP_HOME"
 
 	
 	echo -e "* Install directory: \e[36m$DEFAULT_RPRO_PATH\e[m"
+	write_log "Install directory: $DEFAULT_RPRO_PATH"
 
 	
 	if [[ $OS_NAME == *"Ubuntu"* ]]; then
@@ -1829,12 +2053,15 @@ detect_system()
 	OS_TYPE=$OS_RHL
 	fi
 
+	write_log "OS TYPE $OS_TYPE"
+
 }
 
 
 
 simple_usage_mode()
 {
+	write_log "Basic mode selected"
 
 	MODE=0
 
@@ -1847,6 +2074,8 @@ simple_usage_mode()
 
 advance_usage_mode()
 {
+	write_log "Advance mode selected"
+
 	MODE=1
 	
 	advance_menu
@@ -1857,6 +2086,7 @@ advance_usage_mode()
 
 welcome_menu()
 {
+	write_log "Rendering welcome menu"
 
 	cls
 
@@ -1883,6 +2113,8 @@ welcome_menu()
 
 read_welcome_menu_options()
 {
+	write_log "Reading welcome menu option"
+
 	local choice
 	read -p "Enter choice [ 1 - 2 | 0 to exit] " choice
 	case $choice in
@@ -1914,6 +2146,7 @@ prerequisites_unzip()
 {
 	# Checking unzip
 	echo "Checking for unzip"
+	write_log "Checking if unzip is installed"
 	sleep 2
 	
 	check_unzip
@@ -1935,6 +2168,7 @@ prerequisites_wget()
 
 	# Checking wget
 	echo "Checking for wget"
+	write_log "Checking if wget is installed"
 	sleep 2
 	
 	check_wget
@@ -1974,6 +2208,8 @@ postrequisites()
 
 postrequisites_rhl()
 {
+	write_log "Installing additional dependencies for RHLE"
+
 	rpm --import http://packages.atrpms.net/RPM-GPG-KEY.atrpms
 	rpm -ivh http://dl.atrpms.net/all/atrpms-repo-6-7.el6.x86_64.rpm
 	yum -y update --skip-broken
@@ -1985,6 +2221,8 @@ postrequisites_rhl()
 
 postrequisites_deb()
 {
+	write_log "Installing additional dependencies for DEBIAN"
+
 	apt-get install libva1
 	apt-get install libva-drm1
 	apt-get install libva-x11-1
@@ -2045,6 +2283,9 @@ isDebian()
 
 
 # Start application
+write_log "==========================================="
+write_log "===== STARTING NEW INSTALLER SESSION ======"
+
 main
 
 
