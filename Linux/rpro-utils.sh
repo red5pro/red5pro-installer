@@ -31,6 +31,10 @@ JAVA_JRE_DOWNLOAD_URL="http://download.oracle.com/otn-pub/java/jdk/8u102-b14/"
 JAVA_32_FILENAME="jre-8u102-linux-i586.rpm"
 JAVA_64_FILENAME="jre-8u102-linux-x64.rpm"
 
+RED5PRO_DEFAULT_DOWNLOAD_NAME="red5pro_latest.zip"
+RED5PRO_DEFAULT_DOWNLOAD_FOLDER_NAME="tmp"
+RED5PRO_DEFAULT_DOWNLOAD_FOLDER=
+
 
 ######################################################################################
 
@@ -454,8 +458,8 @@ download_latest()
 	lecho "Downloading latest Red5pro from red5pro.com"
 	
 	# create tmp directory
-	dir=`sudo mktemp -d` && cd $dir
-
+	#dir=`sudo mktemp -d` && cd $dir
+	dir="$RED5PRO_DEFAULT_DOWNLOAD_FOLDER"
 	cd $dir
 
 	# echo $dir
@@ -506,15 +510,20 @@ download_latest()
 		# if 200 then proceed
 		if [ "$wget_status_ok" -eq "1" ]; then
 
-			wget --load-cookies cookies.txt --content-disposition -p  https://account.red5pro.com/download/red5
-			search_dir="$dir/account.red5pro.com/download"
-			for file in $search_dir/*.zip
-			do
-				rpro_zip="${file%%.zip}"
+			echo "Attempting to download latest red5pro archive file to $RED5PRO_DEFAULT_DOWNLOAD_FOLDER"
+
+			wget --load-cookies cookies.txt --content-disposition -p  https://account.red5pro.com/download/red5 -O "$RED5PRO_DEFAULT_DOWNLOAD_NAME"
+
+			rpro_zip="$RED5PRO_DEFAULT_DOWNLOAD_FOLDER/$RED5PRO_DEFAULT_DOWNLOAD_NAME"
+
+			if [ -f $rpro_zip ] ; then
+				find . -type f -not \( -name '*zip' \) -delete
+
 				latest_rpro_download_success=1
-				rpro_zip="${rpro_zip}.zip"
-				break	
-			done
+			else
+				lecho "Oops!! Seems like the archive was not downloaded properly to disk."
+				pause	
+			fi
 		else
 			lecho "Failed to authenticate with website!"
 		fi
@@ -698,7 +707,9 @@ install_rpro_zip()
 
 	lecho "Attempting to install red5pro from zip"
 
-	dir=`mktemp -d` && cd $dir
+	dir="$RED5PRO_DEFAULT_DOWNLOAD_FOLDER"
+	cd $dir
+
 	unzip_dest="$dir/$filename"
 
 
@@ -783,7 +794,7 @@ install_rpro_zip()
 	lecho "cleaning up ..."
 	sleep 1
 
-	rm -rf $dir
+	#rm -rf $dir
 	rm -rf $unzip_dest
 
 	sleep 1	
@@ -835,7 +846,6 @@ install_rpro_zip()
 	    pause
 	fi
 	
-
 }
 
 
@@ -1870,13 +1880,17 @@ load_configuration()
 	# Set install location if not set
 
 	CURRENT_DIRECTORY=$PWD
+	
 
 	if [ -z ${DEFAULT_RPRO_INSTALL_LOCATION+x} ]; then 
 		DEFAULT_RPRO_PATH="$CURRENT_DIRECTORY/$DEFAULT_RPRO_FOLDER_NAME"
 	else
 		DEFAULT_RPRO_PATH="$DEFAULT_RPRO_INSTALL_LOCATION/$DEFAULT_RPRO_FOLDER_NAME"			
 	fi
-	
+
+
+	RED5PRO_DEFAULT_DOWNLOAD_FOLDER="$CURRENT_DIRECTORY/$RED5PRO_DEFAULT_DOWNLOAD_FOLDER_NAME"
+	[ ! -d foo ] && mkdir -p $RED5PRO_DEFAULT_DOWNLOAD_FOLDER && chmod ugo+w $RED5PRO_DEFAULT_DOWNLOAD_FOLDER	
 }
 
 
@@ -1941,6 +1955,10 @@ detect_system()
 	
 	echo -e "* Install directory: \e[36m$DEFAULT_RPRO_PATH\e[m"
 	write_log "Install directory: $DEFAULT_RPRO_PATH"
+
+	
+	# echo -e "* Downloads directory: \e[36m$RED5PRO_DEFAULT_DOWNLOAD_FOLDER\e[m"
+	write_log "Downloads directory: $RED5PRO_DEFAULT_DOWNLOAD_FOLDER"
 
 	
 	if [[ $OS_NAME == *"Ubuntu"* ]]; then
