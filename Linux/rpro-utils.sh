@@ -1617,11 +1617,12 @@ set_update_license()
 	check_current_rpro 1
 	if [[ $rpro_exists -eq 1 ]]; then
 
-		lic_file=$rpro_path/LICENSE.KEY
+		lic_file="$rpro_path/LICENSE.KEY"
 		lic_new=1
 
 		if [ ! -f $lic_file ]; then
 	  		echo "Installing license code : Please enter new license code and press [ Enter ]."
+			read license_code
 			write_log "Installing license code"
 			if [ ! -f "$lic_file" ] ; then
 		 		# if not create the file
