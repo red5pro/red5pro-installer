@@ -1,0 +1,17 @@
+{
+  "name": "red5pro_srvice_controller",
+  "version": "1.0.0",
+  "description": "Red5 Pro Service Controller",
+  "main": "./app/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Infrared5",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.1",
+    "express-basic-auth": "^1.1.2",
+    "shelljs": "^0.7.8",
+    "tcp-ping": "^0.1.1"
+  }
+}
