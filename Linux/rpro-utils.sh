@@ -25,7 +25,6 @@ MODE=0
 
 PIDFILE=/var/run/red5.pid
 
-
 JAVA_JRE_DOWNLOAD_URL="http://download.oracle.com/otn-pub/java/jdk/8u102-b14/"
 
 JAVA_32_FILENAME="jre-8u102-linux-i586.rpm"
@@ -40,8 +39,6 @@ RED5PRO_DEFAULT_DOWNLOAD_FOLDER=
 
 ################################## LOGGER ############################################
 
-
-
 write_log()
 {
 	if [ $# -eq 0 ]; then
@@ -52,9 +49,6 @@ write_log()
 		fi
 	fi
 }
-
-
-
 
 lecho()
 {
@@ -69,33 +63,24 @@ lecho()
 	fi
 }
 
-
-
-
 clear_log()
 {
 	> $LOG_FILE
 }
-
-
 
 delete_log()
 {
 	rm $LOG_FILE
 }
 
-
 ######################################################################################
 
 ############################ MISC ----- METHODS ######################################
-
 
 cls()
 {
 	printf "\033c"
 }
-
-
 
 pause()
 {
@@ -112,10 +97,6 @@ pause()
 	fi
 }
 
-
-
-
-
 pause_license()
 {
 
@@ -125,27 +106,20 @@ pause_license()
 	show_licence_menu
 }
 
-
-
 empty_pause()
 {
 	printf "\n"
 	read -r -p 'Press any [ Enter ] key to continue...' key
 }
 
-
 empty_line()
 {
 	printf "\n"
 }
 
-
-
 ######################################################################################
 
 ############################ MISC TOOL INSTALLS ######################################
-
-
 
 # Public
 check_java()
@@ -191,9 +165,6 @@ check_java()
 
 }
 
-
-
-
 # Public
 check_unzip()
 {
@@ -208,9 +179,6 @@ check_unzip()
 	lecho "unzip utility not found."				
 	fi
 }
-
-
-
 
 # Public
 check_wget()
@@ -227,8 +195,6 @@ check_wget()
 	fi
 }
 
-
-
 # Public
 install_java()
 {
@@ -242,7 +208,6 @@ install_java()
 	install_java_rhl
 	fi
 	
-
 	# verify
 	check_java
 
@@ -257,8 +222,6 @@ install_java()
 	fi
 		
 }
-
-
 
 # Private
 install_java_deb()
@@ -278,14 +241,11 @@ install_java_deb()
 	fi
 }
 
-
-
 # Private
 install_java_rhl()
 {
 	lecho "Installing Java 8 for CentOs";
 	
-
 	if repo_has_required_java_rhl; then
 		write_log "Installing java from repo -> default-jre"
 	else
@@ -300,17 +260,12 @@ install_java_rhl()
 
 		write_log "Installing java from rpm -> oracle-java8-installer -> $java_url"
 		
-
 		cd ~
-
-
 
 		# Remove installer if exists
 		if [ -f $java_installer ]; then
 			rm ~/$java_installer
 		fi
-
-
 
 		if [[ $java_downloaded -eq 0 ]]; then
 
@@ -327,8 +282,6 @@ install_java_rhl()
 			fi
 		fi
 
-
-
 		# install
 		if [[ $java_downloaded -eq 1 ]]; then
 			lecho "Installing package $java_installer"
@@ -337,9 +290,6 @@ install_java_rhl()
 		fi
 	fi
 }
-
-
-
 
 # Public
 install_unzip()
@@ -353,8 +303,6 @@ install_unzip()
 	fi		
 }
 
-
-
 # Private
 install_unzip_deb()
 {
@@ -366,8 +314,6 @@ install_unzip_deb()
 	install_unzip="$(which unzip)";
 	lecho "Unzip installed at $install_unzip"
 }
-
-
 
 # Private
 install_unzip_rhl()
@@ -381,9 +327,6 @@ install_unzip_rhl()
 	lecho "Unzip installed at $install_unzip"
 }
 
-
-
-
 # Public
 install_wget()
 {
@@ -395,8 +338,6 @@ install_wget()
 	install_wget_rhl
 	fi		
 }
-
-
 
 # Private
 install_wget_deb()
@@ -410,8 +351,6 @@ install_wget_deb()
 	lecho "wget installed at $install_wget"
 }
 
-
-
 # Private
 install_wget_rhl()
 {
@@ -424,31 +363,21 @@ install_wget_rhl()
 	lecho "wget installed at $install_wget"
 }
 
-
-
-
 # Public
 add_update_java()
 {
 	install_java
 }
 
-
-
-
-
 ######################################################################################
 
 ############################ RED5PRO OPERATIONS ######################################
-
-
 
 # Private
 download_latest()
 {
 	clear
 	
-
 	rpro_email_valid=0
 	rpro_password_valid=0
 
@@ -489,7 +418,6 @@ download_latest()
 		lecho "Invalid password string!"
 	fi
 
-
 	# if all params are valid
 	if [ "$rpro_form_valid" -eq "1" ]; then
 	
@@ -499,7 +427,6 @@ download_latest()
 		wget --server-response --save-cookies cookies.txt --keep-session-cookies --post-data="email=$rpro_email&password=$rpro_passcode" "https://account.red5pro.com/login" 2>$dir/wsession.txt
 		wget_status=$(< $dir/wsession.txt)
 	
-
 		# Check http code
 		wget_status_ok=0
 		if [[ $wget_status == *"HTTP/1.1 200"* ]] 
@@ -533,10 +460,6 @@ download_latest()
 	fi
 }
 
-
-
-
-
 # Public
 auto_install_rpro()
 {
@@ -560,7 +483,6 @@ auto_install_rpro()
 		install_java
 	fi 
 
-
 	# Download red5 zip from red5pro.com
 	echo "Preparing to install Red5Pro from Red5pro.com"
 	sleep 2
@@ -571,12 +493,10 @@ auto_install_rpro()
 		pause
 	fi
 
-
 	if [ -z "$rpro_zip" ]; then
 		echo "Downloaded file could not be found or is invalid. Exiting now!"
 		pause
 	fi
-
 
 	# Installing red5 from zip downloaded  from red5pro.com
 
@@ -587,7 +507,6 @@ auto_install_rpro()
 	if [ "$red5_zip_install_success" -eq 0 ]; then		
 		lecho "Failed to install Red5pro distribution. Something went wrong!! Try again or contact support!"
 	fi
-
 	
 	if [ $# -eq 0 ]
 	  then
@@ -595,9 +514,6 @@ auto_install_rpro()
 	fi
 	
 }
-
-
-
 
 # Public
 register_rpro_as_service()
@@ -632,9 +548,6 @@ register_rpro_as_service()
 	fi
 }
 
-
-
-
 # Public
 unregister_rpro_as_service()
 {
@@ -656,17 +569,12 @@ unregister_rpro_as_service()
 	fi
 }
 
-
-
-
-
 # Public
 install_rpro_zip()
 {
 	red5_zip_install_success=0
 
 	prerequisites_unzip
-
 			
 	clear
 	lecho "Installing red5pro from zip"
@@ -687,11 +595,9 @@ install_rpro_zip()
 		pause;
 	fi
 
-
 	filename=$(basename "$rpro_zip_path")
 	extension="${filename##*.}"
 	filename="${filename%.*}"
-
 
 	case "$extension" in 
 	zip|tar|gz*) 
@@ -703,15 +609,12 @@ install_rpro_zip()
 	    ;;
 	esac
 	
-
-
 	lecho "Attempting to install red5pro from zip"
 
 	dir="$RED5PRO_DEFAULT_DOWNLOAD_FOLDER"
 	cd $dir
 
 	unzip_dest="$dir/$filename"
-
 
 	check_current_rpro 1
 	
@@ -749,21 +652,17 @@ install_rpro_zip()
 		esac	
 	fi
 
-
 	lecho "Unpacking archive to install location..."
-	
 	
 	if ! unzip $rpro_zip_path -d $unzip_dest; then
 		lecho "Failed to extract zip. Possible invalid archive"
 		pause;
 	fi
 
-
 	if [ ! -d "$unzip_dest" ]; then
 		lecho "Could not create output directory."
 		pause;
 	fi
-
 
 	# Move to actual install location 
 	rpro_loc=$DEFAULT_RPRO_PATH
@@ -782,7 +681,6 @@ install_rpro_zip()
 	chmod +x $rpro_loc/red5.sh
 
 	chmod +x $rpro_loc/red5-shutdown.sh
-
 
 	# set path
 	lecho "Setting RED5_HOME"
@@ -811,7 +709,6 @@ install_rpro_zip()
 
 	# Install additional libraries
 	postrequisites
-
 
 	# Installing red5 service
 	echo "For Red5pro to autostart with operating system, it needs to be registered as a service"
@@ -848,9 +745,6 @@ install_rpro_zip()
 	
 }
 
-
-
-
 # Public
 register_rpro_service()
 {
@@ -859,7 +753,6 @@ register_rpro_service()
 
 	lecho "Preparing to install service..."
 	sleep 2
-
 
 #######################################################
 
@@ -896,7 +789,6 @@ start() {
 stop() {
   cd \${RED5_HOME} && ./red5-shutdown.sh > /dev/null 2>&1 &
 }
-
 
 case \"\$1\" in
   start)
@@ -943,8 +835,6 @@ esac"
 	rpro_service_install_success=1
 }
 
-
-
 # Private
 register_rpro_service_deb()
 {
@@ -958,8 +848,6 @@ register_rpro_service_deb()
 
 	/usr/sbin/update-rc.d red5pro enable
 }
-
-
 
 # Private
 register_rpro_service_rhl()
@@ -976,10 +864,6 @@ register_rpro_service_rhl()
 	systemctl enable red5pro.service
 }
 
-
-
-
-
 # Public
 unregister_rpro_service()
 {
@@ -989,7 +873,6 @@ unregister_rpro_service()
 
 	lecho "Preparing to remove service..."
 	sleep 2
-
 
 	if [ -f "$SERVICE_LOCATION/$SERVICE_NAME" ];	then
 	
@@ -1015,9 +898,6 @@ unregister_rpro_service()
 	fi
 }
 
-
-
-
 # Private
 unregister_rpro_service_deb()
 {
@@ -1032,9 +912,6 @@ unregister_rpro_service_deb()
 	/usr/sbin/update-rc.d $SERVICE_NAME remove
 }
 
-
-
-
 # Private
 unregister_rpro_service_rhl()
 {
@@ -1047,12 +924,6 @@ unregister_rpro_service_rhl()
 	lecho "Removing service \"$SERVICE_NAME\""
 	sleep 1
 }
-
-
-
-
-
-
 
 start_red5pro_service()
 {
@@ -1085,10 +956,6 @@ start_red5pro_service()
 	fi
 }
 
-
-
-
-
 stop_red5pro_service()
 {
 	cd ~
@@ -1115,8 +982,6 @@ stop_red5pro_service()
 	fi
 }
 
-
-
 # TO DO
 is_red5_running()
 {	
@@ -1125,10 +990,6 @@ is_red5_running()
 	fi
 	
 }
-
-
-
-
 
 remove_rpro_installation()
 {
@@ -1173,10 +1034,6 @@ remove_rpro_installation()
 	
 }
 
-
-
-
-
 check_current_rpro()
 {
 	write_log "Checking for existing Red5Pro installation at install location"
@@ -1216,12 +1073,9 @@ check_current_rpro()
 	fi
 }
 
-
-
 ######################################################################################
 
 ####################### RED5PRO UPGRADE OPERATION MENU ###############################
-
 
 ## PRIVATE ###
 restore_rpro()
@@ -1248,7 +1102,6 @@ restore_rpro()
 
 	sleep 2
 
-	
 	##################################################################################################
 	################################### RESTORE LICENSE ##############################################
 	empty_line
@@ -1275,9 +1128,6 @@ restore_rpro()
 	sleep 1
 	;;
 	esac
-
-
-
 
 	##################################################################################################
 	################################### RESTORE CLUSTERING ###########################################
@@ -1306,7 +1156,6 @@ restore_rpro()
 	;;
 	esac
 
-
 	##################################################################################################
 	################################### RESTORE APPLICATIONS #########################################
 	empty_line
@@ -1329,7 +1178,6 @@ restore_rpro()
 
 		echo "Total applications found = $apps_to_restore"
 		sleep 2
-
 
 	#################################################################################################
 	
@@ -1371,7 +1219,6 @@ restore_rpro()
 	;;
 	esac
 
-
 	#################################################################################################
 	empty_line
 	rpro_backup_restore_wizard=1	
@@ -1379,8 +1226,6 @@ restore_rpro()
 	empty_pause
 	
 }
-
-
 
 ## PRIVATE ###
 backup_rpro()
@@ -1392,7 +1237,6 @@ backup_rpro()
 	  mkdir -p $RPRO_BACKUP_HOME
 	  chmod ugo+w $RPRO_BACKUP_HOME
 	fi
-
 	
 	if [ -d "$RPRO_BACKUP_HOME" ]; then
 	  
@@ -1438,10 +1282,6 @@ backup_rpro()
 	
 }
 
-
-
-
-
 upgrade()
 {
 	upgrade_rpro_success=0
@@ -1455,7 +1295,6 @@ upgrade()
 	else
 		upgrade_from_zip=0		
 	fi
-
 
 	# Start process
 	lecho "Initializing upgrade process..."
@@ -1501,7 +1340,6 @@ upgrade()
 		# check install state here
 	fi
 
-
 	# If install is successful try restore....
 	if [[ $red5_zip_install_success -eq 1 ]]; then
 
@@ -1528,10 +1366,6 @@ upgrade()
 	pause
 
 }
-
-
-
-
 
 ## PRIVATE ###
 upgrade_clean()
@@ -1562,14 +1396,9 @@ upgrade_clean()
 	esac
 }
 
-
-
 ######################################################################################
 
 ############################ LICENSE OPERATIONS ######################################
-
-
-
 
 check_license()
 {
@@ -1600,9 +1429,6 @@ check_license()
 	pause_license;	
 }
 
-
-
-
 set_update_license()
 {
 
@@ -1613,7 +1439,6 @@ set_update_license()
 		rpro_path=$DEFAULT_RPRO_PATH
 	fi
 	
-
 	check_current_rpro 1
 	if [[ $rpro_exists -eq 1 ]]; then
 
@@ -1639,8 +1464,6 @@ set_update_license()
 			read license_code			
 		fi
 
-		
-
 		license_code=$(echo $license_code | tr '[a-z]' '[A-Z]')
 		write_log "Writing license code to file $license_code"
 		printf $license_code > $lic_file;
@@ -1656,17 +1479,9 @@ set_update_license()
 	pause_license;	
 }
 
-
-
-
-
-
 ######################################################################################
 
 ############################ LICENSE MENU ############################################
-
-
-
 
 show_licence_menu()
 {
@@ -1674,11 +1489,8 @@ show_licence_menu()
 	license_menu_read_options
 }
 
-
-
 licence_menu()
 {
-
 	cls
 
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"	
@@ -1690,10 +1502,6 @@ licence_menu()
 	echo "3. BACK TO MAIN MENU"
 	echo "			  "   
 }
-
-
-
-
 
 license_menu_read_options(){
 
@@ -1715,20 +1523,15 @@ license_menu_read_options(){
 }
 
 
-
-
 ######################################################################################
 
 ############################ ADVANCE OPERATION MENU ################################
-
-
 
 show_advance_menu()
 {
 	advance_menu
 	advance_menu_read_options
 }
-
 
 advance_menu()
 {
@@ -1752,10 +1555,6 @@ advance_menu()
 
 }
 
-
-
-
-
 advance_menu_read_options(){
 
 
@@ -1774,29 +1573,15 @@ advance_menu_read_options(){
 	esac
 }
 
-
-
-
-
-
-
 ######################################################################################
 
 ############################ SIMPLE OPERATION MENU ################################
-
-
-
-
 
 show_simple_menu()
 {
 	simple_menu
 	simple_menu_read_options
 }
-
-
-
-
 
 simple_menu()
 {
@@ -1824,13 +1609,6 @@ simple_menu()
 
 }
 
-
-
-
-
-
-
-
 simple_menu_read_options(){
 
 
@@ -1850,15 +1628,9 @@ simple_menu_read_options(){
 	esac
 }
 
-
-
-
-
-
 ######################################################################################
 
 ################################ INIT FUNCTIONS ######################################
-
 
 load_configuration()
 {
@@ -1868,7 +1640,6 @@ load_configuration()
 		echo "Exiting..."
 		exit 0
 	fi
-
 
 	# Load config values
 	source "$CONFIGURATION_FILE"
@@ -1893,7 +1664,6 @@ load_configuration()
 	RED5PRO_DEFAULT_DOWNLOAD_FOLDER="$CURRENT_DIRECTORY/$RED5PRO_DEFAULT_DOWNLOAD_FOLDER_NAME"
 	[ ! -d foo ] && mkdir -p $RED5PRO_DEFAULT_DOWNLOAD_FOLDER && chmod ugo+w $RED5PRO_DEFAULT_DOWNLOAD_FOLDER	
 }
-
 
 
 detect_system()
@@ -1942,7 +1712,6 @@ detect_system()
 	echo -e "* Kernel: \e[36m$os_bits\e[m"
 	write_log "Kernel: $os_bits"
 
-
 	empty_line
 
 	USER_HOME=$(getent passwd $SUDO_USER | cut -d: -f6)
@@ -1973,7 +1742,6 @@ detect_system()
 }
 
 
-
 simple_usage_mode()
 {
 	write_log "Basic mode selected"
@@ -1983,9 +1751,6 @@ simple_usage_mode()
 	simple_menu
 	simple_menu_read_options
 }
-
-
-
 
 advance_usage_mode()
 {
@@ -1997,12 +1762,9 @@ advance_usage_mode()
 	advance_menu_read_options
 }
 
-
-
 welcome_menu()
 {	
 	cls
-
 
 	echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"	
 	echo " RED5PRO INSTALLER - W E L C O M E   M E N U"
@@ -2021,9 +1783,6 @@ welcome_menu()
 	echo "                             "
 }
 
-
-
-
 read_welcome_menu_options()
 {
 	
@@ -2037,22 +1796,15 @@ read_welcome_menu_options()
 	esac
 }
 
-
-
 main()
 {
 	welcome_menu
 	read_welcome_menu_options
 }
 
-
-
-
 ######################################################################################
 
 ############################ prerequisites FUNCTION ##################################
-
-
 
 prerequisites_unzip()
 {
@@ -2070,9 +1822,6 @@ prerequisites_unzip()
 		install_unzip
 	fi 
 }
-
-
-
 
 prerequisites_wget()
 {
@@ -2092,14 +1841,9 @@ prerequisites_wget()
 	fi 
 }
 
-
-
-
 ######################################################################################
 
 ########################### postrequisites FUNCTION ##################################
-
-
 
 postrequisites()
 {
@@ -2113,9 +1857,6 @@ postrequisites()
 	fi	
 }
 
-
-
-
 postrequisites_rhl()
 {
 	write_log "Installing additional dependencies for RHLE"
@@ -2125,9 +1866,6 @@ postrequisites_rhl()
 	yum -y update --skip-broken
 	yum -y --enablerepo=atrpms install libva libvdpau1
 }
-
-
-
 
 postrequisites_deb()
 {
@@ -2139,12 +1877,9 @@ postrequisites_deb()
 	apt-get install libvdpau1
 }
 
-
-
 ######################################################################################
 
 ############################## isinstalled FUNCTION ##################################
-
 
 isinstalled()
 {
@@ -2155,8 +1890,6 @@ isinstalled()
 	fi
 }
 
-
-
 isinstalled_rhl()
 {
 	if yum list installed "$@" >/dev/null 2>&1; then
@@ -2165,7 +1898,6 @@ isinstalled_rhl()
 	false
 	fi
 }
-
 
 isinstalled_deb()
 {
@@ -2178,7 +1910,6 @@ isinstalled_deb()
 	fi
 }
 
-
 # Public
 isDebian()
 {
@@ -2189,15 +1920,9 @@ isDebian()
 	fi
 }
 
-
-
-
 #################################################################################################
 
 ############################## repo_has_required_java FUNCTION ##################################
-
-
-
 
 repo_has_required_java()
 {
@@ -2207,7 +1932,6 @@ repo_has_required_java()
 	repo_has_required_java_rhl
 	fi
 }
-
 
 repo_has_required_java_deb()
 {
@@ -2224,25 +1948,17 @@ repo_has_required_java_deb()
 	fi
 }
 
-
 repo_has_required_java_rhl()
 {
 	false
 }
 
-
-
-
 #################################################################################################
-
-
 
 # Load configuration
 load_configuration
-
 
 # Start application
 write_log "====================================="
 write_log "	NEW INSTALLER SESSION	"
 main
-
