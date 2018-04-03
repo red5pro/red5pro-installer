@@ -1,0 +1,12 @@
+C:\Users\Rajdeep\Documents\Visual Studio 2015\Projects\Red5Service\Red5Service\bin\Debug\Red5Service.exe
+C:\Users\Rajdeep\Documents\Visual Studio 2015\Projects\Red5Service\Red5Service\bin\Debug\Red5Service.pdb
+C:\Users\Rajdeep\Documents\Visual Studio 2015\Projects\Red5Service\Red5Service\obj\Debug\Red5Service.ProjectInstaller.resources
+C:\Users\Rajdeep\Documents\Visual Studio 2015\Projects\Red5Service\Red5Service\obj\Debug\Red5Service.csproj.GenerateResource.Cache
+C:\Users\Rajdeep\Documents\Visual Studio 2015\Projects\Red5Service\Red5Service\obj\Debug\Red5Service.exe
+C:\Users\Rajdeep\Documents\Visual Studio 2015\Projects\Red5Service\Red5Service\obj\Debug\Red5Service.pdb
+C:\Users\Rajdeep\Documents\GitHub\red5pro-installer\Windows\service\Red5Service\Red5Service\bin\Debug\Red5Service.exe
+C:\Users\Rajdeep\Documents\GitHub\red5pro-installer\Windows\service\Red5Service\Red5Service\bin\Debug\Red5Service.pdb
+C:\Users\Rajdeep\Documents\GitHub\red5pro-installer\Windows\service\Red5Service\Red5Service\obj\Debug\Red5Service.ProjectInstaller.resources
+C:\Users\Rajdeep\Documents\GitHub\red5pro-installer\Windows\service\Red5Service\Red5Service\obj\Debug\Red5Service.csproj.GenerateResource.Cache
+C:\Users\Rajdeep\Documents\GitHub\red5pro-installer\Windows\service\Red5Service\Red5Service\obj\Debug\Red5Service.exe
+C:\Users\Rajdeep\Documents\GitHub\red5pro-installer\Windows\service\Red5Service\Red5Service\obj\Debug\Red5Service.pdb

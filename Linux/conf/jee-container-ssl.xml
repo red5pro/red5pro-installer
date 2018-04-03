@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:lang="http://www.springframework.org/schema/lang"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd">
+
+    <!-- War deployer -->
+    <bean id="warDeployer" class="org.red5.server.tomcat.WarDeployer">
+        <property name="checkInterval" value="${war.deploy.server.check.interval}"/>
+        <property name="webappFolder" value="${red5.root}/webapps"/>
+        <!-- Expand war files prior to startup of the remaining services -->
+        <property name="expandWars" value="true" />
+    </bean>
+
+    <!-- Non-secured transports for HTTP and WS -->
+
+    <!--
+    
+    <bean id="tomcat.server" class="org.red5.server.tomcat.TomcatLoader" depends-on="context.loader,warDeployer" lazy-init="true">
+
+        <property name="webappFolder" value="${red5.root}/webapps" />
+        
+        <property name="connectors">
+            <list>
+                <bean name="httpConnector" class="org.red5.server.tomcat.TomcatConnector">
+                    <property name="protocol" value="org.apache.coyote.http11.Http11Nio2Protocol" />
+                    <property name="address" value="${http.host}:${http.port}" />
+                    <property name="redirectPort" value="${https.port}" />
+                    <property name="connectionProperties">
+                        <map>
+                            <entry key="maxHttpHeaderSize" value="${http.max_headers_size}"/>
+                            <entry key="maxKeepAliveRequests" value="${http.max_keep_alive_requests}"/>
+                            <entry key="keepAliveTimout" value="-1"/>
+                        </map>
+                    </property>
+                </bean>
+            </list>
+        </property>
+        
+        <property name="baseHost">
+           <bean class="org.apache.catalina.core.StandardHost">
+               <property name="name" value="${http.host}" />
+           </bean>
+        </property>
+
+        <property name="valves">
+            <list>
+                <bean id="valve.access" class="org.apache.catalina.valves.AccessLogValve">
+                    <property name="directory" value="log" />
+                    <property name="prefix" value="${http.host}_access." />
+                    <property name="suffix" value=".log" />
+                    <property name="pattern" value="common" />
+                    <property name="rotatable" value="true" />
+                </bean>
+            </list>
+        </property>
+        
+    </bean>
+
+    <bean id="webSocketTransport" class="org.red5.net.websocket.WebSocketTransport">
+        <property name="addresses">
+            <list>
+                <value>${ws.host}:${ws.port}</value>
+            </list>
+        </property>
+    </bean>
+
+    -->
+
+    <!-- Secure transports for HTTPS and WSS -->
+
+    <bean id="tomcat.server" class="org.red5.server.tomcat.TomcatLoader" depends-on="context.loader" lazy-init="true">
+
+        <property name="webappFolder" value="${red5.root}/webapps" />
+        
+        <property name="connectors">
+            <list>
+                <bean name="httpConnector" class="org.red5.server.tomcat.TomcatConnector">
+                    <property name="protocol" value="org.apache.coyote.http11.Http11Nio2Protocol" />
+                    <property name="address" value="${http.host}:${http.port}" />
+                    <property name="redirectPort" value="${https.port}" />
+                </bean>
+                <bean name="httpsConnector" class="org.red5.server.tomcat.TomcatConnector">
+                    <property name="secure" value="true" />
+                    <property name="protocol" value="org.apache.coyote.http11.Http11Nio2Protocol" />
+                    <property name="address" value="${http.host}:${https.port}" />
+                    <property name="redirectPort" value="${http.port}" />
+                    <property name="connectionProperties">
+                        <map>
+                            <entry key="port" value="${https.port}" />
+                            <entry key="redirectPort" value="${http.port}" />
+                            <entry key="SSLEnabled" value="true" />
+                            <entry key="sslProtocol" value="TLSv1.2" />
+                            <entry key="ciphers" value="TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA" />
+                            <entry key="useServerCipherSuitesOrder" value="true" />
+                            <entry key="keystoreFile" value="${rtmps.keystorefile}" />
+                            <entry key="keystorePass" value="${rtmps.keystorepass}" />
+                            <entry key="truststoreFile" value="${rtmps.truststorefile}" />
+                            <entry key="truststorePass" value="${rtmps.truststorepass}" />
+                            <entry key="clientAuth" value="false" />
+                            <entry key="allowUnsafeLegacyRenegotiation" value="false" />
+                            <entry key="maxHttpHeaderSize" value="${http.max_headers_size}"/>
+                            <entry key="maxKeepAliveRequests" value="${http.max_keep_alive_requests}"/>
+                            <entry key="keepAliveTimout" value="-1"/>
+                            <entry key="useExecutor" value="true"/>
+                            <entry key="maxThreads" value="${http.max_threads}"/>
+                            <entry key="acceptorThreadCount" value="${http.acceptor_thread_count}"/>
+                            <entry key="processorCache" value="${http.processor_cache}"/>
+                        </map>
+                    </property>
+                </bean>
+            </list>
+        </property>
+
+        <property name="baseHost">
+            <bean class="org.apache.catalina.core.StandardHost">
+                <property name="name" value="${http.host}" />
+            </bean>
+        </property>
+        
+    </bean>
+
+    <bean id="webSocketTransportSecure" class="org.red5.net.websocket.WebSocketTransport">
+        <property name="receiveBufferSize" value="4096"/>
+        <property name="secureConfig">
+            <bean id="webSocketSecureConfig" class="org.red5.net.websocket.SecureWebSocketConfiguration">
+                <property name="keystoreFile" value="${rtmps.keystorefile}"/>
+                <property name="keystorePassword" value="${rtmps.keystorepass}"/>
+                <property name="truststoreFile" value="${rtmps.truststorefile}"/>
+                <property name="truststorePassword" value="${rtmps.truststorepass}"/>
+                <property name="cipherSuites">
+                    <array>
+                        <value>TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</value>
+                        <value>TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256</value>
+                        <value>TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA</value>
+                        <value>TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</value>
+                        <value>TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256</value>
+                        <value>TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA</value>
+                        <value>TLS_RSA_WITH_AES_128_GCM_SHA256</value>
+                        <value>TLS_RSA_WITH_AES_128_CBC_SHA256</value>
+                        <value>TLS_RSA_WITH_AES_128_CBC_SHA</value>
+                    </array>
+                </property>
+                <property name="protocols">
+                    <array>
+                        <value>TLSv1.2</value>
+                    </array>
+                </property>
+            </bean>
+        </property>
+        <property name="addresses">
+            <list>
+                <value>${wss.host}:${wss.port}</value>
+            </list>
+        </property>
+    </bean>
+
+</beans>
