@@ -19,6 +19,7 @@ This script is 'currently' designed to work with linux systems. You need to have
 
 The script requires super user privileges to execute and carry out subtasks. Hence you must execute the script as a super user on your linux system (sudo...).
 
+__NOTE__ : The entire content provided in the 'Linux' directory is required. The SSL installation requires the preconfigured 'jee-container.xml' and 'red5.properties' files.
 
 ## USAGE
 ---
