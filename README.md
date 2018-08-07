@@ -4,17 +4,16 @@ Installer for Red5 Pro Server
 
 ## INTRODUCTION
 
-The Red5pro install is a shell script, designed to make Red5pro installation simple and more efficient by automating most of the tasks related to getting a new Red5pro installation running.
+The Red5pro installer is a shell script, designed to make Red5pro installation simple and more efficient by automating most of the tasks related to getting a new Red5pro installation running.
 
-The script presents a collection menu driven options to help achieve various red5pro setup tasks. Additionally it also takes care of installing the software dependencies required to get Red5pro working. The script in intended to work on supported linux flavors.
-
+The script presents a collection menu driven options to help achieve various red5pro setup tasks. Additionally it also takes care of installing the software dependencies required to get Red5pro working.
 ## REQUIREMENTS
 
-This script is 'currently' designed to work with linux systems. You need to have a linux distribution supported by 'Red5Pro' (ex: ubuntu, centos).
+This script is 'currently' designed to work with specific flavours of linux only. You need to have a linux distribution supported by `Red5Pro` (ex: ubuntu 16.xx or centos 7.x).
 
-The script requires super user privileges to execute and carry out subtasks. Hence you must execute the script as a super user on your linux system (sudo...).
+The script requires super user privileges to execute and carry out subtasks. Hence you must execute the script as a super user on your linux system (sudo...). 
 
-__NOTE__ : The entire content provided in the 'Linux' directory is required. The SSL installation requires the preconfigured 'jee-container.xml' and 'red5.properties' files.
+__NOTE__ : The entire content provided in the 'Linux' directory of this repo is `required`.
 
 ## USAGE
 
@@ -81,9 +80,13 @@ RED5PRO_DOWNLOAD_URL=
 # ---------------------------------------
 RED5PRO_INSTALLER_OPERATIONS_CLEANUP=1
 
-# MINIMUM PERCENTAGE OF SYSTEM MEMORY TO ALLOCATE
+# MINIMUM PERCENTAGE OF SYSTEM MEMORY TO ALLOCATE TO JVM
 # ---------------------------------------
 RED5PRO_MEMORY_PCT=80
+
+# INSTALL RED5PRO AS SERVICE BY DEFAULT
+# ---------------------------------------
+RPRO_INSTALL_AS_SERVICE=true
 
 # SERVICE TYPE [ init.d (1) or jsvc (2)
 # ---------------------------------------
@@ -99,6 +102,7 @@ RED5PRO_SSL_DEFAULT_HTTP_PORT=80
 RED5PRO_SSL_DEFAULT_HTTPS_PORT=443
 RED5PRO_SSL_DEFAULT_WS_PORT=8081
 RED5PRO_SSL_DEFAULT_WSS_PORT=8083
+
 ```
 
 ##### CONFIGURAION OPTIONS:
@@ -114,6 +118,7 @@ RED5PRO_SSL_DEFAULT_WSS_PORT=8083
 * `LOGGING`: Boolean flag to enable or disable logging. Defaults to `true`
 * `RED5PRO_DOWNLOAD_URL`: Custom Red5 Pro archive URL for installation (must be modified with the download URL of your server if you choose that installation option)
 * `RED5PRO_INSTALLER_OPERATIONS_CLEANUP`: Choose whether or not to remove the downloaded Red5 Pro zip file after installation is finished. Set to `1` to remove the zipfile and `0` to leave it in place. (Default value is `1`).
+* `RPRO_INSTALL_AS_SERVICE` : Determines whether the installation process of Red5 Pro is followed by Red5 Pro service installation automatically by default or not. Setting the value to `false` disables service installation prompt during normal Red5 Pro installation. Defaults to `true`.
 * `RED5PRO_MEMORY_PCT`: How much (percentage) of system memory to allocate for JVM to Run Red5 Pro. Defaults to `80`.
 * `SERVICE_VERSION`: The default installation will set up Red5 Pro service using `systemctl` (option `2`). If you prefer to use the older method (`/etc/init.d`) change this value to `1`.
 * `RED5PRO_SSL_LETSENCRYPT_FOLDER_NAME` : The Letsencrypt SSL installer directory name. This is created in the installer directory.
@@ -163,9 +168,9 @@ The script prompts to determine if a autostart service is required for the red5p
 
 #### 2. INSTALL RED5PRO FROM URL
 
-This option lets you install Red5pro from a arbitrary Red5 Pro server archive located anywhere on the internet or LAN. In case you have a custom version of Red5 Pro that you wish to install you shoudl use this option. The only thing to remember is that the archive format (folder level in the archives) should be compatible with the installer. 
+This option lets you install Red5pro from a arbitrary Red5 Pro server archive located anywhere on the internet or LAN. In case you have a custom version of Red5 Pro that you wish to install you shoudl use this option. The only thing to rememberr is that the archive content structure should be match the one provided on Red5Pro.com.
 
-> Basically the rule of the thumb is that your archive should extract to a single folder containi9ng all the Red5 Pro server files.
+As long as the archive structure matches, you can host the file anywhere on the internet. This feature is specifically useful when installing pre-customized Red5 Pro distributions.
 
 The script checks the basic red5pro requirements as with the first option (INSTALL LATEST RED5PRO). Once requirements are met, it prompts you for the full qualified URL of the red5pro server archive (From S3 bucket or dropbox etc). 
 
@@ -173,7 +178,7 @@ The program extracts the archive file's content and copies the red5pro files int
 
 #### 3. REMOVE RED5PRO INSTALLATION
 
-This option lets you remove an existing red5pro installation. Removal deletes all the files and removes red5pro startup script if it exists.
+This option lets you remove an existing red5pro installation. Removal deletes all the files and removes red5pro service (if it exists).
 
 On selection of this option, the program looks for existing red5pro installation in the install location. If an installation is found, the user will be prompted to confirm the removal action. If user confirms it (by pressing Y + [ ENTER ] ), the script deletes the red5pro installation as well as any red5pro service installed on the OS.
 
@@ -185,13 +190,26 @@ __1. ADD / UPDATE LICENSE :__  Provides option to add a new license or update on
 
 __2. VIEW LICENSE :__  Provides option to view an existing red5pro license via the LICENSE.KEY file. The program looks for an existing red5pro installation and then the LICENSE.KEY file at expected location. If a file is found it displays the content of the file on terminal.
 
-#### 5. START RED5PRO
+#### 5. SSL CERT INSTALLER (Letsencrypt)
+
+This option allows you to install a free SSL certificate (Obtained via letsencrypt CA), on your Red5 Pro instance. Prior to using this option you need to make sure you have a valid DNS name that points to your instance.
+
+#### 6. START RED5PRO
 
 This option allows you to start Red5pro. On selecting this option, the program first checks to see if a Red5pro service is installed on the system or not. If a red5pro service is found, it attempts to start red5 using the service. If no service is found it attempts to start red5 using 'red5.sh' script located at the red5 install location.
 
-#### 6. STOP RED5PRO
+#### 7. STOP RED5PRO
 
 This option allows you to stop Red5pro. On selecting this option, the program first checks to see if a Red5pro service is installed on the system or not. If a red5pro service is found, it attempts to stop red5 using the service. If no service is found it attempts to stop red5 using 'red5.sh' script located at the red5 install location.
+
+#### 8. RESTART RED5PRO
+
+This option allows you to restart Red5pro.This option is available only if you Red56 Pro is installed as a service.
+
+#### 9. INSTALL AS SERVICE OR REMOVE SERVICE
+
+This option allows you to install or uninstall Red5 Pro service. If Red5 Pro service was registered during installation, the option is labeled as `REMOVE SERVICE`, otherwise as `INSTALL AS SERVICE`.
+
 
 ### UTILITY MODE
 
@@ -202,11 +220,3 @@ Check the default install location for an existing Red5 Pro installation and dis
 #### 2. WHICH JAVA AM I USING ?
 
 Selecting this option lets you see the current java version on your system. If java is not found, the program will print a message to notify the same.
-
-#### 3. INSTALL RED5PRO SERVICE
-
-This option lets you install red5 service. On selecting this option, the program first checks to see if red5pro in installed. If red5pro is not installed the operation exits. If red5pro installation is found the program attempts to register it as a service. If red5pro service is already installed on the OS, it prompts the user to overwrite it. If user selects to overwrite (By selecting 'y' + ENTER), the service will be re-installed else the operation exists.
-
-#### 4. UNINSTALL RED5PRO SERVICE
-
-This option lets you uninstall red5 service. On selecting this option, the program first checks to see if red5pro in installed. Next it checks to see if service is installed. If red5pro is not installed the operation exits. If red5pro installation is found the program attempts to unregister it as a service. If red5pro service does not exist on the OS, the operation exits. If service is found it is removed.
