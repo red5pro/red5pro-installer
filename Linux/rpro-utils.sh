@@ -2999,7 +2999,7 @@ simple_menu()
 		echo "9. --- REMOVE SERVICE			"
 		else
 		printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-		echo "8. --- INSTALL AS SERVICE			"
+		echo "8. --- INSTALL SERVICE			"
 		fi
 
 	fi
