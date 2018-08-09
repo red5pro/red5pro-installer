@@ -7,15 +7,15 @@ RPRO_CONFIGURATION_FILE=conf.ini
 
 # DEFAULT_RPRO_PATH=/usr/local/red5pro
 # MIN_JAVA_VERSION="1.8"
-RPRO_LOGGING=true
-RPRO_LOG_FILE_NAME=rpro_installer.log
-RPRO_LOG_FILE=$PWD/$RPRO_LOG_FILE_NAME
+RED5PRO_LOGGING=true
+RED5PRO_LOG_FILE_NAME=rpro_installer.log
+RPRO_LOG_FILE=$PWD/$RED5PRO_LOG_FILE_NAME
 
 RPRO_OS_TYPE=
 OS_DEB="DEBIAN"
 OS_RHL="REDHAT"
 
-RPRO_INSTALL_AS_SERVICE=true 
+RED5PRO_INSTALL_AS_SERVICE=true 
 RPRO_SERVICE_LOCATION_V1=/etc/init.d
 RPRO_SERVICE_NAME_V1=red5pro 
 RPRO_SERVICE_LOCATION_V2=/lib/systemd/system
@@ -24,7 +24,7 @@ RPRO_SERVICE_LOCATION=
 RPRO_SERVICE_NAME=
 
 # init.d(1) vs modern jsvc(2)
-RPRO_SERVICE_VERSION=2
+RED5PRO_SERVICE_VERSION=2
 
 RPRO_RED5SH=red5.sh
 RPRO_SERVICE_INSTALLER=/usr/sbin/update-rc.d
@@ -72,7 +72,7 @@ write_log()
 	if [ $# -eq 0 ]; then
 		return
 	else
-		if $RPRO_LOGGING; then			
+		if $RED5PRO_LOGGING; then			
 			logger -s $1 2>> $RPRO_LOG_FILE
 		fi
 	fi
@@ -88,7 +88,7 @@ lecho()
 	else
 		echo $1
 
-		if $RPRO_LOGGING; then
+		if $RED5PRO_LOGGING; then
 			logger -s $1 2>> $RPRO_LOG_FILE
 		fi
 	fi
@@ -104,7 +104,7 @@ lecho_err()
 		# Red in Yellow
 		echo -e "\e[41m $1\e[m"
 
-		if $RPRO_LOGGING; then
+		if $RED5PRO_LOGGING; then
 			logger -s $1 2>> $RPRO_LOG_FILE
 		fi
 	fi
@@ -1826,7 +1826,7 @@ install_rpro_zip()
 
 
 	# Installing red5 service
-	if $RPRO_INSTALL_AS_SERVICE; then			
+	if $RED5PRO_INSTALL_AS_SERVICE; then			
 
 		echo "For Red5 Pro to autostart with operating system, it needs to be registered as a service"
 		read -r -p "Do you want to register Red5 Pro service now? [y/N] " response
@@ -1874,7 +1874,7 @@ install_rpro_zip()
 # Public
 register_rpro_service()
 {
-	if [ "$RPRO_SERVICE_VERSION" -eq "1" ]; then
+	if [ "$RED5PRO_SERVICE_VERSION" -eq "1" ]; then
 	   register_rpro_service_v1
 	else
 	   register_rpro_service_v2
@@ -1887,7 +1887,7 @@ register_rpro_service()
 unregister_rpro_service()
 {
 	
-	if [ "$RPRO_SERVICE_VERSION" -eq "1" ]; then
+	if [ "$RED5PRO_SERVICE_VERSION" -eq "1" ]; then
 	   unregister_rpro_service_v1
 	else
 	   unregister_rpro_service_v2
@@ -2343,7 +2343,7 @@ start_red5pro_service()
 			lecho "Red5 Pro service was found at $RPRO_SERVICE_LOCATION/$RPRO_SERVICE_NAME"
 			lecho " Attempting to start service"
 
-			if [ "$RPRO_SERVICE_VERSION" -eq "1" ]; then
+			if [ "$RED5PRO_SERVICE_VERSION" -eq "1" ]; then
 				
 				if !(is_running_red5pro_service 1); then
 					start_red5pro_service_v1
@@ -2399,7 +2399,7 @@ stop_red5pro_service()
 			lecho "Red5 Pro service was found at $RPRO_SERVICE_LOCATION/$RPRO_SERVICE_NAME."
 			lecho "Attempting to stop Red5 Pro service"
 
-			if [ "$RPRO_SERVICE_VERSION" -eq "1" ]; then	
+			if [ "$RED5PRO_SERVICE_VERSION" -eq "1" ]; then	
 
 				if is_running_red5pro_service 1; then
 					stop_red5pro_service_v1
@@ -2442,7 +2442,7 @@ restart_red5pro_service()
 			lecho "Red5 Pro service was found at $RPRO_SERVICE_LOCATION/$RPRO_SERVICE_NAME."
 			lecho "Attempting to restart Red5 Pro service"
 
-			if [ "$RPRO_SERVICE_VERSION" -eq "1" ]; then
+			if [ "$RED5PRO_SERVICE_VERSION" -eq "1" ]; then
 				restart_red5pro_service_v1
 			else
 				restart_red5pro_service_v2
@@ -2498,7 +2498,7 @@ is_running_red5pro_service()
 			lecho "It seems Red5 Pro service was not installed. Please register Red5 Pro service from the menu for to activate this feature."
 		else			
 
-			if [ "$RPRO_SERVICE_VERSION" -eq "1" ]; then
+			if [ "$RED5PRO_SERVICE_VERSION" -eq "1" ]; then
 				if is_running_red5pro_service_v1; then
 					rpro_running=1
 				fi
@@ -3148,6 +3148,7 @@ load_configuration()
 	
 
 	RED5PRO_SSL_LETSENCRYPT_FOLDER="$CURRENT_DIRECTORY/$RED5PRO_SSL_LETSENCRYPT_FOLDER_NAME"
+
 }
 
 
@@ -3226,21 +3227,21 @@ detect_system()
 
 
 	# Service installation
-	if $RPRO_INSTALL_AS_SERVICE; then			
+	if $RED5PRO_INSTALL_AS_SERVICE; then			
 
-	# Service installer mode selection
-	if [ "$RPRO_SERVICE_VERSION" -eq "1" ]; then
-	RPRO_SERVICE_LOCATION=$RPRO_SERVICE_LOCATION_V1
-	RPRO_SERVICE_NAME=$RPRO_SERVICE_NAME_V1
-	echo -e "* Service Deployment : \e[36mClassic\e[m"
-	else
-	RPRO_SERVICE_LOCATION=$RPRO_SERVICE_LOCATION_V2
-	RPRO_SERVICE_NAME=$RPRO_SERVICE_NAME_V2
-	echo -e "* Service Deployment : \e[36mModern\e[m"
-	fi
+		# Service installer mode selection
+		if [ "$RED5PRO_SERVICE_VERSION" -eq "1" ]; then
+		RPRO_SERVICE_LOCATION=$RPRO_SERVICE_LOCATION_V1
+		RPRO_SERVICE_NAME=$RPRO_SERVICE_NAME_V1
+		echo -e "* Service Deployment : \e[36mClassic\e[m"
+		else
+		RPRO_SERVICE_LOCATION=$RPRO_SERVICE_LOCATION_V2
+		RPRO_SERVICE_NAME=$RPRO_SERVICE_NAME_V2
+		echo -e "* Service Deployment : \e[36mModern\e[m"
+		fi
 
 	else
-	echo -e "* Service Deployment : \e[36mDisabled\e[m"
+		echo -e "* Service Deployment : \e[36mDisabled\e[m"
 	fi
 
 	write_log "OS TYPE $RPRO_OS_TYPE"
