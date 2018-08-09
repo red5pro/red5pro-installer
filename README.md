@@ -1,4 +1,4 @@
-# red5pro-installer
+# red5pro installer
 Installer for Red5 Pro Server
 
 
@@ -45,7 +45,7 @@ The configuration file `conf.ini` is located in the same location as the program
 MIN_JAVA_VERSION="1.8"
 
 
-# JAVA DOWNLOAD LOCATIONS FOR CENTOS
+# JAVA DOWNLOAD LOCATIONS FOR CENTOS (Deprecated)
 # ---------------------------------------------------------------------------
 JAVA_JRE_DOWNLOAD_URL="http://download.oracle.com/otn-pub/java/jdk/8u102-b14/"
 JAVA_32_FILENAME="jre-8u102-linux-i586.rpm"
@@ -69,8 +69,8 @@ DEFAULT_RPRO_FOLDER_NAME=red5pro
 
 # Logging settings
 # ----------------------------------------
-LOG_FILE_NAME=rpro_installer.log
-LOGGING=true
+RED5PRO_LOG_FILE_NAME=rpro_installer.log
+RED5PRO_LOGGING=true
 
 # CUSTOM URL LOCATION
 # ---------------------------------------
@@ -86,11 +86,11 @@ RED5PRO_MEMORY_PCT=80
 
 # INSTALL RED5PRO AS SERVICE BY DEFAULT
 # ---------------------------------------
-RPRO_INSTALL_AS_SERVICE=true
+RED5PRO_INSTALL_AS_SERVICE=true
 
 # SERVICE TYPE [ init.d (1) or jsvc (2)
 # ---------------------------------------
-SERVICE_VERSION=2
+RED5PRO_SERVICE_VERSION=2
 
 
 # SSL INSTALLER
@@ -114,13 +114,13 @@ RED5PRO_SSL_DEFAULT_WSS_PORT=8083
 * `DEFAULT_BACKUP_FOLDER`: Filepath of the Red5 Pro backup directory (if there is an existing Red5 Pro installation that is being upgraded; default is `red5pro_backups`)
 * `DEFAULT_RPRO_INSTALL_LOCATION`: Red5 Pro install directory path (default is `/usr/local`)
 * `DEFAULT_RPRO_FOLDER_NAME`: Name of the Red5 Pro folder (default is `red5pro`)
-* `LOG_FILE_NAME`: Name of installer log file. Defaults to `rpro_installer.log`.
-* `LOGGING`: Boolean flag to enable or disable logging. Defaults to `true`
+* `RED5PRO_LOG_FILE_NAME`: Name of installer log file. Defaults to `rpro_installer.log`.
+* `RED5PRO_LOGGING`: Boolean flag to enable or disable logging. Defaults to `true`
 * `RED5PRO_DOWNLOAD_URL`: Custom Red5 Pro archive URL for installation (must be modified with the download URL of your server if you choose that installation option)
 * `RED5PRO_INSTALLER_OPERATIONS_CLEANUP`: Choose whether or not to remove the downloaded Red5 Pro zip file after installation is finished. Set to `1` to remove the zipfile and `0` to leave it in place. (Default value is `1`).
-* `RPRO_INSTALL_AS_SERVICE` : Determines whether the installation process of Red5 Pro is followed by Red5 Pro service installation automatically by default or not. Setting the value to `false` disables service installation prompt during normal Red5 Pro installation. Defaults to `true`.
+* `RED5PRO_INSTALL_AS_SERVICE` : Determines whether the installation process of Red5 Pro is followed by Red5 Pro service installation automatically by default or not. Setting the value to `false` disables service installation prompt during normal Red5 Pro installation. Defaults to `true`.
 * `RED5PRO_MEMORY_PCT`: How much (percentage) of system memory to allocate for JVM to Run Red5 Pro. Defaults to `80`.
-* `SERVICE_VERSION`: The default installation will set up Red5 Pro service using `systemctl` (option `2`). If you prefer to use the older method (`/etc/init.d`) change this value to `1`.
+* `RED5PRO_SERVICE_VERSION`: The default installation will set up Red5 Pro service using `systemctl` (option `2`). If you prefer to use the older method (`/etc/init.d`) change this value to `1`.
 * `RED5PRO_SSL_LETSENCRYPT_FOLDER_NAME` : The Letsencrypt SSL installer directory name. This is created in the installer directory.
 * `RED5PRO_SSL_LETSENCRYPT_GIT`: Letsencrypt SSL installer GIT repo URL
 * `RED5PRO_SSL_LETSENCRYPT_EXECUTABLE`: The Letsencrypt SSL installer executable 
