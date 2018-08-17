@@ -61,6 +61,14 @@ RED5PRO_DEFAULT_MEMORY_PATTERN="-Xmx2g"
 
 
 
+validatePermissions()
+{
+	if [[ $EUID -ne 0 ]]; then
+		echo "This script does not seem to have / has lost root permissions. Please re-run the script with 'sudo'"
+		exit 1
+	fi
+}
+
 
 
 ######################################################################################
@@ -676,6 +684,9 @@ has_ssl_cert_menu_read_options(){
 
 rpro_ssl_installer()
 {
+	# Permission check
+	validatePermissions
+
 	rpro_ssl_installation_success=0
 
 
@@ -1301,7 +1312,7 @@ eval_memory_to_allocate()
 			;;
 			*)
 			sleep 1
-			exit
+			exit 0
 			;;
 			esac
 		fi	
@@ -1368,6 +1379,9 @@ red5pro_com_login_form()
 		rpro_form_valid=0
 		lecho "Invalid password string!"
 	fi
+
+	# Permission check
+	validatePermissions
 
 	# if all params are valid
 	if [ "$rpro_form_valid" -eq "1" ]; then
@@ -1457,6 +1471,9 @@ download_from_url()
 		echo "Enter the Red5 Pro archive file URL source";
 		read RED5PRO_DOWNLOAD_URL
 	fi
+
+	# Permission check
+	validatePermissions
 
 	lecho "Attempting to download Red5 Pro archive file to $RED5PRO_DEFAULT_DOWNLOAD_FOLDER"
 
@@ -1661,7 +1678,7 @@ install_rpro_zip()
 	write_log "Installing Red5 Pro from zip $rpro_zip_path"
 
 
-	if !isValidArchive $rpro_zip_path; then
+	if ! isValidArchive $rpro_zip_path; then
 		lecho "Cannot process archive $rpro_zip_path"
 		pause;
 	fi
@@ -1716,6 +1733,10 @@ install_rpro_zip()
 
 
 	lecho "Unpacking archive $rpro_zip_path to install location..."
+
+	if [ -d "$unzip_dest" ]; then
+	  rm -rf $unzip_dest
+	fi
 	
 	
 	if ! unzip $rpro_zip_path -d $unzip_dest; then
@@ -1915,6 +1936,9 @@ isSingleLevel()
 # Public
 register_rpro_service()
 {
+	# Permission check
+	validatePermissions
+
 	if [ "$RED5PRO_SERVICE_VERSION" -eq "1" ]; then
 	   register_rpro_service_v1
 	else
@@ -1927,6 +1951,8 @@ register_rpro_service()
 # Public
 unregister_rpro_service()
 {
+	# Permission check
+	validatePermissions
 	
 	if [ "$RED5PRO_SERVICE_VERSION" -eq "1" ]; then
 	   unregister_rpro_service_v1
@@ -2707,6 +2733,9 @@ restore_rpro()
 ## PRIVATE ###
 backup_rpro()
 {
+	# Permission check
+	validatePermissions
+
 	rpro_backup_success=0
 
 
@@ -2975,6 +3004,10 @@ advance_menu_read_options(){
 
 
 	local choice
+
+	# Permission check
+	validatePermissions
+
 	read -p "Enter choice [ 1 - 2 | 0 to go back | X to exit ] " choice
 
 	case $choice in
@@ -3009,7 +3042,6 @@ show_simple_menu()
 
 
 
-
 simple_menu()
 {
 
@@ -3021,9 +3053,7 @@ simple_menu()
 	echo -e "\e[44m RED5 PRO INSTALLER - BASIC MODE \e[m"
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
 	echo "1. --- INSTALL LATEST RED5 PRO		"
-	echo "2. --- INSTALL RED5 PRO FROM URL 		"
-	echo -e "\e[40m [ The archive format should be same as provided on 'red5pro.com' ]\e[m"
-
+	echo "2. --- INSTALL RED5 PRO FROM URL (UPLOADED ARCHIVE)	"
 
 	if [[ $rpro_exists -eq 1 ]]; then
 
@@ -3068,7 +3098,10 @@ simple_menu()
 simple_menu_read_options(){
 
 
-	local choice	
+	local choice
+
+	# Permission check
+	validatePermissions
 
 	if [[ $rpro_exists -eq 1 ]]; then
 		if is_service_installed; then
@@ -3164,7 +3197,7 @@ load_configuration()
 
 		echo -e "\e[41m CRITICAL ERROR!! - Configuration file not found!\e[m"
 		echo -e "\e[41m Exiting...\e[m"
-		exit 0
+		exit 1
 	fi
 
 
@@ -3652,6 +3685,9 @@ function isEmailValid() {
       [[ "${1}" =~ $regex ]]
 }
 
+
+# Permission check
+validatePermissions
 
 
 # Load configuration
