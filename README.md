@@ -18,38 +18,33 @@ __NOTE__ : The entire content provided in the 'Linux' directory of this repo is 
 ## USAGE
 
 **To execute the script :** 
+
 >> Script is located at : `Linux/rpro-utils.sh`
-* Copy the script and conf.ini (script configuration file) to a location from where it can be executed such as : `/home/{username}/`.
-* Navigate to directory location in the linux terminal (shell)
-* Assign executable permissions to the script by issuing the following command in terminal : `sudo chmod +x ./rpro-utils.sh`
+* Copy the script and conf.ini (script configuration file) to a location from where it can be executed, such as the user's home directory.
+* Navigate to directory location in the linux terminal (shell), where the `rpro-utils.sh` file was copied to.
+* Assign executable permissions to the script by issuing the following command in terminal: 
 
-##### UBUNTU
+```sh
+sudo chmod +x *.sh
+```
+* Execute the script by issuing the following command:
 
-* Execute the script by issuing the following command : `sudo ./rpro-utils.sh`
+```sh
+sudo ./rpro-utils.sh
+```
 
-##### CENTOS
+> On linux you can hit `CTRL + C` in the terminal anytime to interrupt/abort a script execution.
 
-**CentOs is currently not supported**
-
-##### SPECIAL NOTE
-
-__On linux you can hit `CTRL + C` in the terminal at anytiem to interrupt/abort a script execution.__
 
 ## PROGRAM CONFIGURATION FILE -> CONF.INI
 
 The configuration file `conf.ini` is located in the same location as the program itself. It contains the basic configuration information needed for the installer script to run. Some of the configuration can be changed and some are fixed. Given below is the content of the `conf.ini` file.
 
 ```ini
+
 # JAVA REQUIREMENTS
 # -------------------
 MIN_JAVA_VERSION="1.8"
-
-
-# JAVA DOWNLOAD LOCATIONS FOR CENTOS (Deprecated)
-# ---------------------------------------------------------------------------
-JAVA_JRE_DOWNLOAD_URL="http://download.oracle.com/otn-pub/java/jdk/8u102-b14/"
-JAVA_32_FILENAME="jre-8u102-linux-i586.rpm"
-JAVA_64_FILENAME="jre-8u102-linux-x64.rpm"
 
 
 # Backup Folder => [ located in home directory ]
@@ -67,26 +62,32 @@ RED5PRO_DEFAULT_DOWNLOAD_FOLDER_NAME=tmp
 DEFAULT_RPRO_INSTALL_LOCATION=/usr/local
 DEFAULT_RPRO_FOLDER_NAME=red5pro
 
+
 # Logging settings
 # ----------------------------------------
 RED5PRO_LOG_FILE_NAME=rpro_installer.log
 RED5PRO_LOGGING=true
 
+
 # CUSTOM URL LOCATION
 # ---------------------------------------
 RED5PRO_DOWNLOAD_URL=
+
 
 # INSTALLER CLEANUP
 # ---------------------------------------
 RED5PRO_INSTALLER_OPERATIONS_CLEANUP=1
 
+
 # MINIMUM PERCENTAGE OF SYSTEM MEMORY TO ALLOCATE TO JVM
 # ---------------------------------------
 RED5PRO_MEMORY_PCT=80
 
+
 # INSTALL RED5PRO AS SERVICE BY DEFAULT
 # ---------------------------------------
 RED5PRO_INSTALL_AS_SERVICE=true
+
 
 # SERVICE TYPE [ init.d (1) or jsvc (2)
 # ---------------------------------------
@@ -103,31 +104,29 @@ RED5PRO_SSL_DEFAULT_HTTPS_PORT=443
 RED5PRO_SSL_DEFAULT_WS_PORT=8081
 RED5PRO_SSL_DEFAULT_WSS_PORT=8083
 
+
 ```
 
 ##### CONFIGURAION OPTIONS:
 
 * `MIN_JAVA_VERSION`: Minimim version of java (JRE/JDK) that is required by the installer to install Red5pro on the system. This value should not be changed by the user.
-* `JAVA_JRE_DOWNLOAD_URL`: Base url of the latest rpm package(s) required for java installation on CentOs. This value should not be changed by the user.This attribute is deprecated.
-* `JAVA_32_FILENAME`: Filename of the 32 bit java rpm package for CentOs .This attribute is deprecated.
-* `JAVA_64_FILENAME`: Filename of the 64 bit java rpm package for CentOs.This attribute is deprecated.
-* `DEFAULT_BACKUP_FOLDER`: Filepath of the Red5 Pro backup directory (if there is an existing Red5 Pro installation that is being upgraded; default is `red5pro_backups`)
-* `DEFAULT_RPRO_INSTALL_LOCATION`: Red5 Pro install directory path (default is `/usr/local`)
-* `DEFAULT_RPRO_FOLDER_NAME`: Name of the Red5 Pro folder (default is `red5pro`)
+* `DEFAULT_BACKUP_FOLDER`: Filepath of the Red5 Pro backup directory. Thsi is useful if you are installing red5pro while there is already an installation present.The installer prompts you to back it up to a safe location before proceeding with the new installation.
+* `DEFAULT_RPRO_INSTALL_LOCATION`: Red5 Pro install directory path (default is `/usr/local`).
+* `DEFAULT_RPRO_FOLDER_NAME`: Name of the Red5 Pro folder (default is `red5pro`).
 * `RED5PRO_LOG_FILE_NAME`: Name of installer log file. Defaults to `rpro_installer.log`.
 * `RED5PRO_LOGGING`: Boolean flag to enable or disable logging. Defaults to `true`
-* `RED5PRO_DOWNLOAD_URL`: Custom Red5 Pro archive URL for installation (must be modified with the download URL of your server if you choose that installation option)
-* `RED5PRO_INSTALLER_OPERATIONS_CLEANUP`: Choose whether or not to remove the downloaded Red5 Pro zip file after installation is finished. Set to `1` to remove the zipfile and `0` to leave it in place. (Default value is `1`).
+* `RED5PRO_DOWNLOAD_URL`: Custom Red5 Pro archive URL for installation. The url should host your own red5pro archive in a valid structure.
+* `RED5PRO_INSTALLER_OPERATIONS_CLEANUP`: Choose whether or not to remove the downloaded Red5 Pro zip file after installation is finished. Set to `1` to remove the zipfile and `0` to leave it in place. (Default value is `1`).This option can be helpful in debugging.
 * `RED5PRO_INSTALL_AS_SERVICE` : Determines whether the installation process of Red5 Pro is followed by Red5 Pro service installation automatically by default or not. Setting the value to `false` disables service installation prompt during normal Red5 Pro installation. Defaults to `true`.
 * `RED5PRO_MEMORY_PCT`: How much (percentage) of system memory to allocate for JVM to Run Red5 Pro. Defaults to `80`.
 * `RED5PRO_SERVICE_VERSION`: The default installation will set up Red5 Pro service using `systemctl` (option `2`). If you prefer to use the older method (`/etc/init.d`) change this value to `1`.
-* `RED5PRO_SSL_LETSENCRYPT_FOLDER_NAME` : The Letsencrypt SSL installer directory name. This is created in the installer directory.
+* `RED5PRO_SSL_LETSENCRYPT_FOLDER_NAME` : The Letsencrypt SSL installer directory name. This is created in the installer directory. This option should not be edited.
 * `RED5PRO_SSL_LETSENCRYPT_GIT`: Letsencrypt SSL installer GIT repo URL
-* `RED5PRO_SSL_LETSENCRYPT_EXECUTABLE`: The Letsencrypt SSL installer executable 
-* `RED5PRO_SSL_DEFAULT_HTTP_PORT`: Red5 Pro default HTTP port. This is used by the SSL installer to configure the HTTP port value (`5080` is the default)
-* `RED5PRO_SSL_DEFAULT_HTTPS_PORT`: Red5 Pro default HTTPS port. This is used by the SSL installer to configure the HTTPS port value (`443` is the default)
-* `RED5PRO_SSL_DEFAULT_WS_PORT`: Red5 Pro default unsecure websocket port. This is used by the SSL installer to configure the unsecure websocket port value (`8081` is the default).
-* `RED5PRO_SSL_DEFAULT_WSS_PORT`: Red5 Pro default secure websocket port. This is used by the SSL installer to configure the secure websocket port value (`8083` is the default).
+* `RED5PRO_SSL_LETSENCRYPT_EXECUTABLE`: The Letsencrypt SSL installer executable.This option should not be edited.
+* `RED5PRO_SSL_DEFAULT_HTTP_PORT`: Red5 Pro default HTTP port. This is used by the SSL installer to configure the HTTP port value (`5080` is the default).This option should not be edited.
+* `RED5PRO_SSL_DEFAULT_HTTPS_PORT`: Red5 Pro default HTTPS port. This is used by the SSL installer to configure the HTTPS port value (`443` is the default).This option should not be edited.
+* `RED5PRO_SSL_DEFAULT_WS_PORT`: Red5 Pro default unsecure websocket port. This is used by the SSL installer to configure the unsecure websocket port value (`8081` is the default).This option should not be edited.
+* `RED5PRO_SSL_DEFAULT_WSS_PORT`: Red5 Pro default secure websocket port. This is used by the SSL installer to configure the secure websocket port value (`8083` is the default).This option should not be edited.
 
 
 ## PROGRAM OPTIONS
@@ -168,11 +167,15 @@ The script prompts to determine if a autostart service is required for the red5p
 
 #### 2. INSTALL RED5PRO FROM URL
 
-This option lets you install Red5pro from a arbitrary Red5 Pro server archive located anywhere on the internet or LAN. In case you have a custom version of Red5 Pro that you wish to install you shoudl use this option. The only thing to rememberr is that the archive content structure should be match the one provided on Red5Pro.com.
+This option lets you install Red5pro from a arbitrary Red5 Pro server archive located anywhere on the internet or LAN. In case you have a custom version of Red5 Pro that you wish to install you shoudl use this option. As long as the archive structure matches, you can host the file anywhere on the internet. This feature is specifically useful when installing pre-customized Red5 Pro builds.
 
-As long as the archive structure matches, you can host the file anywhere on the internet. This feature is specifically useful when installing pre-customized Red5 Pro distributions.
+Here, the script checks the basic red5pro requirements as with the first option (INSTALL LATEST RED5PRO). Once requirements are met, it prompts you for the full qualified URL of the red5pro server archive (From S3 bucket or dropbox etc). 
 
-The script checks the basic red5pro requirements as with the first option (INSTALL LATEST RED5PRO). Once requirements are met, it prompts you for the full qualified URL of the red5pro server archive (From S3 bucket or dropbox etc). 
+Custom archives should be in one of two forms:
+
+* Single level archive : An archive created from inside the red5pro root directory, by selecting/adding all the files to archive. ie `{archive.zip} => red5.sh`.
+
+* Two level archive : An archive created from outside the red5pro root directory matching the archive structure that is available from red5pro.com.ie `{archive.zip} => {red5profolder} => red5.sh`.
 
 The program extracts the archive file's content and copies the red5pro files into the install location. The rest of the process is exactly the same as for the first option (INSTALL LATEST RED5PRO).
 
@@ -196,20 +199,21 @@ This option allows you to install a free SSL certificate (Obtained via letsencry
 
 #### 6. START RED5PRO
 
-This option allows you to start Red5pro. On selecting this option, the program first checks to see if a Red5pro service is installed on the system or not. If a red5pro service is found, it attempts to start red5 using the service. If no service is found it attempts to start red5 using 'red5.sh' script located at the red5 install location.
+This option allows you to start Red5pro. On selecting this option, the program first checks to see if a Red5pro service is installed on the system or not. If a red5pro service is found, it attempts to start red5 using the service. If no service was installed it attempts to start red5 using 'red5.sh' script located at the red5 install location.
 
 #### 7. STOP RED5PRO
 
-This option allows you to stop Red5pro. On selecting this option, the program first checks to see if a Red5pro service is installed on the system or not. If a red5pro service is found, it attempts to stop red5 using the service. If no service is found it attempts to stop red5 using 'red5.sh' script located at the red5 install location.
+This option allows you to stop Red5pro. On selecting this option, the program first checks to see if a Red5pro service is installed on the system or not. If a red5pro service is found, it attempts to stop red5 using the service. If no service was installed it attempts to stop red5 using 'red5.sh' script located at the red5 install location.
 
 #### 8. RESTART RED5PRO
 
-This option allows you to restart Red5pro.This option is available only if you Red56 Pro is installed as a service.
+This option allows you to restart Red5pro.This option is available only if you Red5 Pro is installed as a service.
 
-#### 9. INSTALL AS SERVICE OR REMOVE SERVICE
+#### 9. INSTALL SERVICE OR REMOVE SERVICE
 
-This option allows you to install or uninstall Red5 Pro service. If Red5 Pro service was registered during installation, the option is labeled as `REMOVE SERVICE`, otherwise as `INSTALL AS SERVICE`.
+This option allows you to install or uninstall Red5 Pro service. If Red5 Pro service was registered during installation, the option displays `REMOVE SERVICE`, otherwise as `INSTALL AS SERVICE`. Selecting `REMOVE SERVICE` will remove the installed red5pro service, whereas selecting `INSTALL SERVICE` will install the red5 pro service.
 
+---
 
 ### UTILITY MODE
 
