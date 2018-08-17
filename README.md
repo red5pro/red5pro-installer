@@ -187,11 +187,22 @@ Custom archives should be in one of two forms:
 
 The program extracts the archive file's content and copies the red5pro files into the install location. The rest of the process is exactly the same as for the first option (INSTALL LATEST RED5PRO).
 
+
+[![Installing Red5 Pro from custom url](https://img.youtube.com/vi/GKagGx9k6zs/0.jpg)](https://www.youtube.com/watch?v=GKagGx9k6zs)
+
+**ScreenCast**
+
 #### 3. REMOVE RED5PRO INSTALLATION
 
 This option lets you remove an existing red5pro installation. Removal deletes all the files and removes red5pro service (if it exists).
 
 On selection of this option, the program looks for existing red5pro installation in the install location. If an installation is found, the user will be prompted to confirm the removal action. If user confirms it (by pressing Y + [ ENTER ] ), the script deletes the red5pro installation as well as any red5pro service installed on the OS.
+
+
+[![Removing Red5 Pro](https://img.youtube.com/vi/7DF7ek84QgE/0.jpg)](https://www.youtube.com/watch?v=7DF7ek84QgE)
+
+**ScreenCast**
+
 
 #### 4. ADD / UPDATE RED5PRO LICENSE
 
@@ -202,7 +213,7 @@ __1. ADD / UPDATE LICENSE :__  Provides option to add a new license or update on
 __2. VIEW LICENSE :__  Provides option to view an existing red5pro license via the LICENSE.KEY file. The program looks for an existing red5pro installation and then the LICENSE.KEY file at expected location. If a file is found it displays the content of the file on terminal.
 
 
-[![Updating License](https://img.youtube.com/vi/4qxP8BOd3LA/0.jpg)](https://www.youtube.com/watch?v=4qxP8BOd3LA)
+[![Updating / Viewing License](https://img.youtube.com/vi/4qxP8BOd3LA/0.jpg)](https://www.youtube.com/watch?v=4qxP8BOd3LA)
 
 **ScreenCast**
 
@@ -222,7 +233,6 @@ The installer script uses the [Red5 Pro SSL page](https://www.red5pro.com/docs/s
 [![Letsencrypt SSL Installation](https://img.youtube.com/vi/9vCRvr4HRM4/0.jpg)](https://www.youtube.com/watch?v=9vCRvr4HRM4)
 
 **ScreenCast**
-
 
 
 #### 6. START RED5PRO
