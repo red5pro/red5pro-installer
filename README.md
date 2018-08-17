@@ -7,13 +7,16 @@ Installer for Red5 Pro Server
 The Red5pro installer is a shell script, designed to make Red5pro installation simple and more efficient by automating most of the tasks related to getting a new Red5pro installation running.
 
 The script presents a collection menu driven options to help achieve various red5pro setup tasks. Additionally it also takes care of installing the software dependencies required to get Red5pro working.
+
 ## REQUIREMENTS
 
 This script is 'currently' designed to work with specific flavours of linux only. You need to have a linux distribution supported by `Red5Pro` (ex: ubuntu 16.xx or centos 7.x).
 
-The script requires super user privileges to execute and carry out subtasks. Hence you must execute the script as a super user on your linux system (sudo...). 
+The script requires super user privileges to execute and carry out subtasks. Hence you must execute the script as a superuser on your linux system (sudo...). 
 
-__NOTE__ : The entire content provided in the 'Linux' directory of this repo is `required`.
+__NOTE 1__ : The entire content provided in the 'Linux' directory of this repo is `required`.
+
+__NOTE 2__ : This installer cannot be used to install more than one installation of Red5 Pro on the same instance. To install a new distribution you need to uninstall the previous one.
 
 ## USAGE
 
@@ -107,10 +110,10 @@ RED5PRO_SSL_DEFAULT_WSS_PORT=8083
 
 ```
 
-##### CONFIGURAION OPTIONS:
+##### CONFIGURATION OPTIONS:
 
-* `MIN_JAVA_VERSION`: Minimim version of java (JRE/JDK) that is required by the installer to install Red5pro on the system. This value should not be changed by the user.
-* `DEFAULT_BACKUP_FOLDER`: Filepath of the Red5 Pro backup directory. Thsi is useful if you are installing red5pro while there is already an installation present.The installer prompts you to back it up to a safe location before proceeding with the new installation.
+* `MIN_JAVA_VERSION`: Minimum version of java (JRE/JDK) that is required by the installer to install Red5pro on the system. This value should not be changed by the user.
+* `DEFAULT_BACKUP_FOLDER`: Filepath of the Red5 Pro backup directory. This is useful if you are installing red5pro while there is already an installation present.The installer prompts you to back it up to a safe location before proceeding with the new installation.
 * `DEFAULT_RPRO_INSTALL_LOCATION`: Red5 Pro install directory path (default is `/usr/local`).
 * `DEFAULT_RPRO_FOLDER_NAME`: Name of the Red5 Pro folder (default is `red5pro`).
 * `RED5PRO_LOG_FILE_NAME`: Name of installer log file. Defaults to `rpro_installer.log`.
@@ -148,7 +151,7 @@ The basic mode provides all the options, commonly required to setup a new red5pr
 
 #### 1. INSTALL LATEST RED5PRO
 
-Allows you to install Red5pro from red5pro.com website. You must have an existing account on red5pro.com to use this option. Before proceesding, the script checks for a few basic requirements : 
+Allows you to install Red5pro from red5pro.com website. You must have an existing account on red5pro.com to use this option. Before proceeding, the script checks for a few basic requirements : 
 
 * Java : Java (JRE / JDK 1.8 or greater is required to install Red5pro)
 * unzip : Unzip utility is required to unpack zip archives.
@@ -165,11 +168,16 @@ Depending on whether the softwares are found in the os distribution, the script 
 
 The script prompts to determine if a autostart service is required for the red5pro installation. If user accepts, The program creates a linux startup script for the current OS platform. This script helps red5pro start automatically with operating system.
 
+[![Installing Red5 Pro from site](https://img.youtube.com/vi/WcHQWRbFpII/0.jpg)](https://www.youtube.com/watch?v=WcHQWRbFpII)
+
+**ScreenCast**
+
+
 #### 2. INSTALL RED5PRO FROM URL
 
-This option lets you install Red5pro from a arbitrary Red5 Pro server archive located anywhere on the internet or LAN. In case you have a custom version of Red5 Pro that you wish to install you shoudl use this option. As long as the archive structure matches, you can host the file anywhere on the internet. This feature is specifically useful when installing pre-customized Red5 Pro builds.
+This option lets you install Red5pro from a arbitrary Red5 Pro server archive located anywhere on the internet or LAN. In case you have a custom version of Red5 Pro that you wish to install you should use this option. As long as the archive structure matches, you can host the file anywhere on the internet. This feature is specifically useful when installing pre-customized Red5 Pro builds.
 
-Here, the script checks the basic red5pro requirements as with the first option (INSTALL LATEST RED5PRO). Once requirements are met, it prompts you for the full qualified URL of the red5pro server archive (From S3 bucket or dropbox etc). 
+Here, the script checks the basic red5pro requirements as with the first option (INSTALL LATEST RED5PRO). Once requirements are met, it prompts you for the fully qualified URL of the red5pro server archive (From S3 bucket or dropbox etc). 
 
 Custom archives should be in one of two forms:
 
@@ -193,17 +201,49 @@ __1. ADD / UPDATE LICENSE :__  Provides option to add a new license or update on
 
 __2. VIEW LICENSE :__  Provides option to view an existing red5pro license via the LICENSE.KEY file. The program looks for an existing red5pro installation and then the LICENSE.KEY file at expected location. If a file is found it displays the content of the file on terminal.
 
+
+[![Updating License](https://img.youtube.com/vi/4qxP8BOd3LA/0.jpg)](https://www.youtube.com/watch?v=4qxP8BOd3LA)
+
+**ScreenCast**
+
 #### 5. SSL CERT INSTALLER (Letsencrypt)
 
 This option allows you to install a free SSL certificate (Obtained via letsencrypt CA), on your Red5 Pro instance. Prior to using this option you need to make sure you have a valid DNS name that points to your instance.
+
+The installer script uses the [Red5 Pro SSL page](https://www.red5pro.com/docs/server/red5prossl.html) as guide to create a SSL installation automation.
+
+**Prerequisites for SSL Installation:**
+
+* `Domain Name` : You should have a valid domain / subdomain name for which the SSL certificate is to be requested.
+* `DNS A record` : You should have a valid DNS type `A` record created for your domain management panel, that maps the public IP of the instance where Red5 Pro is running to the domain / subdomain name.
+* `Port Allowance` : Standard SSL port (443) as well as http port (80) should be open for the certificate generation to be successful.
+
+
+[![Letsencrypt SSL Installation](https://img.youtube.com/vi/9vCRvr4HRM4/0.jpg)](https://www.youtube.com/watch?v=9vCRvr4HRM4)
+
+**ScreenCast**
+
+
 
 #### 6. START RED5PRO
 
 This option allows you to start Red5pro. On selecting this option, the program first checks to see if a Red5pro service is installed on the system or not. If a red5pro service is found, it attempts to start red5 using the service. If no service was installed it attempts to start red5 using 'red5.sh' script located at the red5 install location.
 
+
+[![Letsencrypt SSL Installation](https://img.youtube.com/vi/0Rjir1xiiv8/0.jpg)](https://www.youtube.com/watch?v=0Rjir1xiiv8)
+
+**ScreenCast**
+
+
 #### 7. STOP RED5PRO
 
 This option allows you to stop Red5pro. On selecting this option, the program first checks to see if a Red5pro service is installed on the system or not. If a red5pro service is found, it attempts to stop red5 using the service. If no service was installed it attempts to stop red5 using 'red5.sh' script located at the red5 install location.
+
+
+[![Letsencrypt SSL Installation](https://img.youtube.com/vi/_Lanh0K-NUM/0.jpg)](https://www.youtube.com/watch?v=_Lanh0K-NUM)
+
+**ScreenCast**
+
 
 #### 8. RESTART RED5PRO
 
