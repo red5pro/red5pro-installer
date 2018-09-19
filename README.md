@@ -12,20 +12,21 @@ The script presents a collection menu driven options to help achieve various red
 
 This script is 'currently' designed to work with specific flavours of linux only. You need to have a linux distribution supported by `Red5Pro` (ex: ubuntu 16.xx or centos 7.x).
 
-The script requires super user privileges to execute and carry out subtasks. Hence you must execute the script as a superuser on your linux system (sudo...). 
+The script requires super user privileges to execute and carry out subtasks. Hence you must execute the script as a superuser on your linux system (sudo...).
 
 __NOTE 1__ : The entire content provided in the 'Linux' directory of this repo is `required`.
 
 __NOTE 2__ : This installer cannot be used to install more than one installation of Red5 Pro on the same instance. To install a new distribution you need to uninstall the previous one.
 
+
 ## USAGE
 
-**To execute the script :** 
+**To execute the script :**
 
 >> Script is located at : `Linux/rpro-utils.sh`
 * Copy the script and conf.ini (script configuration file) to a location from where it can be executed, such as the user's home directory.
 * Navigate to directory location in the linux terminal (shell), where the `rpro-utils.sh` file was copied to.
-* Assign executable permissions to the script by issuing the following command in terminal: 
+* Assign executable permissions to the script by issuing the following command in terminal:
 
 ```sh
 sudo chmod +x *.sh
@@ -118,7 +119,7 @@ RED5PRO_SSL_DEFAULT_WSS_PORT=8083
 * `DEFAULT_RPRO_FOLDER_NAME`: Name of the Red5 Pro folder (default is `red5pro`).
 * `RED5PRO_LOG_FILE_NAME`: Name of installer log file. Defaults to `rpro_installer.log`.
 * `RED5PRO_LOGGING`: Boolean flag to enable or disable logging. Defaults to `true`
-* `RED5PRO_DOWNLOAD_URL`: Custom Red5 Pro archive URL for installation. The url should host your own red5pro archive in a valid structure.
+* `RED5PRO_DOWNLOAD_URL`: Custom Red5 Pro archive URL for installation. The url should host your own red5pro archive in a valid structure. Must link directly to the archive, not to a directory.
 * `RED5PRO_INSTALLER_OPERATIONS_CLEANUP`: Choose whether or not to remove the downloaded Red5 Pro zip file after installation is finished. Set to `1` to remove the zipfile and `0` to leave it in place. (Default value is `1`).This option can be helpful in debugging.
 * `RED5PRO_INSTALL_AS_SERVICE` : Determines whether the installation process of Red5 Pro is followed by Red5 Pro service installation automatically by default or not. Setting the value to `false` disables service installation prompt during normal Red5 Pro installation. Defaults to `true`.
 * `RED5PRO_MEMORY_PCT`: How much (percentage) of system memory to allocate for JVM to Run Red5 Pro. Defaults to `80`.
@@ -138,7 +139,7 @@ RED5PRO_SSL_DEFAULT_WSS_PORT=8083
 
 As the script runs in the terminal, it detects the operating system details such as Distribution (OS name), Version (OS version), Kernel type (64/32 bit), User's home directory, Red5pro default backup directory (located inside the home directory) and the default install location (the current directory).
 
-The detected information is printed on screen and then the menu which allows you to select a operation mode is rendered. The program supports two modes of operation : 
+The detected information is printed on screen and then the menu which allows you to select a operation mode is rendered. The program supports two modes of operation :
 
 * Basic Mode: Provides most of the options for new installations.
 * Utility Mode: Provides utilities for doing more with the Red5 Pro installation
@@ -151,12 +152,12 @@ The basic mode provides all the options, commonly required to setup a new red5pr
 
 #### 1. INSTALL LATEST RED5PRO
 
-Allows you to install Red5pro from red5pro.com website. You must have an existing account on red5pro.com to use this option. Before proceeding, the script checks for a few basic requirements : 
+Allows you to install Red5pro from red5pro.com website. You must have an existing account on red5pro.com to use this option. Before proceeding, the script checks for a few basic requirements :
 
 * Java : Java (JRE / JDK 1.8 or greater is required to install Red5pro)
 * unzip : Unzip utility is required to unpack zip archives.
 
-Once the requirements are met the script proceeds to 'obtaining the latest Red5pro from Red5pro.com'. At this point, it prompts you for site credentials (email  & password). This information is posted to the website to help authenticate your download. If authentication succeeds, it begins downloading the latest red5pro archive file from red5pro.com. 
+Once the requirements are met the script proceeds to 'obtaining the latest Red5pro from Red5pro.com'. At this point, it prompts you for site credentials (email  & password). This information is posted to the website to help authenticate your download. If authentication succeeds, it begins downloading the latest red5pro archive file from red5pro.com.
 
 __* If an existing script is found, the script tried to stop red5 in case it was running before it can continue.__
 
@@ -177,7 +178,7 @@ The script prompts to determine if a autostart service is required for the red5p
 
 This option lets you install Red5pro from a arbitrary Red5 Pro server archive located anywhere on the internet or LAN. In case you have a custom version of Red5 Pro that you wish to install you should use this option. As long as the archive structure matches, you can host the file anywhere on the internet. This feature is specifically useful when installing pre-customized Red5 Pro builds.
 
-Here, the script checks the basic red5pro requirements as with the first option (INSTALL LATEST RED5PRO). Once requirements are met, it prompts you for the fully qualified URL of the red5pro server archive (From S3 bucket or dropbox etc). 
+Here, the script checks the basic red5pro requirements as with the first option (INSTALL LATEST RED5PRO). Once requirements are met, it prompts you for the fully qualified URL of the red5pro server archive (From S3 bucket or dropbox etc). Please verify that the file is publicly accessible. You MUST link DIRECTLY to the archive, not to a directory containing it.
 
 Custom archives should be in one of two forms:
 
