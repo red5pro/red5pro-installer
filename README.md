@@ -5,6 +5,7 @@ Installer for Red5 Pro Server
 ## INTRODUCTION
 
 The Red5pro installer is a shell script that will install a single server red5pro instance.
+
 The script presents a collection menu driven options to help achieve various red5pro setup tasks including SSL certificate via Letsencrypt, adding/changing license key, and managing the red5pro service. You may also check your Red5Pro installation and verify which version of Java you are running.
 
 ## REQUIREMENTS
