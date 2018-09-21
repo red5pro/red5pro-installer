@@ -4,40 +4,46 @@ Installer for Red5 Pro Server
 
 ## INTRODUCTION
 
-The Red5pro installer is a shell script, designed to make Red5pro installation simple and more efficient by automating most of the tasks related to getting a new Red5pro installation running.
-
-The script presents a collection menu driven options to help achieve various red5pro setup tasks. Additionally it also takes care of installing the software dependencies required to get Red5pro working.
+The Red5pro installer is a shell script that will install a single server red5pro instance.
+The script presents a collection menu driven options to help achieve various red5pro setup tasks including SSL certificate via Letsencrypt, adding/changing license key, and managing the red5pro service. You may also check your Red5Pro installation and verify which version of Java you are running.
 
 ## REQUIREMENTS
 
-This script is 'currently' designed to work with specific flavours of linux only. You need to have a linux distribution supported by `Red5Pro` (ex: ubuntu 16.xx or centos 7.x).
+`Red5Pro` supports the following Linux distributions: Ubuntu 16.xx or Centos 7.x
 
 The script requires super user privileges to execute and carry out subtasks. Hence you must execute the script as a superuser on your linux system (sudo...).
 
-__NOTE 1__ : The entire content provided in the 'Linux' directory of this repo is `required`.
+__NOTE 1__ : The entire content provided in the 'installer' directory of this repo is `required`.
 
 __NOTE 2__ : This installer cannot be used to install more than one installation of Red5 Pro on the same instance. To install a new distribution you need to uninstall the previous one.
 
 
 ## USAGE
 
-**To execute the script :**
+ **CentOS only instructions:**
+> CentOS does not come with git installed so you must install it. In your server's command line, run the following command:
 
->> Script is located at : `Linux/rpro-utils.sh`
-* Copy the script and conf.ini (script configuration file) to a location from where it can be executed, such as the user's home directory.
-* Navigate to directory location in the linux terminal (shell), where the `rpro-utils.sh` file was copied to.
-* Assign executable permissions to the script by issuing the following command in terminal:
 
-```sh
-sudo chmod +x *.sh
-```
-* Execute the script by issuing the following command:
+`sudo yum -y install git`
 
-```sh
-sudo ./rpro-utils.sh
-```
+**For both Ubuntu & CentOS:**
+On your server's command line enter the following commands:
+
+1. `git clone https://github.com/infrared5/red5pro-installer`
+2. `cd red5pro-installer`
+3. `sudo chmod +x *.sh`
+4. `sudo ./red5pro-installer.sh`
+
+You are now running the installer!
+
+* Press 1 then Enter to open the installer menu.
+* Press 1 then Enter again to install the latest red5pro build.
+* (Press 2 if you have a custom build of red5pro)
+
+
 
 > On linux you can hit `CTRL + C` in the terminal anytime to interrupt/abort a script execution.
+
 
 
 ## PROGRAM CONFIGURATION FILE -> CONF.INI
@@ -111,7 +117,7 @@ RED5PRO_SSL_DEFAULT_WSS_PORT=8083
 
 ```
 
-##### CONFIGURATION OPTIONS:
+##### Configuration Options:
 
 * `MIN_JAVA_VERSION`: Minimum version of java (JRE/JDK) that is required by the installer to install Red5pro on the system. This value should not be changed by the user.
 * `DEFAULT_BACKUP_FOLDER`: Filepath of the Red5 Pro backup directory. This is useful if you are installing red5pro while there is already an installation present.The installer prompts you to back it up to a safe location before proceeding with the new installation.
