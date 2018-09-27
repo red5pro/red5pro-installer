@@ -3571,7 +3571,7 @@ postrequisites()
 postrequisites_rhl()
 {
 	write_log "Installing additional dependencies for RHLE"
-	yum -y install java unzip jsvc ntp libva libvdpau
+	yum -y install ntp libva libvdpau
 }
 
 
@@ -3580,7 +3580,7 @@ postrequisites_rhl()
 postrequisites_deb()
 {
 	write_log "Installing additional dependencies for DEBIAN"
-	apt-get install -y libva1 libva-drm1 libva-x11-1 libvdpau1
+	apt-get install -y ntp libva1 libva-drm1 libva-x11-1 libvdpau1
 }
 
 
