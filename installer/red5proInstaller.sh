@@ -1263,6 +1263,7 @@ modify_jvm_memory()
 			alloc_phymem_string="-Xmx"$alloc_phymem_rounded"g"
 
 			sed -i -e "s/-Xmx2g/$alloc_phymem_string/g" $red5_sh_file # improve this
+			sed -i -e "s/-Xms2g/$alloc_phymem_string/g" $red5_sh_file # improve this
 			lecho "JVM memory size is set to $alloc_phymem_rounded Gb!"
 			sleep 1
 
