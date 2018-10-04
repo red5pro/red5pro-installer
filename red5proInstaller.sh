@@ -48,7 +48,7 @@ RED5PRO_SSL_LETSENCRYPT_FOLDER_NAME="letsencrypt"
 RED5PRO_SSL_LETSENCRYPT_GIT="https://github.com/letsencrypt/letsencrypt"
 RED5PRO_SSL_LETSENCRYPT_FOLDER=
 RED5PRO_SSL_LETSENCRYPT_EXECUTABLE="letsencrypt-auto"
-RED5PRO_SSL_DEFAULT_HTTP_PORT=80
+RED5PRO_SSL_DEFAULT_HTTP_PORT=5080
 RED5PRO_SSL_DEFAULT_HTTPS_PORT=443
 RED5PRO_SSL_DEFAULT_WS_PORT=8081
 RED5PRO_SSL_DEFAULT_WSS_PORT=8083
@@ -56,7 +56,7 @@ RED5PRO_SSL_DEFAULT_WSS_PORT=8083
 
 RED5PRO_DOWNLOAD_URL=
 RED5PRO_MEMORY_PCT=80
-
+RED5PRO_UPFRONT_MEMORY_ALLOC=true
 RED5PRO_DEFAULT_MEMORY_PATTERN="-Xmx2g"
 
 
@@ -2201,9 +2201,16 @@ register_rpro_service_v2()
 	lecho "Preparing to install service..."
 	sleep 2
 
-
 	# JVM memory allocation
 	eval_memory_to_allocate 1
+		
+	# If upfront allocation 'selected' then min = max else min = 256m 
+	if $RED5PRO_UPFRONT_MEMORY_ALLOC; then			
+		JVM_MEMORY_ALLOC_MIN="-Xms"$alloc_phymem_rounded"g"
+	else
+		JVM_MEMORY_ALLOC_MIN="-Xms256m"
+	fi
+	
 	JVM_MEMORY_ALLOC="-Xmx"$alloc_phymem_rounded"g"
 
 
@@ -2242,7 +2249,7 @@ ExecStart=/usr/bin/jsvc -debug \
     -Djava.security.debug=failure -Djava.security.egd=file:/dev/./urandom \
     -Dcatalina.home=\${RED5_HOME} -Dcatalina.useNaming=true \
     -Dorg.terracotta.quartz.skipUpdateCheck=true \
-    -Xms256m $JVM_MEMORY_ALLOC -Xverify:none \
+    $JVM_MEMORY_ALLOC_MIN $JVM_MEMORY_ALLOC -Xverify:none \
     -XX:+TieredCompilation -XX:+UseBiasedLocking \
     -XX:MaxMetaspaceSize=128m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC \
     -XX:InitialCodeCacheSize=8m -XX:ReservedCodeCacheSize=32m \
@@ -3570,7 +3577,7 @@ postrequisites()
 postrequisites_rhl()
 {
 	write_log "Installing additional dependencies for RHLE"
-	yum -y install java unzip jsvc ntp libva libvdpau
+	yum -y install ntp libva libvdpau
 }
 
 
@@ -3579,7 +3586,7 @@ postrequisites_rhl()
 postrequisites_deb()
 {
 	write_log "Installing additional dependencies for DEBIAN"
-	apt-get install -y libva1 libva-drm1 libva-x11-1 libvdpau1
+	apt-get install -y ntp libva1 libva-drm1 libva-x11-1 libvdpau1
 }
 
 

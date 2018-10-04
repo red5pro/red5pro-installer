@@ -9,7 +9,7 @@ The script presents a collection menu driven options to help achieve various red
 
 ## REQUIREMENTS
 
-`Red5Pro` supports the following Linux distributions: Ubuntu 16.xx or Centos 7.x
+`Red5Pro` supports the following Linux distributions: Ubuntu 16.04 or Centos 7.x
 
 The script requires super user privileges to execute and carry out subtasks. Hence you must execute the script as a superuser on your linux system (sudo...).
 
@@ -30,7 +30,7 @@ __NOTE 2__ : This installer cannot be used to install more than one installation
 On your server's command line enter the following commands:
 
 1. `git clone https://github.com/infrared5/red5pro-installer`
-2. `cd red5pro-installer`
+2. `cd red5pro-installer/installer`
 3. `sudo chmod +x *.sh`
 4. `sudo ./red5pro-installer.sh`
 
@@ -92,6 +92,7 @@ RED5PRO_INSTALLER_OPERATIONS_CLEANUP=1
 # MINIMUM PERCENTAGE OF SYSTEM MEMORY TO ALLOCATE TO JVM
 # ---------------------------------------
 RED5PRO_MEMORY_PCT=80
+RED5PRO_UPFRONT_MEMORY_ALLOC=true
 
 
 # INSTALL RED5PRO AS SERVICE BY DEFAULT
@@ -109,7 +110,7 @@ RED5PRO_SERVICE_VERSION=2
 RED5PRO_SSL_LETSENCRYPT_FOLDER_NAME=letsencrypt
 RED5PRO_SSL_LETSENCRYPT_GIT=https://github.com/letsencrypt/letsencrypt
 RED5PRO_SSL_LETSENCRYPT_EXECUTABLE=letsencrypt-auto
-RED5PRO_SSL_DEFAULT_HTTP_PORT=80
+RED5PRO_SSL_DEFAULT_HTTP_PORT=5080
 RED5PRO_SSL_DEFAULT_HTTPS_PORT=443
 RED5PRO_SSL_DEFAULT_WS_PORT=8081
 RED5PRO_SSL_DEFAULT_WSS_PORT=8083
@@ -129,6 +130,7 @@ RED5PRO_SSL_DEFAULT_WSS_PORT=8083
 * `RED5PRO_INSTALLER_OPERATIONS_CLEANUP`: Choose whether or not to remove the downloaded Red5 Pro zip file after installation is finished. Set to `1` to remove the zipfile and `0` to leave it in place. (Default value is `1`).This option can be helpful in debugging.
 * `RED5PRO_INSTALL_AS_SERVICE` : Determines whether the installation process of Red5 Pro is followed by Red5 Pro service installation automatically by default or not. Setting the value to `false` disables service installation prompt during normal Red5 Pro installation. Defaults to `true`.
 * `RED5PRO_MEMORY_PCT`: How much (percentage) of system memory to allocate for JVM to Run Red5 Pro. Defaults to `80`.
+* `RED5PRO_UPFRONT_MEMORY_ALLOC`: Indicates whether minimum jvm memory should be allocated with the maximum memeory allocable upfront. Defaults to `true`.
 * `RED5PRO_SERVICE_VERSION`: The default installation will set up Red5 Pro service using `systemctl` (option `2`). If you prefer to use the older method (`/etc/init.d`) change this value to `1`.
 * `RED5PRO_SSL_LETSENCRYPT_FOLDER_NAME` : The Letsencrypt SSL installer directory name. This is created in the installer directory. This option should not be edited.
 * `RED5PRO_SSL_LETSENCRYPT_GIT`: Letsencrypt SSL installer GIT repo URL
