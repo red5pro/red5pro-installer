@@ -1263,7 +1263,6 @@ modify_jvm_memory()
 			alloc_phymem_string="-Xmx"$alloc_phymem_rounded"g"
 
 			sed -i -e "s/-Xmx2g/$alloc_phymem_string/g" $red5_sh_file # improve this
-			sed -i -e "s/-Xms2g/$alloc_phymem_string/g" $red5_sh_file # improve this
 			lecho "JVM memory size is set to $alloc_phymem_rounded Gb!"
 			sleep 1
 
@@ -2205,6 +2204,7 @@ register_rpro_service_v2()
 
 	# JVM memory allocation
 	eval_memory_to_allocate 1
+	JVM_MEMORY_ALLOC_MIN="-Xms"$alloc_phymem_rounded"g"
 	JVM_MEMORY_ALLOC="-Xmx"$alloc_phymem_rounded"g"
 
 
@@ -2243,7 +2243,7 @@ ExecStart=/usr/bin/jsvc -debug \
     -Djava.security.debug=failure -Djava.security.egd=file:/dev/./urandom \
     -Dcatalina.home=\${RED5_HOME} -Dcatalina.useNaming=true \
     -Dorg.terracotta.quartz.skipUpdateCheck=true \
-    -Xms256m $JVM_MEMORY_ALLOC -Xverify:none \
+    $JVM_MEMORY_ALLOC_MIN $JVM_MEMORY_ALLOC -Xverify:none \
     -XX:+TieredCompilation -XX:+UseBiasedLocking \
     -XX:MaxMetaspaceSize=128m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC \
     -XX:InitialCodeCacheSize=8m -XX:ReservedCodeCacheSize=32m \
