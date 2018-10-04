@@ -9,7 +9,7 @@ The script presents a collection menu driven options to help achieve various red
 
 ## REQUIREMENTS
 
-`Red5Pro` supports the following Linux distributions: Ubuntu 16.xx or Centos 7.x
+`Red5Pro` supports the following Linux distributions: Ubuntu 16.04 or Centos 7.x
 
 The script requires super user privileges to execute and carry out subtasks. Hence you must execute the script as a superuser on your linux system (sudo...).
 
