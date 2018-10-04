@@ -30,7 +30,7 @@ __NOTE 2__ : This installer cannot be used to install more than one installation
 On your server's command line enter the following commands:
 
 1. `git clone https://github.com/infrared5/red5pro-installer`
-2. `cd red5pro-installer`
+2. `cd red5pro-installer/installer`
 3. `sudo chmod +x *.sh`
 4. `sudo ./red5pro-installer.sh`
 
