@@ -2201,10 +2201,16 @@ register_rpro_service_v2()
 	lecho "Preparing to install service..."
 	sleep 2
 
-
 	# JVM memory allocation
 	eval_memory_to_allocate 1
-	JVM_MEMORY_ALLOC_MIN="-Xms"$alloc_phymem_rounded"g"
+		
+	# If upfront allocation 'selected' then min = max else min = 256m 
+	if $RED5PRO_UPFRONT_MEMORY_ALLOC; then			
+		JVM_MEMORY_ALLOC_MIN="-Xms"$alloc_phymem_rounded"g"
+	else
+		JVM_MEMORY_ALLOC_MIN="-Xms256m"
+	fi
+	
 	JVM_MEMORY_ALLOC="-Xmx"$alloc_phymem_rounded"g"
 
 
