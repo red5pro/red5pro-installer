@@ -2748,22 +2748,30 @@ check_current_rpro()
 
 check_websockets_version()
 {
-	local PLUGINS_DIR="$DEFAULT_RPRO_PATH /plugins"
+	local PLUGINS_DIR="$DEFAULT_RPRO_PATH/plugins"
 	local websocket_plugin_file="$PLUGINS_DIR/websocket-*"
 	local tomcat_plugin_file="$PLUGINS_DIR/tomcatplugin-*"
 
 	# Checking if websocket plugin exists
+
 	if ls $websocket_plugin_file 1> /dev/null 2>&1; then
-		lecho "Build uses old websocket implementation"
+		
+		# Additional check for new websocket plugin version
+		#if ls $tomcat_plugin_file 1> /dev/null 2>&1; then
+		#	echo $tomcat_plugin_file
+		#fi
+
+		write_log "Build uses old websocket implementation"
 		NEW_RED5PRO_WEBSOCKETS=false
 		RED5PRO_SSL_DEFAULT_WS_PORT=$RED5PRO_SSL_DEPRECATED_WS_PORT
 		RED5PRO_SSL_DEFAULT_WSS_PORT=$RED5PRO_SSL_DEPRECATED_WSS_PORT		
 	else
-		lecho "Build uses new websocket implementation"
+		write_log "Build uses new websocket implementation"
 		NEW_RED5PRO_WEBSOCKETS=true
 		RED5PRO_SSL_DEFAULT_WS_PORT=$RED5PRO_SSL_DEFAULT_HTTP_PORT
 		RED5PRO_SSL_DEFAULT_WSS_PORT=$RED5PRO_SSL_DEFAULT_HTTPS_PORT
 	fi
+
 
 
 	# if no params supplied then return normally else return valuee
