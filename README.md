@@ -214,6 +214,8 @@ This option allows you to install a free SSL certificate (Obtained via letsencry
 
 The installer script uses the [Red5 Pro SSL page](https://www.red5pro.com/docs/server/red5prossl.html) as guide to create a SSL installation automation.
 
+> Installer supports newer builds (>=5.4.0 and onwards) as well as older builds (<=5.3.x) by checking for websocket implementation using the presence of the `websocket-x.x.x.jar` file in the plugins directory. New websocket implementation uses websockets classes from the tomcat plugin and the `websocket-x.x.x.jar` is no longer present in the newer builds.
+
 **Prerequisites for SSL Installation:**
 
 * `Domain Name`: You should have a valid domain / subdomain name for which the SSL certificate is to be requested.
