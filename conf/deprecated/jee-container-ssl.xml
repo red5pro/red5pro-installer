@@ -14,10 +14,11 @@
     </bean>
 
     <!-- Non-secured transports for HTTP and WS -->
-	<!--
+    <!--
     <bean id="tomcat.server" class="org.red5.server.tomcat.TomcatLoader" depends-on="context.loader,warDeployer" lazy-init="true">
-        <property name="websocketEnabled" value="true" />
+
         <property name="webappFolder" value="${red5.root}/webapps" />
+        
         <property name="connectors">
             <list>
                 <bean name="httpConnector" class="org.red5.server.tomcat.TomcatConnector">
@@ -34,11 +35,13 @@
                 </bean>
             </list>
         </property>
+        
         <property name="baseHost">
            <bean class="org.apache.catalina.core.StandardHost">
                <property name="name" value="${http.host}" />
            </bean>
         </property>
+
         <property name="valves">
             <list>
                 <bean id="valve.access" class="org.apache.catalina.valves.AccessLogValve">
@@ -50,14 +53,24 @@
                 </bean>
             </list>
         </property>
+        
+    </bean>
+
+    <bean id="webSocketTransport" class="org.red5.net.websocket.WebSocketTransport">
+        <property name="addresses">
+            <list>
+                <value>${ws.host}:${ws.port}</value>
+            </list>
+        </property>
     </bean>
 	-->
 
     <!-- Secure transports for HTTPS and WSS -->
 
     <bean id="tomcat.server" class="org.red5.server.tomcat.TomcatLoader" depends-on="context.loader" lazy-init="true">
-        <property name="websocketEnabled" value="true" />
+
         <property name="webappFolder" value="${red5.root}/webapps" />
+        
         <property name="connectors">
             <list>
                 <bean name="httpConnector" class="org.red5.server.tomcat.TomcatConnector">
@@ -96,10 +109,49 @@
                 </bean>
             </list>
         </property>
+
         <property name="baseHost">
             <bean class="org.apache.catalina.core.StandardHost">
                 <property name="name" value="${http.host}" />
             </bean>
+        </property>
+        
+    </bean>
+
+    <bean id="webSocketTransportSecure" class="org.red5.net.websocket.WebSocketTransport">
+        <property name="receiveBufferSize" value="4096"/>
+        <property name="handshakeWriteTimeout" value="10000"/>
+        <property name="latchTimeout" value="10000"/>
+        <property name="secureConfig">
+            <bean id="webSocketSecureConfig" class="org.red5.net.websocket.SecureWebSocketConfiguration">
+                <property name="keystoreFile" value="${rtmps.keystorefile}"/>
+                <property name="keystorePassword" value="${rtmps.keystorepass}"/>
+                <property name="truststoreFile" value="${rtmps.truststorefile}"/>
+                <property name="truststorePassword" value="${rtmps.truststorepass}"/>
+                <property name="cipherSuites">
+                    <array>
+                        <value>TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</value>
+                        <value>TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256</value>
+                        <value>TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA</value>
+                        <value>TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</value>
+                        <value>TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256</value>
+                        <value>TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA</value>
+                        <value>TLS_RSA_WITH_AES_128_GCM_SHA256</value>
+                        <value>TLS_RSA_WITH_AES_128_CBC_SHA256</value>
+                        <value>TLS_RSA_WITH_AES_128_CBC_SHA</value>
+                    </array>
+                </property>
+                <property name="protocols">
+                    <array>
+                        <value>TLSv1.2</value>
+                    </array>
+                </property>
+            </bean>
+        </property>
+        <property name="addresses">
+            <list>
+                <value>${wss.host}:${wss.port}</value>
+            </list>
         </property>
     </bean>
 
