@@ -94,11 +94,13 @@ RED5PRO_SERVICE_VERSION=2
 # ---------------------------------------
 RED5PRO_SSL_LETSENCRYPT_FOLDER_NAME=letsencrypt
 RED5PRO_SSL_LETSENCRYPT_GIT=https://github.com/letsencrypt/letsencrypt
-RED5PRO_SSL_LETSENCRYPT_EXECUTABLE=letsencrypt-auto
+REDRED5PRO_SSL_LETSENCRYPT_EXECUTABLE=letsencrypt-auto
 RED5PRO_SSL_DEFAULT_HTTP_PORT=5080
 RED5PRO_SSL_DEFAULT_HTTPS_PORT=443
-RED5PRO_SSL_DEFAULT_WS_PORT=8081
-RED5PRO_SSL_DEFAULT_WSS_PORT=8083
+RED5PRO_SSL_DEFAULT_WS_PORT=5080
+RED5PRO_SSL_DEFAULT_WSS_PORT=443
+RED5PRO_SSL_DEPRECATED_WS_PORT=8081
+RED5PRO_SSL_DEPRECATED_WSS_PORT=8083
 ```
 
 ##### Configuration Options:
@@ -120,8 +122,10 @@ RED5PRO_SSL_DEFAULT_WSS_PORT=8083
 * `RED5PRO_SSL_LETSENCRYPT_EXECUTABLE`: The Letsencrypt SSL installer executable. This option should not be edited.
 * `RED5PRO_SSL_DEFAULT_HTTP_PORT`: Red5 Pro default HTTP port. This is used by the SSL installer to configure the HTTP port value (`5080` is the default).This option should not be edited.
 * `RED5PRO_SSL_DEFAULT_HTTPS_PORT`: Red5 Pro default HTTPS port. This is used by the SSL installer to configure the HTTPS port value (`443` is the default). This option should not be edited.
-* `RED5PRO_SSL_DEFAULT_WS_PORT`: Red5 Pro default unsecure websocket port. This is used by the SSL installer to configure the unsecure websocket port value (`8081` is the default).This option should not be edited.
-* `RED5PRO_SSL_DEFAULT_WSS_PORT`: Red5 Pro default secure websocket port. This is used by the SSL installer to configure the secure websocket port value (`8083` is the default). This option should not be edited.
+* `RED5PRO_SSL_DEFAULT_WS_PORT`: Red5 Pro default unsecure websocket port. This is used by the SSL installer to configure the unsecure websocket port value (`5080` is the default).This option should not be edited.
+* `RED5PRO_SSL_DEFAULT_WSS_PORT`: Red5 Pro default secure websocket port. This is used by the SSL installer to configure the secure websocket port value (`443` is the default). This option should not be edited.
+* `RED5PRO_SSL_DEPRECATED_WS_PORT`: Red5 Pro deprecated unsecure websocket port. This is used by the SSL installer to configure the unsecure websocket port value for older builds (`8081` is the default). This option should not be edited.
+* `RED5PRO_SSL_DEPRECATED_WSS_PORT`: Red5 Pro deprecated secure websocket port. This is used by the SSL installer to configure the secure websocket port value for older builds (`8083` is the default). This option should not be edited.
 
 ## PROGRAM OPTIONS
 
