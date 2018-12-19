@@ -50,14 +50,22 @@ RED5PRO_SSL_LETSENCRYPT_FOLDER=
 RED5PRO_SSL_LETSENCRYPT_EXECUTABLE="letsencrypt-auto"
 RED5PRO_SSL_DEFAULT_HTTP_PORT=5080
 RED5PRO_SSL_DEFAULT_HTTPS_PORT=443
-RED5PRO_SSL_DEFAULT_WS_PORT=8081
-RED5PRO_SSL_DEFAULT_WSS_PORT=8083
+RED5PRO_SSL_DEPRECATED_WS_PORT=8081
+RED5PRO_SSL_DEPRECATED_WSS_PORT=8083
+
+RED5PRO_SSL_DEFAULT_WS_PORT=
+RED5PRO_SSL_DEFAULT_WSS_PORT=
+
+NEW_RED5PRO_WEBSOCKETS=true
 
 
 RED5PRO_DOWNLOAD_URL=
 RED5PRO_MEMORY_PCT=80
 RED5PRO_UPFRONT_MEMORY_ALLOC=true
 RED5PRO_DEFAULT_MEMORY_PATTERN="-Xmx2g"
+
+
+
 
 
 
@@ -2695,6 +2703,7 @@ check_current_rpro()
 				if [ ! "$check_silent" -eq 1 ] ; then					
 					red5pro_server_version=$(echo $line | sed -e "s/server.version=/${replace}/g")
 					lecho "Red5 Pro build info : $red5pro_server_version" 
+					check_websockets_version
 					break
 				fi
 			;;
@@ -2718,6 +2727,38 @@ check_current_rpro()
 		true
 	else
 		false
+	fi
+
+}
+
+
+check_websockets_version()
+{
+	local PLUGINS_DIR="$DEFAULT_RPRO_PATH /plugins"
+	local websocket_plugin_file="$PLUGINS_DIR/websocket-*"
+	local tomcat_plugin_file="$PLUGINS_DIR/tomcatplugin-*"
+
+	# Checking if websocket plugin exists
+	if ls $websocket_plugin_file 1> /dev/null 2>&1; then
+		lecho "Old version of websockets detected. Probably carries ol websocket implementation"
+		NEW_RED5PRO_WEBSOCKETS=false
+		RED5PRO_SSL_DEFAULT_WS_PORT=$RED5PRO_SSL_DEPRECATED_WS_PORT
+		RED5PRO_SSL_DEFAULT_WSS_PORT=$RED5PRO_SSL_DEPRECATED_WSS_PORT		
+	else
+		lecho "Old version of websockets not found. Probably carries new websocket implementation"
+		NEW_RED5PRO_WEBSOCKETS=true
+		RED5PRO_SSL_DEFAULT_WS_PORT=$RED5PRO_SSL_DEFAULT_HTTP_PORT
+		RED5PRO_SSL_DEFAULT_WSS_PORT=$RED5PRO_SSL_DEFAULT_HTTPS_PORT
+	fi
+
+
+	# if no params supplied then return normally else return valuee
+	if [ $# -gt 0 ]; then
+		if $NEW_RED5PRO_WEBSOCKETS; then
+			true
+		else
+			false
+		fi		
 	fi
 
 }
