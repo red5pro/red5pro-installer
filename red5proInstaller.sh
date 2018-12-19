@@ -53,8 +53,8 @@ RED5PRO_SSL_DEFAULT_HTTPS_PORT=443
 RED5PRO_SSL_DEPRECATED_WS_PORT=8081
 RED5PRO_SSL_DEPRECATED_WSS_PORT=8083
 
-RED5PRO_SSL_DEFAULT_WS_PORT=
-RED5PRO_SSL_DEFAULT_WSS_PORT=
+RED5PRO_SSL_DEFAULT_WS_PORT=5080
+RED5PRO_SSL_DEFAULT_WSS_PORT=443
 
 NEW_RED5PRO_WEBSOCKETS=true
 
@@ -897,9 +897,16 @@ rpro_ssl_installer()
 
 	red5pro_conf_properties="$DEFAULT_RPRO_PATH/conf/red5.properties"
 	red5pro_conf_jee_container="$DEFAULT_RPRO_PATH/conf/jee-container.xml"
+
+	# Select appropriate ssl config files after checking websocket version
+	if $NEW_RED5PRO_WEBSOCKETS ; then
+		red5pro_installer_conf_properties="$CURRENT_DIRECTORY/conf/red5-ssl.properties"
+		red5pro_installer_conf_jee_container="$CURRENT_DIRECTORY/conf/jee-container-ssl.xml"
+	else
+		red5pro_installer_conf_properties="$CURRENT_DIRECTORY/conf/deprecated/red5-ssl.properties"
+		red5pro_installer_conf_jee_container="$CURRENT_DIRECTORY/conf/deprecated/jee-container-ssl.xml"
+	fi	
 	
-	red5pro_installer_conf_properties="$CURRENT_DIRECTORY/conf/red5-ssl.properties"
-	red5pro_installer_conf_jee_container="$CURRENT_DIRECTORY/conf/jee-container-ssl.xml"
 
 	config_ssl_jeecontainer
 
@@ -1188,50 +1195,57 @@ smart_config_ssl_properties()
 
 	local rtmps_truststorefile_pattern="rtmps.truststorefile=.*"
 	local rtmps_truststorefile_replacement_value="$rpro_ssl_trust_store_rtmps_truststorefie"
-
-	# Websocket
-
-	local ws_host_pattern="ws.host=.*" 
-	local ws_host_replacement_value="ws.host=0.0.0.0"
-
-	local ws_port_pattern="ws.port=.*" 
-	local ws_port_replacement_value="ws.port=$RED5PRO_SSL_DEFAULT_WS_PORT"
-
-	local wss_host_pattern="wss.host=.*" 
-	local wss_host_replacement_value="wss.host=0.0.0.0"
-
-	local wss_port_pattern="wss.port=.*" 
-	local wss_port_replacement_value="wss.port=$RED5PRO_SSL_DEFAULT_WSS_PORT"
-
-	local ws_config_pattern="ws.port=.*"
-	local ws_config_replacement_value="$ws_port_replacement_value\n$wss_host_replacement_value\n$wss_port_replacement_value"
-
 	local has_wss_conf=0
 
-	# Check if wss is already configured in the file
-	while IFS= read line
-	do
-		case "$line" in			
-			$wss_port_pattern) 
-			has_wss_conf=1
-			break
-			;;
-			*) continue ;;
-			esac		
+	# Websocket configuration
+
+	# For old version of websockets	
+	if ! $NEW_RED5PRO_WEBSOCKETS ; then
+
+		local ws_host_pattern="ws.host=.*" 
+		local ws_host_replacement_value="ws.host=0.0.0.0"
+
+		local ws_port_pattern="ws.port=.*" 
+		local ws_port_replacement_value="ws.port=$RED5PRO_SSL_DEFAULT_WS_PORT"
+
+		local wss_host_pattern="wss.host=.*" 
+		local wss_host_replacement_value="wss.host=0.0.0.0"
+
+		local wss_port_pattern="wss.port=.*" 
+		local wss_port_replacement_value="wss.port=$RED5PRO_SSL_DEFAULT_WSS_PORT"
+
+		local ws_config_pattern="ws.port=.*"
+		local ws_config_replacement_value="$ws_port_replacement_value\n$wss_host_replacement_value\n$wss_port_replacement_value"
+		
+
+		# Check if wss is already configured in the file
+		while IFS= read line
+		do
+			case "$line" in			
+				$wss_port_pattern) 
+				has_wss_conf=1
+				break
+				;;
+				*) continue ;;
+				esac		
 	
-	done <"$red5pro_conf_properties"
+		done <"$red5pro_conf_properties"
+
+	fi
 
 
 	# First pass - Simple replacements
-
-
 	sed -i -e "s|$http_port_pattern|$http_port_replacement_value|" -e "s|$https_port_pattern|$https_port_replacement_value|" -e "s|$rtmps_keystorepass_pattern|$rtmps_keystorepass_replacement_value|" -e "s|$rtmps_keystorefile_pattern|$rtmps_keystorefile_replacement_value|" -e "s|$rtmps_truststorepass_pattern|$rtmps_truststorepass_replacement_value|" -e "s|$rtmps_truststorefile_pattern|$rtmps_truststorefile_replacement_value|"   "$red5pro_conf_properties"
 
-	# Second pass - wss config check & smart replacements
-	if [[ $has_wss_conf -eq 1 ]]; then
-		sed -i -e "s|$wss_host_pattern|$wss_host_replacement_value|" -e "s|$wss_port_pattern|$wss_port_replacement_value|" "$red5pro_conf_properties"
-	else
-		sed -i -e "s|$ws_config_pattern|$ws_config_replacement_value|" "$red5pro_conf_properties"
+
+	# For old version of websockets	
+	if ! $NEW_RED5PRO_WEBSOCKETS ; then
+		# Second pass - wss config check & smart replacements
+		if [[ $has_wss_conf -eq 1 ]]; then
+			sed -i -e "s|$wss_host_pattern|$wss_host_replacement_value|" -e "s|$wss_port_pattern|$wss_port_replacement_value|" "$red5pro_conf_properties"
+		else
+			sed -i -e "s|$ws_config_pattern|$ws_config_replacement_value|" "$red5pro_conf_properties"
+		fi
 	fi
 }
 
@@ -2740,12 +2754,12 @@ check_websockets_version()
 
 	# Checking if websocket plugin exists
 	if ls $websocket_plugin_file 1> /dev/null 2>&1; then
-		lecho "Old version of websockets detected. Probably carries ol websocket implementation"
+		lecho "Build uses old websocket implementation"
 		NEW_RED5PRO_WEBSOCKETS=false
 		RED5PRO_SSL_DEFAULT_WS_PORT=$RED5PRO_SSL_DEPRECATED_WS_PORT
 		RED5PRO_SSL_DEFAULT_WSS_PORT=$RED5PRO_SSL_DEPRECATED_WSS_PORT		
 	else
-		lecho "Old version of websockets not found. Probably carries new websocket implementation"
+		lecho "Build uses new websocket implementation"
 		NEW_RED5PRO_WEBSOCKETS=true
 		RED5PRO_SSL_DEFAULT_WS_PORT=$RED5PRO_SSL_DEFAULT_HTTP_PORT
 		RED5PRO_SSL_DEFAULT_WSS_PORT=$RED5PRO_SSL_DEFAULT_HTTPS_PORT
@@ -2754,7 +2768,7 @@ check_websockets_version()
 
 	# if no params supplied then return normally else return valuee
 	if [ $# -gt 0 ]; then
-		if $NEW_RED5PRO_WEBSOCKETS; then
+		if $NEW_RED5PRO_WEBSOCKETS ; then
 			true
 		else
 			false
