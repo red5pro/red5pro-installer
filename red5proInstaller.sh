@@ -1994,42 +1994,24 @@ Environment=JAVA_HOME=$JAVA_ENV
 LimitNOFILE=65536
 Environment=RED5_HOME=$DEFAULT_RPRO_PATH
 WorkingDirectory=$DEFAULT_RPRO_PATH
-ExecStart=/usr/bin/jsvc -debug \
-
-    -home \${JAVA_HOME} \
-
-    -cwd \${RED5_HOME} \
-
-    -cp \${RED5_HOME}/commons-daemon-1.0.15.jar:\${RED5_HOME}/red5-service.jar:\${RED5_HOME}/conf \
-
-    -Dred5.root=\${RED5_HOME} \
-
-    -Djava.library.path=\${RED5_HOME}/lib/amd64-Linux-gpp/jni \
-
-    -Djava.security.debug=failure -Djava.security.egd=file:/dev/./urandom \
-
-    -Dcatalina.home=\${RED5_HOME} -Dcatalina.useNaming=true \
-
-    -Dorg.terracotta.quartz.skipUpdateCheck=true \
-
-    $JVM_MEMORY_ALLOC_MIN $JVM_MEMORY_ALLOC -Xverify:none \
-
-    -XX:+TieredCompilation -XX:+UseBiasedLocking \
-
-    -XX:MaxMetaspaceSize=128m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC \
-
-    -XX:InitialCodeCacheSize=8m -XX:ReservedCodeCacheSize=32m \
-
-    -XX:CMSInitiatingOccupancyFraction=60 \
-
-    -outfile \${RED5_HOME}/log/jsvc-service.log -errfile \${RED5_HOME}/log/jsvc-error.log \
-
-    -wait 60 \
-
-    -umask 011 \
-
+ExecStart=/usr/bin/jsvc -debug \\
+    -home \${JAVA_HOME} \\
+    -cwd \${RED5_HOME} \\
+    -cp \${RED5_HOME}/commons-daemon-1.0.15.jar:\${RED5_HOME}/red5-service.jar:\${RED5_HOME}/conf \\
+    -Dred5.root=\${RED5_HOME} \\
+    -Djava.library.path=\${RED5_HOME}/lib/amd64-Linux-gpp/jni \\
+    -Djava.security.debug=failure -Djava.security.egd=file:/dev/./urandom \\
+    -Dcatalina.home=\${RED5_HOME} -Dcatalina.useNaming=true \\
+    -Dorg.terracotta.quartz.skipUpdateCheck=true \\
+    $JVM_MEMORY_ALLOC_MIN $JVM_MEMORY_ALLOC -Xverify:none \\
+    -XX:+TieredCompilation -XX:+UseBiasedLocking \\
+    -XX:MaxMetaspaceSize=128m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC \\
+    -XX:InitialCodeCacheSize=8m -XX:ReservedCodeCacheSize=32m \\
+    -XX:CMSInitiatingOccupancyFraction=60 \\
+    -outfile \${RED5_HOME}/log/jsvc-service.log -errfile \${RED5_HOME}/log/jsvc-error.log \\
+    -wait 60 \\
+    -umask 011 \\
     -pidfile \${PID} org.red5.daemon.EngineLauncher 9999
-
 ExecStop=/usr/bin/jsvc -stop -pidfile \${PID} org.red5.daemon.EngineLauncher 9999
 
 [Install]
