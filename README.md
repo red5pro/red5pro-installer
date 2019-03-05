@@ -31,7 +31,7 @@ From your server's command line enter the following commands:
 1. `git clone https://github.com/red5pro/red5pro-installer`
 2. `cd red5pro-installer`
 3. `sudo chmod +x *.sh`
-4. `sudo ./red5pro-installer.sh`
+4. `sudo ./red5proInstaller.sh`
 
 You are now running the installer!
 
