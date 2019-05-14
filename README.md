@@ -1,6 +1,8 @@
 # red5pro installer
 Installer for Red5 Pro Server
 
+> **NOTE**: if you are running CentOS 7, please verify that in /usr/local/red5pro/conf/webrtc-plugin.properties `openssl=false`. You may have to modify that file manually. This must be set for WebRTC to function on CentOS.
+
 
 ## INTRODUCTION
 
