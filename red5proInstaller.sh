@@ -3169,6 +3169,8 @@ configure_openssl_centos()
 	local open_ssl_enabled_pattern="openssl.enabled=.*"
 	local open_ssl_replacement_value="openssl.enabled=false"
 	local version_str=$RED5PRO_VERSION
+	
+	lecho "Checking openssl settings.."
 
 	IFS='.'
 	read -ra ADDR <<< "$version_str"
@@ -3183,11 +3185,11 @@ configure_openssl_centos()
 	done
 	IFS=' '
 
-	local min_ver=522
+	local min_ver="522"
 
         # if version greater than 5.2.2
         if [[ "$ver_num" -gt "$min_ver" ]]; then
-                lecho "Configuring openssl settings for centos.."
+                lecho "Updating openssl settings for centos.."
                 sleep 1
                 sed -i -e "s|$open_ssl_enabled_pattern|$open_ssl_replacement_value|" "$red5pro_webrtc_plugin_conf"
         fi
