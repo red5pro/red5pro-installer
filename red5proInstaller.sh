@@ -3185,9 +3185,9 @@ configure_openssl_centos()
 	done
 	IFS=' '
 
-	local min_ver="522"
+	local min_ver="521"
 
-        # if version greater than 5.2.2
+        # if version greater than 5.2.1
         if [[ "$ver_num" -gt "$min_ver" ]]; then
                 lecho "Updating openssl settings for centos.."
                 sleep 1
