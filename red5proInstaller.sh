@@ -2398,8 +2398,9 @@ check_current_rpro()
 		do
 			case "$line" in			
 			$pattern) 
+				red5pro_server_version=$(echo $line | sed -e "s/server.version=/${replace}/g")
+				RED5PRO_VERSION=$red5pro_server_version
 				if [ ! "$check_silent" -eq 1 ] ; then					
-					red5pro_server_version=$(echo $line | sed -e "s/server.version=/${replace}/g")
 					lecho "Red5 Pro build info : $red5pro_server_version" 
 					check_websockets_version
 					break
