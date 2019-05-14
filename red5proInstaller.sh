@@ -62,6 +62,7 @@ RED5PRO_DOWNLOAD_URL=
 RED5PRO_MEMORY_PCT=80
 RED5PRO_UPFRONT_MEMORY_ALLOC=true
 RED5PRO_DEFAULT_MEMORY_PATTERN="-Xmx2g"
+RED5PRO_VERSION=_
 
 validatePermissions()
 {
@@ -2397,8 +2398,9 @@ check_current_rpro()
 		do
 			case "$line" in			
 			$pattern) 
+				red5pro_server_version=$(echo $line | sed -e "s/server.version=/${replace}/g")
+				RED5PRO_VERSION=$red5pro_server_version
 				if [ ! "$check_silent" -eq 1 ] ; then					
-					red5pro_server_version=$(echo $line | sed -e "s/server.version=/${replace}/g")
 					lecho "Red5 Pro build info : $red5pro_server_version" 
 					check_websockets_version
 					break
@@ -3159,6 +3161,44 @@ prerequisites_jsvc()
 }
 
 
+configure_openssl_centos()
+{
+	check_current_rpro 1 1
+	
+	local red5pro_webrtc_plugin_conf="$DEFAULT_RPRO_PATH/conf/webrtc-plugin.properties"
+
+	# Patterns and replacements
+	local open_ssl_enabled_pattern="openssl.enabled=.*"
+	local open_ssl_replacement_value="openssl.enabled=false"
+	local version_str=$RED5PRO_VERSION
+	
+	lecho "Checking openssl settings.."
+
+	IFS='.'
+	read -ra ADDR <<< "$version_str"
+	local count=0
+	local ver_num=""
+	for i in "${ADDR[@]}"; do # access each element of array
+	    ver_num="$ver_num$i"
+	    count=$((count+1))	
+	    if [[ $count -eq 3 ]]; then
+		break
+	    fi	
+	done
+	IFS=' '
+
+	local min_ver="521"
+
+        # if version greater than 5.2.1
+        if [[ "$ver_num" -gt "$min_ver" ]]; then
+                lecho "Updating openssl settings for centos.."
+                sleep 1
+                sed -i -e "s|$open_ssl_enabled_pattern|$open_ssl_replacement_value|" "$red5pro_webrtc_plugin_conf"
+        fi
+	
+}
+
+
 ######################################################################################
 ########################### postrequisites FUNCTION ##################################
 
@@ -3176,6 +3216,8 @@ postrequisites()
 
 postrequisites_rhl()
 {
+	configure_openssl_centos
+
 	write_log "Installing additional dependencies for RHLE"
 	yum -y install ntp libva libvdpau
 }
