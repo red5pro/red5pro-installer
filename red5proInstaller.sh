@@ -62,6 +62,7 @@ RED5PRO_DOWNLOAD_URL=
 RED5PRO_MEMORY_PCT=80
 RED5PRO_UPFRONT_MEMORY_ALLOC=true
 RED5PRO_DEFAULT_MEMORY_PATTERN="-Xmx2g"
+RED5PRO_VERSION=_
 
 validatePermissions()
 {
@@ -3159,6 +3160,37 @@ prerequisites_jsvc()
 }
 
 
+configure_openssl_centos()
+{
+	local red5pro_webrtc_plugin_conf="$DEFAULT_RPRO_PATH/conf/webrtc-plugin.properties"
+
+	# Patterns and replacements
+	local open_ssl_enabled_pattern="openssl.enabled=.*"
+	local open_ssl_replacement_value="openssl.enabled=false"
+	local version_str=$RED5PRO_VERSION
+
+	IFS='.'
+	read -ra ADDR <<< "$version_str"
+	local count=0
+	local ver_num=""
+	for i in "${ADDR[@]}"; do # access each element of array
+	    ver_num="$ver_num$i"
+	    count=$((count+1))	
+	    if [[ $count -eq 3 ]]; then
+		break
+	    fi	
+	done
+	IFS=' '
+
+	# if version greater than 5.2.2
+	if [[ $ver_num -gt 522 ]]; then
+		lecho "Configuring openssl settings for centos.."
+		sed -i -e "s|$open_ssl_enabled_pattern|$open_ssl_replacement_value|" "$red5pro_webrtc_plugin_conf"
+	fi
+	
+}
+
+
 ######################################################################################
 ########################### postrequisites FUNCTION ##################################
 
@@ -3176,6 +3208,8 @@ postrequisites()
 
 postrequisites_rhl()
 {
+	configure_openssl_centos
+
 	write_log "Installing additional dependencies for RHLE"
 	yum -y install ntp libva libvdpau
 }
