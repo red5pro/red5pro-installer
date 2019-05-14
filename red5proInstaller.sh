@@ -3163,6 +3163,8 @@ prerequisites_jsvc()
 
 configure_openssl_centos()
 {
+	check_current_rpro 1 1
+	
 	local red5pro_webrtc_plugin_conf="$DEFAULT_RPRO_PATH/conf/webrtc-plugin.properties"
 
 	# Patterns and replacements
