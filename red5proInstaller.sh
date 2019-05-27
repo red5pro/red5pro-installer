@@ -1998,7 +1998,7 @@ WorkingDirectory=$DEFAULT_RPRO_PATH
 ExecStart=/usr/bin/jsvc -debug \\
     -home \${JAVA_HOME} \\
     -cwd \${RED5_HOME} \\
-    -cp \${RED5_HOME}/commons-daemon-1.0.15.jar:\${RED5_HOME}/red5-service.jar:\${RED5_HOME}/conf \\
+    -cp \${RED5_HOME}/commons-daemon-1.1.0.jar:\${RED5_HOME}/red5-service.jar:\${RED5_HOME}/conf \\
     -Dred5.root=\${RED5_HOME} \\
     -Djava.library.path=\${RED5_HOME}/lib/amd64-Linux-gpp/jni \\
     -Djava.security.debug=failure -Djava.security.egd=file:/dev/./urandom \\

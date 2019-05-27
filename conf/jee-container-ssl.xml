@@ -14,7 +14,7 @@
     </bean>
 
     <!-- Non-secured transports for HTTP and WS -->
-	<!--
+    <!-- 
     <bean id="tomcat.server" class="org.red5.server.tomcat.TomcatLoader" depends-on="context.loader,warDeployer" lazy-init="true">
         <property name="websocketEnabled" value="true" />
         <property name="webappFolder" value="${red5.root}/webapps" />
@@ -51,10 +51,8 @@
             </list>
         </property>
     </bean>
-	-->
-
+-->
     <!-- Secure transports for HTTPS and WSS -->
-
     <bean id="tomcat.server" class="org.red5.server.tomcat.TomcatLoader" depends-on="context.loader" lazy-init="true">
         <property name="websocketEnabled" value="true" />
         <property name="webappFolder" value="${red5.root}/webapps" />
