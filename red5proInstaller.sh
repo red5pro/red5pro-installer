@@ -784,7 +784,7 @@ rpro_ssl_installer()
 
 	rpro_ssl_installation_success=1
 
-	lecho "Red5 Pro SSL configuration conplete!. Please restart server for changes to take effect."
+	lecho "Red5 Pro SSL configuration complete!. Please restart server for changes to take effect."
 	read -r -p "Restart server now ? [y/N] " rpro_restart_response
 	case $rpro_restart_response in
 	[yY][eE][sS]|[yY]) 
@@ -862,7 +862,7 @@ ssl_cert_passphrase_form()
 	local rpro_ssl_cert_passphrase_valid=0
 
 
-	echo "Enter the  SSL cert password : "
+	echo "Enter the  SSL cert password (can not contain spaces or the & character): "
 	read -s rpro_ssl_cert_passphrase
 
 	echo "Confirm password : "
@@ -1581,19 +1581,19 @@ install_rpro_zip()
 			  mkdir -p $rpro_loc
 			fi
 
-			mv -v $unzip_dest/* $rpro_loc
+			mv -v $unzip_dest $rpro_loc
 
 		else
 			# Two level archive -> like at red5pro.com
 			rpro_loc=$DEFAULT_RPRO_PATH
-			mv -v $unzip_dest/* $rpro_loc
+			mv -v $unzip_dest $rpro_loc
 		fi
 
 
 	else
 		# Move to actual install location 
 		rpro_loc=$DEFAULT_RPRO_PATH
-		mv -v $unzip_dest/* $rpro_loc
+		mv -v $unzip_dest $rpro_loc
 	fi
 
 	# DEFAULT_RPRO_PATH=/usr/local/red5pro
