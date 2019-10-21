@@ -1581,14 +1581,17 @@ install_rpro_zip()
 			  mkdir -p $rpro_loc
 			fi
 
-			mv -v $unzip_dest $rpro_loc
+			mv -v $unzip_dest/* $rpro_loc
 
 		else
 			# Two level archive -> like at red5pro.com
 			rpro_loc=$DEFAULT_RPRO_PATH
-			mv -v $unzip_dest $rpro_loc
+			if [ ! -d "$rpro_loc" ]; then
+			  mkdir -p $rpro_loc
+			fi
+			
+			mv -v $unzip_dest/* $rpro_loc
 		fi
-
 
 	else
 		# Move to actual install location 
