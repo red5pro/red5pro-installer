@@ -1571,32 +1571,65 @@ install_rpro_zip()
 	lecho "Moving files to install location : $rpro_loc"
 
 	# Identify archive type and move accordingly
+	local loc_from
+	local loc_to
 
 	if [[ $# -gt 1 ]]; then
 
 		if isSingleLevel $unzip_dest; then
 			
-			# Single level archive -> top level manual zip
-			if [ ! -d "$rpro_loc" ]; then
-			  mkdir -p $rpro_loc
-			fi
+			lecho "Type 1 archive detected" && sleep 1
+			loc_from=$unzip_dest
+			loc_to=$rpro_loc
 
-			mv -v $unzip_dest/* $rpro_loc
+			# Single level archive -> top level manual zip
+			# mv -v $unzip_dest/* $rpro_loc
+			# src=$unzip_dest
+
+		elif isTwoLevel $unzip_dest; then
+
+			lecho "Type 2 archive detected" && sleep 1
+			# Two level archive -> like at red5pro.com
+			loc_from=$unzip_dest
+			loc_to=$rpro_loc
+			
+			# mv -v $unzip_dest/* $rpro_loc
+			# src=$unzip_dest
+
+		elif hasOneFolderInsideZip $unzip_dest; then
+
+			lecho "Type 3 archive detected" && sleep 1
+
+			local dir=$(find $unzip_dest -mindepth 1 -maxdepth 1 -type d)
+			# Folder inside archive -> S3
+			loc_from=$dir
+			loc_to=$rpro_loc
 
 		else
-			# Two level archive -> like at red5pro.com
-			rpro_loc=$DEFAULT_RPRO_PATH
-			if [ ! -d "$rpro_loc" ]; then
-			  mkdir -p $rpro_loc
-			fi
 			
-			mv -v $unzip_dest/* $rpro_loc
+			echo "i am confused. I dont know how to process this archive structure" && sleep 2
+			pause
 		fi
 
+
 	else
-		# Move to actual install location 
-		rpro_loc=$DEFAULT_RPRO_PATH
-		mv -v $unzip_dest $rpro_loc
+		loc_from=$unzip_dest
+		loc_to=$rpro_loc
+	fi
+
+	
+	# Move to actual install location 
+
+	if [ -z ${loc_from+x} ]; then 
+		lecho "Source not determined. Cannot move files to destination!" && sleep 2
+		pause
+	else
+		if [ ! -d "$rpro_loc" ]; then
+		  mkdir -p $rpro_loc
+		fi
+
+		echo "Moving files from $loc_from to $loc_to"
+		mv -v $loc_from/* $loc_to
 	fi
 
 	# DEFAULT_RPRO_PATH=/usr/local/red5pro
@@ -1730,6 +1763,32 @@ isSingleLevel()
 	else
 		false
 	fi
+}
+
+
+isTwoLevel()
+{
+	local rpro_tmp=$1
+	local loc="$rpro_tmp/*.zip"
+	echo $loc
+	local count=$(ls -1 $loc 2>/dev/null | wc -l)
+	if [ $count != 0 ]; then 
+		true # this means location has another zip
+	else
+		false # this means location has folder/files except zip
+	fi 
+}
+
+
+hasOneFolderInsideZip()
+{
+	local rpro_tmp=$1
+	local count=$(ls -l $rpro_tmp | grep -c ^d)
+	if [ $count = 1 ]; then 
+		true
+	else
+		false
+	fi 
 }
 
 # Public
