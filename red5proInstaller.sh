@@ -1,5 +1,5 @@
 #!/bin/bash
-#!/usr/bin/bash 
+#!/usr/bin/bash
 ## --
 
 # Configuration file
@@ -15,9 +15,9 @@ RPRO_OS_TYPE=
 OS_DEB="DEBIAN"
 OS_RHL="REDHAT"
 
-RED5PRO_INSTALL_AS_SERVICE=true 
+RED5PRO_INSTALL_AS_SERVICE=true
 RPRO_SERVICE_LOCATION_V1=/etc/init.d
-RPRO_SERVICE_NAME_V1=red5pro 
+RPRO_SERVICE_NAME_V1=red5pro
 RPRO_SERVICE_LOCATION_V2=/lib/systemd/system
 RPRO_SERVICE_NAME_V2=red5pro.service
 RPRO_SERVICE_LOCATION=
@@ -80,7 +80,7 @@ write_log()
 	if [ $# -eq 0 ]; then
 		return
 	else
-		if $RED5PRO_LOGGING; then			
+		if $RED5PRO_LOGGING; then
 			logger -s $1 2>> $RPRO_LOG_FILE
 		fi
 	fi
@@ -210,8 +210,8 @@ check_java()
 		JAVA_VERSION_MAJOR=`echo "${JAVA_VERSION:0:3}"`
 
 		if (( $(echo "$JAVA_VERSION_MAJOR < $MIN_JAVA_VERSION" |bc -l) )); then
-			has_min_java_version=0			
-			lecho "You need to install a newer java version of java!"		
+			has_min_java_version=0
+			lecho "You need to install a newer java version of java!"
 		else
 			has_min_java_version=1
 			lecho "Minimum java version is already installed!"
@@ -228,15 +228,15 @@ check_java()
 # Public
 check_unzip()
 {
-	write_log "Checking for unzip utility"			
+	write_log "Checking for unzip utility"
 	unzip_check_success=0
 
 	if isinstalled unzip; then
 	unzip_check_success=1
-	write_log "unzip utility was found"		
+	write_log "unzip utility was found"
 	else
 	unzip_check_success=0
-	lecho "unzip utility not found."				
+	lecho "unzip utility not found."
 	fi
 }
 
@@ -244,7 +244,7 @@ check_unzip()
 
 check_git()
 {
-	write_log "Checking for git software"	
+	write_log "Checking for git software"
 	git_check_success=0
 
 	if isinstalled git; then
@@ -258,7 +258,7 @@ check_git()
 
 check_wget()
 {
-	write_log "Checking for wget utility"	
+	write_log "Checking for wget utility"
 	wget_check_success=0
 
 	if isinstalled wget; then
@@ -272,7 +272,7 @@ check_wget()
 
 check_bc()
 {
-	write_log "Checking for bc utility"	
+	write_log "Checking for bc utility"
 	bc_check_success=0
 
 	if isinstalled bc; then
@@ -286,7 +286,7 @@ check_bc()
 
 check_jsvc()
 {
-	write_log "Checking for jsvc utility"	
+	write_log "Checking for jsvc utility"
 	jsvc_check_success=0
 
 	if isinstalled jsvc; then
@@ -301,15 +301,15 @@ check_jsvc()
 # Public
 install_java()
 {
-	write_log "Installing java"	
+	write_log "Installing java"
 	java_install_success=0
 
 	if isDebian; then
-	install_java_deb	
+	install_java_deb
 	else
 	install_java_rhl
 	fi
-	
+
 	# verify
 	check_java
 
@@ -322,7 +322,7 @@ install_java()
 	else
 		lecho "Could not install required version of java"
 	fi
-		
+
 }
 
 # Private
@@ -345,10 +345,10 @@ install_jsvc()
 	write_log "Installing jsvc"
 
 	if isDebian; then
-	install_jsvc_deb	
+	install_jsvc_deb
 	else
 	install_jsvc_rhl
-	fi		
+	fi
 }
 
 # Private
@@ -377,10 +377,10 @@ install_unzip()
 	write_log "Installing unzip"
 
 	if isDebian; then
-	install_unzip_deb	
+	install_unzip_deb
 	else
 	install_unzip_rhl
-	fi		
+	fi
 }
 
 # Private
@@ -413,10 +413,10 @@ install_git()
 	write_log "Installing git"
 
 	if isDebian; then
-	install_git_deb	
+	install_git_deb
 	else
 	install_git_rhl
-	fi		
+	fi
 }
 
 install_wget()
@@ -424,10 +424,10 @@ install_wget()
 	write_log "Installing wget"
 
 	if isDebian; then
-	install_wget_deb	
+	install_wget_deb
 	else
 	install_wget_rhl
-	fi		
+	fi
 }
 
 install_bc()
@@ -435,10 +435,10 @@ install_bc()
 	write_log "Installing bc"
 
 	if isDebian; then
-	install_bc_deb	
+	install_bc_deb
 	else
 	install_bc_rhl
-	fi		
+	fi
 }
 
 # Private
@@ -518,9 +518,9 @@ add_update_java()
 ############################# SSL INSTALLER (LetsEncrypt) ############################
 
 letsencrypt_exists()
-{	
+{
 	if [ -d "$RED5PRO_SSL_LETSENCRYPT_FOLDER" ]; then
-		
+
 		RED5PRO_SSL_LETSENCRYPT__SETUP_FILE="$RED5PRO_SSL_LETSENCRYPT_FOLDER/setup.py"
 
 		if [ -f "$RED5PRO_SSL_LETSENCRYPT__SETUP_FILE" ]; then
@@ -540,7 +540,7 @@ letsencrypt_download()
 	cd "$CURRENT_DIRECTORY"
 
 	git clone "$RED5PRO_SSL_LETSENCRYPT_GIT"
-	
+
 	if letsencrypt_exists; then
 
 		letsencrypt_download_success=1
@@ -563,9 +563,9 @@ has_ssl_cert_menu()
 
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	echo -e "\e[44m EXISTING SSL CERT DETECTED! \e[m"
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	echo "1. --- DELETE LETSENCRYPT DIRECTORY (ALL CERTIFICATES) AND TRY AGAIN"
-	echo "2. --- ATTEMPT TO USE THE EXISTING CERTIFICATE			  "	
+	echo "2. --- ATTEMPT TO USE THE EXISTING CERTIFICATE			  "
 	echo "3. --- Exit					 		  "
 	echo "                             		 			  "
 
@@ -580,7 +580,7 @@ has_ssl_cert_menu_read_options(){
 	case $choice in
 		1) rm -rf /etc/letsencrypt ;;
 		2) reuse_existing_ssl_cert=1 ;;
-		[xX])  pause ;;		
+		[xX])  pause ;;
 		*) echo -e "\e[41m Error: Invalid choice\e[m" && sleep 2 && show_has_ssl_cert_menu ;;
 	esac
 }
@@ -603,7 +603,7 @@ rpro_ssl_installer()
 	else
 		lecho "Downloading letsencrypt ssl cert generator"
 		letsencrypt_download
-		
+
 		# Recheck
 		if [[ $letsencrypt_download_success -eq 0 ]]; then
 			lecho_err "Failed to download letsencrypt from github"
@@ -616,26 +616,26 @@ rpro_ssl_installer()
 	if [[ $rpro_exists -eq 0 ]]; then
 		pause
 	fi
-	
+
 	# Stopping Red5 Pro if running [ VERY iMPORTANT! ]
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	lecho "Red5 Pro will be stopped temporarily (If running), for the Letsencrypt SSL challenge to complete successfully!."
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	sleep 5
 	stop_red5pro_service 1
 
 	# Initializing letsencrypt => Need better way to know if this is first time setup or already setup
 
-	cd "$RED5PRO_SSL_LETSENCRYPT_FOLDER"	
+	cd "$RED5PRO_SSL_LETSENCRYPT_FOLDER"
 
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
-	lecho " Preparing letsencrypt" 
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+	lecho " Preparing letsencrypt"
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
 	sleep 2
- 
+
 	./letsencrypt-auto --help 2>&1 | tee -a "$RPRO_LOG_FILE"
-	
+
 	# Get Certificate
 	ssl_cert_request_form
 
@@ -662,9 +662,9 @@ rpro_ssl_installer()
 
 	else
 
-		printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
-		lecho "Requesting SSL certificate" 
-		printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+		printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+		lecho "Requesting SSL certificate"
+		printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
 		sleep 2
 
@@ -680,18 +680,18 @@ rpro_ssl_installer()
 
 			if [ $? == 0 ]; then
 				letsencrypt_cert_gen_success=1
-			else			
+			else
 				lecho_err "SSL cert generation failed!"
 				read -r -p " -- Retry? [y/N] " try_login_response
 				case $try_login_response in
-				[yY][eE][sS]|[yY]) 
+				[yY][eE][sS]|[yY])
 				rpro_ssl_installer
 				;;
 				*)
 				letsencrypt_cert_gen_success=0
 				;;
 				esac
-			fi	
+			fi
 		fi
 
 		# Recheck & exit
@@ -699,7 +699,7 @@ rpro_ssl_installer()
 			lecho "SSL Certificate generation did not succeed. Please rectify any errors mentioned in the logging and try again!"
 			pause
 		fi
-	
+
 		# Create Keystore
 
 		#rpro_ssl_fullchain="/etc/letsencrypt/live/$rpro_ssl_reg_domain/fullchain.pem"
@@ -708,7 +708,7 @@ rpro_ssl_installer()
 		#rpro_ssl_keystore_jks="/etc/letsencrypt/live/$rpro_ssl_reg_domain/keystore.jks"
 		#rpro_ssl_tomcat_cer="/etc/letsencrypt/live/$rpro_ssl_reg_domain/tomcat.cer"
 		#rpro_ssl_trust_store="/etc/letsencrypt/live/$rpro_ssl_reg_domain/truststore.jks"
-	
+
 		# Ask for keystore password here -> input
 		ssl_cert_passphrase_form
 
@@ -719,7 +719,7 @@ rpro_ssl_installer()
 
 		# Check for keytool error
 		if [[ ${keytool_response} == *"keytool error"* ]];then
-		    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+		    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 		    lecho_err "An error occurred while processing certificate.Please resolve the error(s) and try the SSL installer again."
 		    lecho_err "Error Details:"
 		    lecho_err "$keytool_response"
@@ -730,7 +730,7 @@ rpro_ssl_installer()
 
 		# Check for keytool error
 		if [[ ${keytool_response} == *"keytool error"* ]];then
-		    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+		    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 		    lecho_err "An error occurred while processing certificate.Please resolve the error(s) and try the SSL installer again."
 		    lecho_err "Error Details:"
 		    lecho_err "$keytool_response"
@@ -741,7 +741,7 @@ rpro_ssl_installer()
 
 		# Check for keytool error
 		if [[ ${keytool_response} == *"keytool error"* ]];then
-		    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+		    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 		    lecho_err "An error occurred while processing certificate.Please resolve the error(s) and try the SSL installer again."
 		    lecho_err "Error Details:"
 		    lecho_err "$keytool_response"
@@ -749,7 +749,7 @@ rpro_ssl_installer()
 		fi
 
 	fi
-	
+
 	# if all ok -> Prepare RTMPS Key and Trust store parameters
 	# RTMPS Key and Trust store parameters
 	rpro_ssl_trust_store_rtmps_keystorepass="rtmps.keystorepass=$rpro_keystore_cert_pass"
@@ -757,9 +757,9 @@ rpro_ssl_installer()
 	rpro_ssl_trust_store_rtmps_truststorepass="rtmps.truststorepass=$rpro_keystore_cert_pass"
 	rpro_ssl_trust_store_rtmps_truststorefie="rtmps.truststorefile=$rpro_ssl_trust_store"
 
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
-	lecho "Updating configuration files" 
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+	lecho "Updating configuration files"
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
 	## Substitute appropriate files to enable ssl
 
@@ -775,8 +775,8 @@ rpro_ssl_installer()
 	else
 		red5pro_installer_conf_properties="$CURRENT_DIRECTORY/conf/deprecated/red5-ssl.properties"
 		red5pro_installer_conf_jee_container="$CURRENT_DIRECTORY/conf/deprecated/jee-container-ssl.xml"
-	fi	
-	
+	fi
+
 	config_ssl_jeecontainer
 
 	#simple_config_ssl_properties
@@ -787,7 +787,7 @@ rpro_ssl_installer()
 	lecho "Red5 Pro SSL configuration complete!. Please restart server for changes to take effect."
 	read -r -p "Restart server now ? [y/N] " rpro_restart_response
 	case $rpro_restart_response in
-	[yY][eE][sS]|[yY]) 
+	[yY][eE][sS]|[yY])
 	restart_red5pro_service
 	;;
 	*)
@@ -798,15 +798,15 @@ rpro_ssl_installer()
 	  then
 	    pause
 	fi
-	
+
 }
 
 ssl_cert_request_form()
 {
 
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
-	lecho "-------- SSL CERTIFICATE REQUEST ----------" 
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+	lecho "-------- SSL CERTIFICATE REQUEST ----------"
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
 	local rpro_ssl_form_valid=1
 	local rpro_ssl_domain_valid=0
@@ -819,43 +819,43 @@ ssl_cert_request_form()
 	read rpro_ssl_reg_email
 
 	# Simple domain name validation
-	if [ ! -z "$rpro_ssl_reg_domain" -a "$rpro_ssl_reg_domain" != " " ]; then	
-		rpro_ssl_reg_domain_valid=1		
+	if [ ! -z "$rpro_ssl_reg_domain" -a "$rpro_ssl_reg_domain" != " " ]; then
+		rpro_ssl_reg_domain_valid=1
 	else
 		rpro_ssl_form_valid=0
-		lecho "Invalid 'Domain' string!"		
+		lecho "Invalid 'Domain' string!"
 	fi
 
 	# simple validate email
 	if isEmailValid "${rpro_ssl_reg_email}"; then
-		rpro_ssl_reg_email_valid=1		
+		rpro_ssl_reg_email_valid=1
 	else
 		rpro_ssl_form_valid=0
-		lecho "Invalid 'Email' string!"		
+		lecho "Invalid 'Email' string!"
 	fi
 
 	# if all params not valid
 	if [ "$rpro_ssl_form_valid" -eq "0" ]; then
-	
+
 		lecho_err "One or more parameters are invalid. Please check and try again!"
 		read -r -p " -- Retry? [y/N] " try_login_response
 		case $try_login_response in
-		[yY][eE][sS]|[yY]) 
+		[yY][eE][sS]|[yY])
 		ssl_cert_request_form
 		;;
 		*)
 		pause
 		;;
-		esac		
+		esac
 	fi
 }
 
 ssl_cert_passphrase_form()
 {
 
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
-	lecho "------- SSL CERTIFICATE PASSWORD ----------" 
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+	lecho "------- SSL CERTIFICATE PASSWORD ----------"
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
 	local rpro_ssl_cert_passphrase_form_valid=0
 	local rpro_ssl_cert_passphrase_form_error="Unknown error!"
@@ -867,13 +867,13 @@ ssl_cert_passphrase_form()
 
 	echo "Confirm password : "
 	read -s rpro_ssl_cert_passphrase_copy
-	
+
 	# simple validate password
-	if [ ! -z "$rpro_ssl_cert_passphrase" -a "$rpro_ssl_cert_passphrase" != " " ]; then		
+	if [ ! -z "$rpro_ssl_cert_passphrase" -a "$rpro_ssl_cert_passphrase" != " " ]; then
 
 		if [ "$rpro_ssl_cert_passphrase" == "$rpro_ssl_cert_passphrase_copy" ]; then
 
-			rpro_ssl_cert_passphrase_length=size=${#rpro_ssl_cert_passphrase} 
+			rpro_ssl_cert_passphrase_length=size=${#rpro_ssl_cert_passphrase}
 
 			if [[ "$rpro_ssl_cert_passphrase_length" -gt 4 ]]; then
 
@@ -885,7 +885,7 @@ ssl_cert_passphrase_form()
 		else
 			rpro_ssl_cert_passphrase_valid=0
 			rpro_ssl_cert_passphrase_form_error="Passwords do not match!"
-		fi		
+		fi
 	else
 		rpro_ssl_cert_passphrase_valid=0
 		rpro_ssl_cert_passphrase_form_error="Password cannot be empty!"
@@ -894,17 +894,17 @@ ssl_cert_passphrase_form()
 	# If all params not valid
 	local try_login_response
 	if [ "$rpro_ssl_cert_passphrase_valid" -eq "0" ]; then
-	
+
 		lecho_err "There seems to be a problem with the cert password.Cause:$rpro_ssl_cert_passphrase_form_error.Please check and try again!"
 		read -r -p " -- Retry? [y/N] " try_login_response
 		case $try_login_response in
-		[yY][eE][sS]|[yY]) 
+		[yY][eE][sS]|[yY])
 		ssl_cert_passphrase_form
 		;;
 		*)
 		pause
 		;;
-		esac		
+		esac
 	fi
 
 	rpro_keystore_cert_pass=$rpro_ssl_cert_passphrase
@@ -919,13 +919,13 @@ config_ssl_jeecontainer()
 	    lecho_err "Error : File  $red5pro_conf_jee_container not found!"
 	    pause
 	fi
-	
+
 	if [ ! -f "$red5pro_installer_conf_jee_container" ]; then
 	    lecho_err "Error : File  $red5pro_installer_conf_jee_container not found!"
 	    pause
 	fi
 
-	# Replace jee-container config	
+	# Replace jee-container config
 	cp -f "$red5pro_installer_conf_jee_container" "$red5pro_conf_jee_container"
 }
 
@@ -958,12 +958,12 @@ remove_letsencrypt_ssl_config_domain()
 		lecho "SSL Certificate information for $letsencrypt_ssl_cert_domain_value was removed"
 		sleep 2
 	fi
-	
+
 }
 
 read_ssl_config_domain_properties()
 {
-	red5pro_conf_properties="$DEFAULT_RPRO_PATH/conf/red5.properties"	
+	red5pro_conf_properties="$DEFAULT_RPRO_PATH/conf/red5.properties"
 	lecho "Reading SSL config from $red5pro_conf_properties.."
 
 	if [ ! -f "$red5pro_conf_properties" ]; then
@@ -978,20 +978,20 @@ read_ssl_config_domain_properties()
 
 	while IFS= read line
 	do
-		case "$line" in			
-		$letsencrypt_rtmps_keystorefile_pattern) 
+		case "$line" in
+		$letsencrypt_rtmps_keystorefile_pattern)
 			letsencrypt_rtmps_keystorefile_value=$(echo $line | sed -e "s/rtmps.keystorefile=/${letsencrypt_rtmps_keystorefile_pattern_replace}/g")
 			break
 		;;
 		*) continue ;;
 		esac
-	
+
 	done <"$red5pro_conf_properties"
 
 	# Check if set
 	if [ -z ${letsencrypt_rtmps_keystorefile_value+x} ]; then
 		false
-	else 
+	else
 
 		if [[ ${letsencrypt_rtmps_keystorefile_value} == *"letsencrypt"* ]];then
 		   lecho "Letsencrypt ssl cert $letsencrypt_rtmps_keystorefile_value found"
@@ -1004,7 +1004,7 @@ read_ssl_config_domain_properties()
 		    false
 		fi
 	fi
-	
+
 }
 
 smart_config_ssl_properties()
@@ -1037,35 +1037,35 @@ smart_config_ssl_properties()
 
 	# Websocket configuration
 
-	# For old version of websockets	
+	# For old version of websockets
 	if ! $NEW_RED5PRO_WEBSOCKETS ; then
 
-		local ws_host_pattern="ws.host=.*" 
+		local ws_host_pattern="ws.host=.*"
 		local ws_host_replacement_value="ws.host=0.0.0.0"
 
-		local ws_port_pattern="ws.port=.*" 
+		local ws_port_pattern="ws.port=.*"
 		local ws_port_replacement_value="ws.port=$RED5PRO_SSL_DEFAULT_WS_PORT"
 
-		local wss_host_pattern="wss.host=.*" 
+		local wss_host_pattern="wss.host=.*"
 		local wss_host_replacement_value="wss.host=0.0.0.0"
 
-		local wss_port_pattern="wss.port=.*" 
+		local wss_port_pattern="wss.port=.*"
 		local wss_port_replacement_value="wss.port=$RED5PRO_SSL_DEFAULT_WSS_PORT"
 
 		local ws_config_pattern="ws.port=.*"
 		local ws_config_replacement_value="$ws_port_replacement_value\n$wss_host_replacement_value\n$wss_port_replacement_value"
-		
+
 		# Check if wss is already configured in the file
 		while IFS= read line
 		do
-			case "$line" in			
-				$wss_port_pattern) 
+			case "$line" in
+				$wss_port_pattern)
 				has_wss_conf=1
 				break
 				;;
 				*) continue ;;
-				esac		
-	
+				esac
+
 		done <"$red5pro_conf_properties"
 
 	fi
@@ -1074,7 +1074,7 @@ smart_config_ssl_properties()
 	sed -i -e "s|$http_port_pattern|$http_port_replacement_value|" -e "s|$https_port_pattern|$https_port_replacement_value|" -e "s|$rtmps_keystorepass_pattern|$rtmps_keystorepass_replacement_value|" -e "s|$rtmps_keystorefile_pattern|$rtmps_keystorefile_replacement_value|" -e "s|$rtmps_truststorepass_pattern|$rtmps_truststorepass_replacement_value|" -e "s|$rtmps_truststorefile_pattern|$rtmps_truststorefile_replacement_value|"   "$red5pro_conf_properties"
 
 
-	# For old version of websockets	
+	# For old version of websockets
 	if ! $NEW_RED5PRO_WEBSOCKETS ; then
 		# Second pass - wss config check & smart replacements
 		if [[ $has_wss_conf -eq 1 ]]; then
@@ -1090,7 +1090,7 @@ smart_config_ssl_properties()
 
 modify_jvm_memory()
 {
-	
+
 	if [[ $1 -eq 1 ]]; then
 		echo "Enter the full path to Red5 Pro installation"
 		read rpro_path
@@ -1114,7 +1114,7 @@ modify_jvm_memory()
 			sleep 1
 
 			# JVM memory allocation
-			eval_memory_to_allocate			
+			eval_memory_to_allocate
 			alloc_phymem_string="-Xmx"$alloc_phymem_rounded"g"
 
 			sed -i -e "s/-Xmx2g/$alloc_phymem_string/g" $red5_sh_file # improve this
@@ -1139,12 +1139,12 @@ eval_memory_to_allocate()
 	local alloc_phymem=$(awk "BEGIN { pc=${phymem}*${RED5PRO_MEMORY_PCT}/100; print int(pc);}") # calculate percentage to allocate
 	alloc_phymem=$(bc <<< "scale=1;$alloc_phymem/1024") # Mb to Gb
 	alloc_phymem_rounded=$(printf "%.0f" $alloc_phymem) # Round off
-	
+
 
 	if [[ "$alloc_phymem_rounded" -lt 2 ]]; then
 		low_mem_message="SEVERE!: System memory is insufficient for running this software. A minimum of 2GB is required for Red5 Pro"
-	else 
-		if [[ "$alloc_phymem_rounded" -eq 2 ]]; then	
+	else
+		if [[ "$alloc_phymem_rounded" -eq 2 ]]; then
 
 			low_mem_message="WARNING!: System memory is is barely enough for running this software"
 		fi
@@ -1155,10 +1155,10 @@ eval_memory_to_allocate()
 		write_log "Memory $alloc_phymem_rounded GB.Check Ok!"
 	else
 
-		if [ $# -eq 0 ];  then		
+		if [ $# -eq 0 ];  then
 			read -r -p "$low_mem_message.Do you wish to continue ? [y/N] " low_mem_response
 			case $low_mem_response in
-			[yY][eE][sS]|[yY]) 
+			[yY][eE][sS]|[yY])
 				write_log "Memory $alloc_phymem_rounded GB (not ok) but user wishes to continue installation"
 			;;
 			*)
@@ -1166,8 +1166,8 @@ eval_memory_to_allocate()
 			exit 0
 			;;
 			esac
-		fi	
-	fi	
+		fi
+	fi
 
 }
 
@@ -1183,14 +1183,14 @@ download_latest()
 	rpro_zip=
 
 	lecho "Downloading latest Red5 Pro from red5pro.com"
-	
+
 	# create tmp directory
 	#dir=`mktemp -d` && cd $dir
 	dir="$RED5PRO_DEFAULT_DOWNLOAD_FOLDER"
 	cd $dir
 
 	# echo $dir
-	red5pro_com_login_form	
+	red5pro_com_login_form
 }
 
 red5pro_com_login_form()
@@ -1199,10 +1199,10 @@ red5pro_com_login_form()
 	local rpro_form_valid=1
 	local try_login_response
 
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	echo "Please enter your 'red5pro.com' login details"
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
-	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+
 	echo "Enter Email : "
 	read rpro_email
 
@@ -1212,15 +1212,15 @@ red5pro_com_login_form()
 
 	# simple validate email
 	if isEmailValid "${rpro_email}"; then
-		rpro_email_valid=1		
+		rpro_email_valid=1
 	else
 		rpro_form_valid=0
-		lecho "Invalid email string!"		
+		lecho "Invalid email string!"
 	fi
-	
+
 	# simple validate password
 	if [ ! -z "$rpro_passcode" -a "$rpro_passcode" != " " ]; then
-		rpro_password_valid=1		
+		rpro_password_valid=1
 	else
 		rpro_form_valid=0
 		lecho "Invalid password string!"
@@ -1231,22 +1231,22 @@ red5pro_com_login_form()
 
 	# if all params are valid
 	if [ "$rpro_form_valid" -eq "1" ]; then
-	
+
 		lecho "Attempting to log in with your credentials"
 
 		# POST to site
 		wget --server-response --save-cookies cookies.txt --keep-session-cookies --post-data="email=$rpro_email&password=$rpro_passcode" "https://account.red5pro.com/login" 2>$dir/wsession.txt
 		wget_status=$(< $dir/wsession.txt)
 
-		echo "$(cat $RPRO_LOG_FILE)$wget_status" > $RPRO_LOG_FILE	
+		echo "$(cat $RPRO_LOG_FILE)$wget_status" > $RPRO_LOG_FILE
 
 		# Check http code
 		local wget_status_ok=0
-		if [[ $wget_status == *"HTTP/1.1 200"* ]] 
+		if [[ $wget_status == *"HTTP/1.1 200"* ]]
 		then
 			wget_status_ok=1
 		fi
-		
+
 		# if 200 then proceed
 		if [ "$wget_status_ok" -eq "1" ]; then
 
@@ -1262,14 +1262,14 @@ red5pro_com_login_form()
 				latest_rpro_download_success=1
 			else
 				lecho "Oops!! Seems like the archive was not downloaded properly to disk."
-				pause	
+				pause
 			fi
 		else
-			
+
 			lecho_err "Failed to authenticate with website!"
 			read -r -p " -- Retry? [y/N] " try_login_response
 			case $try_login_response in
-			[yY][eE][sS]|[yY]) 
+			[yY][eE][sS]|[yY])
 			download_latest
 			;;
 			*)
@@ -1277,12 +1277,12 @@ red5pro_com_login_form()
 			;;
 			esac
 		fi
-		
+
 	else
 		lecho_err "Invalid request parameters"
 		read -r -p " -- Retry? [y/N] " try_login_response
 		case $try_login_response in
-		[yY][eE][sS]|[yY]) 
+		[yY][eE][sS]|[yY])
 		download_latest
 		;;
 		*)
@@ -1296,13 +1296,13 @@ red5pro_com_login_form()
 download_from_url()
 {
 	clear
-	
+
 	latest_rpro_download_success=0
 	rpro_zip=
 	RED5PRO_DOWNLOAD_URL=
 
 	lecho "Downloading Red5 Pro from url"
-	
+
 	# create tmp directory
 	#dir=`mktemp -d` && cd $dir
 	dir="$RED5PRO_DEFAULT_DOWNLOAD_FOLDER"
@@ -1328,7 +1328,7 @@ download_from_url()
 		latest_rpro_download_success=1
 	else
 		lecho "Oops!! Seems like the archive was not downloaded properly to disk."
-		pause	
+		pause
 	fi
 
 }
@@ -1365,16 +1365,16 @@ auto_install_rpro()
 	sleep 2
 	install_rpro_zip $rpro_zip
 
-	if [ "$red5_zip_install_success" -eq 0 ]; then		
+	if [ "$red5_zip_install_success" -eq 0 ]; then
 		lecho_err "Failed to install Red5 Pro distribution. Something went wrong!! Try again or contact support!"
 	fi
 
-	
+
 	if [ $# -eq 0 ]
 	  then
 	    pause
 	fi
-	
+
 }
 
 auto_install_rpro_url()
@@ -1384,7 +1384,7 @@ auto_install_rpro_url()
 	red5_zip_install_success=0
 
 	# Install prerequisites
-	prerequisites	
+	prerequisites
 
 	# Download red5 zip from url
 	echo "Preparing to install Red5 Pro from $RED5PRO_DOWNLOAD_URL"
@@ -1408,16 +1408,16 @@ auto_install_rpro_url()
 	sleep 2
 	install_rpro_zip $rpro_zip $RED5PRO_DOWNLOAD_URL
 
-	if [ "$red5_zip_install_success" -eq 0 ]; then		
+	if [ "$red5_zip_install_success" -eq 0 ]; then
 		lecho_err "Failed to install Red5 Pro distribution. Something went wrong!! Try again or contact support!"
 	fi
 
-	
+
 	if [ $# -eq 0 ]
 	  then
 	    pause
 	fi
-	
+
 }
 
 # Public
@@ -1430,11 +1430,11 @@ register_rpro_as_service()
 		write_log "Registering service for Red5 Pro"
 
 		if [ -f "$RPRO_SERVICE_LOCATION/$RPRO_SERVICE_NAME" ]; then
-		lecho "Service already exists. Do you wish to re-install ?" 
+		lecho "Service already exists. Do you wish to re-install ?"
 		read -r -p "Are you sure? [y/N] " response
 
 		case $response in
-		[yY][eE][sS]|[yY]) 
+		[yY][eE][sS]|[yY])
 		register_rpro_service
 		;;
 		*)
@@ -1461,7 +1461,7 @@ unregister_rpro_as_service()
 	if [ "$rpro_exists" -eq 1 ]; then
 
 		if [ ! -f "$RPRO_SERVICE_LOCATION/$RPRO_SERVICE_NAME" ]; then
-			lecho "Service does not exists. Nothing to remove" 
+			lecho "Service does not exists. Nothing to remove"
 		else
 			unregister_rpro_service
 		fi
@@ -1481,15 +1481,15 @@ install_rpro_zip()
 
 	# Install prerequisites
 	# prerequisites [ extra not needed ]
-			
+
 	clear
 	lecho "Installing Red5 Pro from zip"
-	
+
 
 	if [ $# -eq 0 ]; then
 		echo "Enter the full path to Red5 Pro distribution archive"
 		read rpro_zip_path
-	else 
+	else
 		rpro_zip_path=$1
 	fi
 
@@ -1512,7 +1512,7 @@ install_rpro_zip()
 	unzip_dest="$dir/$filename"
 
 	check_current_rpro 1
-	
+
 	if [ "$rpro_exists" -eq 1 ]; then
 
 		lecho "An existing Red5 Pro installation was found at install destination.If you continue this will be replaced. The old installation will be backed up to $RPRO_BACKUP_HOME"
@@ -1531,7 +1531,7 @@ install_rpro_zip()
 			# proceed to install new Red5 Pro
 			lecho_err "Failed to create a backup of your existing Red5 Pro installation"
 			pause
-		fi	
+		fi
 
 		# remove rpro service
 		unregister_rpro_service
@@ -1544,7 +1544,7 @@ install_rpro_zip()
 		lecho "Operation cancelled"
 		pause
 		;;
-		esac	
+		esac
 	fi
 
 	lecho "Unpacking archive $rpro_zip_path to install location..."
@@ -1552,8 +1552,8 @@ install_rpro_zip()
 	if [ -d "$unzip_dest" ]; then
 	  rm -rf $unzip_dest
 	fi
-	
-	
+
+
 	if ! unzip $rpro_zip_path -d $unzip_dest; then
 		lecho_err "Failed to extract zip. Possible invalid archive"
 		pause;
@@ -1565,7 +1565,7 @@ install_rpro_zip()
 		pause;
 	fi
 
-	# Move to actual install location 
+	# Move to actual install location
 	rpro_loc=$DEFAULT_RPRO_PATH
 
 	lecho "Moving files to install location : $rpro_loc"
@@ -1575,7 +1575,7 @@ install_rpro_zip()
 	if [[ $# -gt 1 ]]; then
 
 		if isSingleLevel $unzip_dest; then
-			
+
 			# Single level archive -> top level manual zip
 			if [ ! -d "$rpro_loc" ]; then
 			  mkdir -p $rpro_loc
@@ -1591,7 +1591,7 @@ install_rpro_zip()
 
 
 	else
-		# Move to actual install location 
+		# Move to actual install location
 		rpro_loc=$DEFAULT_RPRO_PATH
 		mv -v $unzip_dest $rpro_loc
 	fi
@@ -1603,7 +1603,7 @@ install_rpro_zip()
 	sleep 1
 
 #   commenting out, as these are unnecessary and make the entire directory path executable
-#	chmod -R 755 $rpro_loc	
+#	chmod -R 755 $rpro_loc
 #	chmod -R ugo+w $rpro_loc
 
 	chmod +x $rpro_loc/*.sh
@@ -1612,7 +1612,7 @@ install_rpro_zip()
 	lecho "Setting RED5_HOME"
 	sleep 1
 	export RED5_HOME=$rpro
- 
+
 
 	# Clear tmp directories - IMPORTANT
 	if [ "$RED5PRO_INSTALLER_OPERATIONS_CLEANUP" -eq 1 ]; then
@@ -1626,7 +1626,7 @@ install_rpro_zip()
 		rm -rf $rpro_zip_path
 	fi
 
-	sleep 1	
+	sleep 1
 
 	if [ ! -d "$rpro_loc" ]; then
 		lecho "Could not install Red5 Pro at $rpro_loc"
@@ -1645,19 +1645,19 @@ install_rpro_zip()
 
 
 	# Installing red5 service
-	if $RED5PRO_INSTALL_AS_SERVICE; then			
+	if $RED5PRO_INSTALL_AS_SERVICE; then
 
 		echo "For Red5 Pro to autostart with operating system, it needs to be registered as a service"
 		read -r -p "Do you want to register Red5 Pro service now? [y/N] " response
 
 		case $response in
-		[yY][eE][sS]|[yY]) 
-		
+		[yY][eE][sS]|[yY])
+
 			lecho "Registering Red5 Pro as a service"
 
 			sleep 2
 			register_rpro_service
-		
+
 			if [ "$rpro_service_install_success" -eq 0 ]; then
 			lecho_err "Failed to register Red5 Pro service. Something went wrong!! Try again or contact support!"
 			pause
@@ -1670,19 +1670,19 @@ install_rpro_zip()
 		# All Done
 		lecho "Red5 Pro service is now installed on your system. You can start / stop it with from the menu".
 	else
-		
+
 		lecho "Red5 Pro service auto-install is disabled. You can manually register Red5 Pro as service from the menu.".
 	fi
-	
 
-	# Moving to home directory	
+
+	# Moving to home directory
 	cd ~
 
 	if [ $# -eq 0 ]
 	  then
 	    pause
 	fi
-	
+
 }
 
 isValidArchive()
@@ -1699,15 +1699,15 @@ isValidArchive()
 		filename="${filename%.*}"
 
 		local filesize=$(stat -c%s "$archive_path")
-		
+
 		if [ "$filesize" -lt 30000 ]; then
 			lecho "Invalid archive file size detected for $archive_path. Probable corrupt file!"
 			false
 		else
-			case "$extension" in 
-			zip|tar|gz*) 
+			case "$extension" in
+			zip|tar|gz*)
 			    true
-			    ;;	
+			    ;;
 			*)
 			    lecho "Invalid archive type $extension"
 			    false
@@ -1739,7 +1739,7 @@ register_rpro_service()
 	   register_rpro_service_v1
 	else
 	   register_rpro_service_v2
-	fi	
+	fi
 }
 
 # Public
@@ -1747,12 +1747,12 @@ unregister_rpro_service()
 {
 	# Permission check
 	validatePermissions
-	
+
 	if [ "$RED5PRO_SERVICE_VERSION" -eq "1" ]; then
 	   unregister_rpro_service_v1
 	else
 	   unregister_rpro_service_v2
-	fi	
+	fi
 }
 
 ######################### V1 #########################
@@ -1830,10 +1830,10 @@ esac"
 	chmod 644 /etc/init.d/red5pro
 
 	if isDebian; then
-	register_rpro_service_deb	
+	register_rpro_service_deb
 	else
 	register_rpro_service_rhl
-	fi	
+	fi
 
 
 	lecho "Red5 Pro service installed successfully!"
@@ -1861,7 +1861,7 @@ register_rpro_service_rhl()
 	sleep 1
 
 	systemctl daemon-reload
-	
+
 
 	lecho "Enabling service \"$RPRO_SERVICE_NAME\""
 	sleep 1
@@ -1873,7 +1873,7 @@ register_rpro_service_rhl()
 unregister_rpro_service_v1()
 {
 	rpro_service_remove_success=0
-	
+
 	prog="red5"
 
 	lecho "Preparing to remove service..."
@@ -1881,15 +1881,15 @@ unregister_rpro_service_v1()
 
 
 	if [ -f /etc/init.d/red5pro ];	then
-	
+
 
 		# 1. Terminate service if running
 
 		# 2. check PID file and check pid
-		
+
 
 		if isDebian; then
-		unregister_rpro_service_deb	
+		unregister_rpro_service_deb
 		else
 		unregister_rpro_service_rhl
 		fi
@@ -1898,7 +1898,7 @@ unregister_rpro_service_v1()
 
 		lecho "Service removed successfully"
 		rpro_service_remove_success=0
-	
+
 	else
 		lecho "Red5 Pro service was not found"
 	fi
@@ -1963,21 +1963,21 @@ register_rpro_service_v2()
 
 	# JVM memory allocation
 	eval_memory_to_allocate 1
-		
-	# If upfront allocation 'selected' then min = max else min = 256m 
-	if $RED5PRO_UPFRONT_MEMORY_ALLOC; then			
+
+	# If upfront allocation 'selected' then min = max else min = 256m
+	if $RED5PRO_UPFRONT_MEMORY_ALLOC; then
 		JVM_MEMORY_ALLOC_MIN="-Xms"$alloc_phymem_rounded"g"
 	else
 		JVM_MEMORY_ALLOC_MIN="-Xms256m"
 	fi
-	
+
 	JVM_MEMORY_ALLOC="-Xmx"$alloc_phymem_rounded"g"
 
 	# Installing service manager
 	prerequisites_jsvc
 
 	if isDebian; then
-	JAVA_ENV=/usr/lib/jvm/java-8-openjdk-amd64	
+	JAVA_ENV=/usr/lib/jvm/java-8-openjdk-amd64
 	else
 	JAVA_ENV=/usr/lib/jvm/jre-1.8.0-openjdk
 	fi
@@ -2009,7 +2009,7 @@ ExecStart=/usr/bin/jsvc -debug \\
     -XX:MaxMetaspaceSize=128m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC \\
     -XX:InitialCodeCacheSize=8m -XX:ReservedCodeCacheSize=32m \\
     -XX:CMSInitiatingOccupancyFraction=60 \\
-    -outfile \${RED5_HOME}/log/jsvc-service.log -errfile \${RED5_HOME}/log/jsvc-error.log \\
+    -outfile /dev/null -errfile /dev/null \\
     -wait 60 \\
     -umask 011 \\
     -pidfile \${PID} org.red5.daemon.EngineLauncher 9999
@@ -2036,7 +2036,7 @@ WantedBy=multi-user.target
 	register_rpro_service_generic_v2
 
 	lecho "Red5 Pro service installed successfully!"
-	rpro_service_install_success=1	
+	rpro_service_install_success=1
 }
 
 # Private
@@ -2044,9 +2044,9 @@ register_rpro_service_generic_v2()
 {
 
 	lecho "Registering service \"$RPRO_SERVICE_NAME\""
-	sleep 1	
+	sleep 1
 
-	# Reload daemon 
+	# Reload daemon
 	systemctl daemon-reload
 
 	lecho "Enabling service \"$RPRO_SERVICE_NAME\""
@@ -2059,9 +2059,9 @@ register_rpro_service_generic_v2()
 unregister_rpro_service_generic_v2()
 {
 	lecho "Unregistering service \"$RPRO_SERVICE_NAME\""
-	sleep 1	
+	sleep 1
 
-	# Reload daemon 
+	# Reload daemon
 	systemctl daemon-reload
 
 	lecho "Disabling service \"$RPRO_SERVICE_NAME\""
@@ -2074,14 +2074,14 @@ unregister_rpro_service_generic_v2()
 unregister_rpro_service_v2()
 {
 	rpro_service_remove_success=0
-	
+
 	prog="red5"
 
 	lecho "Preparing to remove service..."
 	sleep 2
 
 	if [ -f /lib/systemd/system/red5pro.service ];	then
-	
+
 		unregister_rpro_service_generic_v2
 
 		# remove service
@@ -2089,7 +2089,7 @@ unregister_rpro_service_v2()
 
 		lecho "Service removed successfully"
 		rpro_service_remove_success=0
-	
+
 	else
 		lecho "Red5 Pro service was not found"
 	fi
@@ -2139,30 +2139,30 @@ start_red5pro_service()
 			if !(is_running_red5pro_service_v1); then
 				cd $DEFAULT_RPRO_PATH && exec $DEFAULT_RPRO_PATH/red5.sh > /dev/null 2>&1 &
 			else
-				lecho "Server is already running!" 
-			fi			
+				lecho "Server is already running!"
+			fi
 
 		else
 			lecho "Red5 Pro service was found at $RPRO_SERVICE_LOCATION/$RPRO_SERVICE_NAME"
 			lecho " Attempting to start service"
 
 			if [ "$RED5PRO_SERVICE_VERSION" -eq "1" ]; then
-				
+
 				if !(is_running_red5pro_service 1); then
 					start_red5pro_service_v1
 				else
-					lecho "Server is already running!" 
+					lecho "Server is already running!"
 				fi
-			else		
+			else
 
 				if !(is_running_red5pro_service 1); then
 					start_red5pro_service_v2
 				else
-					lecho "Server is already running!" 
+					lecho "Server is already running!"
 				fi
 
 			fi
-		
+
 		fi
 	fi
 
@@ -2178,37 +2178,37 @@ stop_red5pro_service()
 
 	check_current_rpro 1 1
 
-	if [ "$rpro_exists" -eq 1 ]; then	
+	if [ "$rpro_exists" -eq 1 ]; then
 
 
 		if [ ! -f "$RPRO_SERVICE_LOCATION/$RPRO_SERVICE_NAME" ];	then
 			lecho "It seems Red5 Pro service was not installed. Please register Red5 Pro service from the menu for best results."
 			lecho " Attempting to stop using \"red5-shutdown.sh\" (if running)"
 
-			if is_running_red5pro_service_v1; then				
+			if is_running_red5pro_service_v1; then
 				cd $DEFAULT_RPRO_PATH && exec $DEFAULT_RPRO_PATH/red5-shutdown.sh > /dev/null 2>&1 &
 				lecho "Note : it may take a few seconds for the server to shut down."
 				sleep 10
 			else
-				lecho "Server is not running!" 
-			fi	
+				lecho "Server is not running!"
+			fi
 		else
 			lecho "Red5 Pro service was found at $RPRO_SERVICE_LOCATION/$RPRO_SERVICE_NAME."
 			lecho "Attempting to stop Red5 Pro service"
 
-			if [ "$RED5PRO_SERVICE_VERSION" -eq "1" ]; then	
+			if [ "$RED5PRO_SERVICE_VERSION" -eq "1" ]; then
 
 				if is_running_red5pro_service 1; then
 					stop_red5pro_service_v1
 				else
-					lecho "Server is not running!" 
+					lecho "Server is not running!"
 				fi
-				
+
 			else
 				if is_running_red5pro_service 1; then
 					stop_red5pro_service_v2
 				else
-					lecho "Server is not running!" 
+					lecho "Server is not running!"
 				fi
 			fi
 		fi
@@ -2223,7 +2223,7 @@ stop_red5pro_service()
 restart_red5pro_service()
 {
 	cd ~
-	
+
 	check_current_rpro 1 1
 
 	if [ "$rpro_exists" -eq 1 ]; then
@@ -2255,26 +2255,26 @@ is_running_red5pro_service_v2()
 	if [ $? == 0 ]; then
 	   true
 	else
-	   false	
+	   false
 	fi
 }
 
 is_running_red5pro_service_v1()
 {
-	local red5_grep=$(ps aux | grep red5)	
+	local red5_grep=$(ps aux | grep red5)
 	echo "$red5_grep" | grep 'org.red5.server.Bootstrap' &> /dev/null
 
 	if [ $? == 0 ]; then
 	   true
 	else
-	   false	
+	   false
 	fi
 }
 
 is_running_red5pro_service()
 {
 	cd ~
-	
+
 	local rpro_running=0
 	check_current_rpro 1 1
 
@@ -2282,7 +2282,7 @@ is_running_red5pro_service()
 
 		if [ ! -f "$RPRO_SERVICE_LOCATION/$RPRO_SERVICE_NAME" ];	then
 			lecho "It seems Red5 Pro service was not installed. Please register Red5 Pro service from the menu for to activate this feature."
-		else			
+		else
 
 			if [ "$RED5PRO_SERVICE_VERSION" -eq "1" ]; then
 				if is_running_red5pro_service_v1; then
@@ -2292,7 +2292,7 @@ is_running_red5pro_service()
 			else
 				if is_running_red5pro_service_v2; then
 					rpro_running=1
-				fi				
+				fi
 			fi
 		fi
 	fi
@@ -2317,7 +2317,7 @@ remove_rpro_installation()
 	if [ ! -d $DEFAULT_RPRO_PATH ]; then
   		lecho "No Red5 Pro installation found at install location : $DEFAULT_RPRO_PATH"
 	else
-		red5pro_ini="$DEFAULT_RPRO_PATH/conf/red5.ini" 
+		red5pro_ini="$DEFAULT_RPRO_PATH/conf/red5.ini"
 
 		if [ ! -f $red5pro_ini ]; then
 		lecho "There were files found at install location : $DEFAULT_RPRO_PATH, but the installation might be broken !. I could not locate version information"
@@ -2327,7 +2327,7 @@ remove_rpro_installation()
 		read -r -p "Are you sure? [y/N] " response
 
 		case $response in
-		[yY][eE][sS]|[yY]) 
+		[yY][eE][sS]|[yY])
 
 		# Stop if running
 		stop_red5pro_service 1
@@ -2353,9 +2353,9 @@ remove_rpro_installation()
 
 
 	if [ $# -eq 0 ]; then
-		pause		
+		pause
 	fi
-	
+
 }
 
 check_current_rpro()
@@ -2365,7 +2365,7 @@ check_current_rpro()
 
 	# IF second param is set then turn on silent mode quick check
 	if [ $# -eq 2 ]; then
-		check_silent=1		
+		check_silent=1
 	fi
 
 
@@ -2380,7 +2380,7 @@ check_current_rpro()
   		lecho "No Red5 Pro installation found at install location : $DEFAULT_RPRO_PATH"
 		fi
 	else
-		red5pro_ini="$DEFAULT_RPRO_PATH/conf/red5.ini" 
+		red5pro_ini="$DEFAULT_RPRO_PATH/conf/red5.ini"
 
 		if [ ! -f $red5pro_ini ]; then
 		lecho "There were files found at install location : $DEFAULT_RPRO_PATH, but the installation might be broken !. I could not locate version information"
@@ -2396,26 +2396,26 @@ check_current_rpro()
 		local replace=""
 		while IFS= read line
 		do
-			case "$line" in			
-			$pattern) 
+			case "$line" in
+			$pattern)
 				red5pro_server_version=$(echo $line | sed -e "s/server.version=/${replace}/g")
 				RED5PRO_VERSION=$red5pro_server_version
-				if [ ! "$check_silent" -eq 1 ] ; then					
-					lecho "Red5 Pro build info : $red5pro_server_version" 
+				if [ ! "$check_silent" -eq 1 ] ; then
+					lecho "Red5 Pro build info : $red5pro_server_version"
 					check_websockets_version
 					break
 				fi
 			;;
 			*) continue ;;
 			esac
-		
+
 		done <"$red5pro_ini"
 
 		fi
 	fi
 
 	if [ $# -eq 0 ]; then
-		pause		
+		pause
 	fi
 
 
@@ -2437,7 +2437,7 @@ check_websockets_version()
 	# Checking if websocket plugin exists
 
 	if ls $websocket_plugin_file 1> /dev/null 2>&1; then
-		
+
 		# Additional check for new websocket plugin version
 		#if ls $tomcat_plugin_file 1> /dev/null 2>&1; then
 		#	echo $tomcat_plugin_file
@@ -2446,7 +2446,7 @@ check_websockets_version()
 		write_log "Build uses old websocket implementation"
 		NEW_RED5PRO_WEBSOCKETS=false
 		RED5PRO_SSL_DEFAULT_WS_PORT=$RED5PRO_SSL_DEPRECATED_WS_PORT
-		RED5PRO_SSL_DEFAULT_WSS_PORT=$RED5PRO_SSL_DEPRECATED_WSS_PORT		
+		RED5PRO_SSL_DEFAULT_WSS_PORT=$RED5PRO_SSL_DEPRECATED_WSS_PORT
 	else
 		write_log "Build uses new websocket implementation"
 		NEW_RED5PRO_WEBSOCKETS=true
@@ -2460,7 +2460,7 @@ check_websockets_version()
 			true
 		else
 			false
-		fi		
+		fi
 	fi
 
 }
@@ -2471,7 +2471,7 @@ check_websockets_version()
 ## PRIVATE ###
 restore_rpro()
 {
-	lecho "Not implemented"	
+	lecho "Not implemented"
 }
 
 ## PRIVATE ###
@@ -2488,9 +2488,9 @@ backup_rpro()
 	  chmod ugo+w $RPRO_BACKUP_HOME
 	fi
 
-	
+
 	if [ -d "$RPRO_BACKUP_HOME" ]; then
-	  
+
 		lecho "Starting backup procedure..."
 		sleep 2
 
@@ -2512,10 +2512,10 @@ backup_rpro()
 		# Show notice to user that back up was saved
 		if [ -d "$RPRO_BACKUP_FOLDER" ]; then
 			if [ -f $red5pro_ini ]; then
-				printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+				printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 				lecho "Your active Red5 Pro installation was backed up successfully to $RPRO_BACKUP_FOLDER"
 				lecho "You can restore any necessary file(s) later from the backup manually."
-				printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+				printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 				chmod -R ugo+w $RPRO_BACKUP_FOLDER
 				rpro_backup_success=1
 			else
@@ -2572,8 +2572,8 @@ check_license()
 			write_log "license found!"
 		fi
 	fi
-	
-	pause_license;	
+
+	pause_license;
 }
 
 set_update_license()
@@ -2608,7 +2608,7 @@ set_update_license()
 			echo "a line: $line"
 			done
 			echo "Updating license : Please enter new license code and press [ Enter ]."
-			read license_code			
+			read license_code
 		fi
 
 		local license_code=$(echo $license_code | tr '[a-z]' '[A-Z]')
@@ -2622,7 +2622,7 @@ set_update_license()
 		fi
 	fi
 
-	pause_license;	
+	pause_license;
 }
 
 ######################################################################################
@@ -2641,12 +2641,12 @@ licence_menu()
 
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	echo -e "\e[44m ----------- MANAGE LICENSE ------------- \e[m"
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	echo "1. ADD OR UPDATE LICENSE"
 	echo "2. VIEW LICENSE"
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	echo "0. BACK"
-	echo "			  "   
+	echo "			  "
 }
 
 license_menu_read_options(){
@@ -2657,12 +2657,12 @@ license_menu_read_options(){
 	case $choice in
 		1) set_update_license 0 ;;
 		2) check_license 0 ;;
-		0) 
-		if [ $RPRO_MODE -eq  1]; then 
-		show_utility_menu 
-		else 
-		show_simple_menu 
-		fi 
+		0)
+		if [ $RPRO_MODE -eq  1]; then
+		show_utility_menu
+		else
+		show_simple_menu
+		fi
 		;;
 		*) echo -e "\e[41m Error: Invalid choice\e[m" && sleep 2 && show_licence_menu ;;
 	esac
@@ -2683,12 +2683,12 @@ advance_menu()
 
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	echo -e "\e[44m RED5 PRO INSTALLER - UTILITY MODE \e[m"
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	echo "1. --- CHECK EXISTING RED5 PRO INSTALLATION"
 	echo "2. --- WHICH JAVA AM I USING ?		 "
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	echo "0. --- BACK					 "
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	echo "X. --- Exit					 "
 	echo "                             		 	 "
 
@@ -2728,9 +2728,9 @@ simple_menu()
 
 	check_current_rpro 1 1
 
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	echo -e "\e[44m RED5 PRO INSTALLER - BASIC MODE \e[m"
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	echo "1. --- INSTALL LATEST RED5 PRO		"
 	echo "2. --- INSTALL RED5 PRO FROM URL (UPLOADED ARCHIVE)	"
 
@@ -2740,10 +2740,10 @@ simple_menu()
 		echo "3. --- REMOVE RED5 PRO INSTALLATION	"
 		echo "4. --- ADD / UPDATE RED5 PRO LICENSE	"
 		echo "5. --- SSL CERT INSTALLER (Letsencrypt) 		"
-		printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+		printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 		echo "6. --- START RED5 PRO			"
-		echo "7. --- STOP RED5 PRO			"		
-		#printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+		echo "7. --- STOP RED5 PRO			"
+		#printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 		#echo "------ RED5 PRO SERVICE OPTIONS		"
 		if is_service_installed; then
 		echo "8. --- RESTART RED5 PRO			"
@@ -2756,9 +2756,9 @@ simple_menu()
 
 	fi
 
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	echo "0. --- BACK"
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	echo "X. --- Exit				"
 	echo "                             		"
 
@@ -2780,33 +2780,33 @@ simple_menu_read_options(){
 	else
 		read -p "Enter choice [ 1 - 2 | 0 to go back | X to exit ] " choice
 	fi
-	
+
 	case $choice in
 		# 1) check_current_rpro ;;
 		1) cls && auto_install_rpro ;;
 		2) cls && auto_install_rpro_url ;;
-		3) 
+		3)
 			if [[ $rpro_exists -eq 1 ]]; then
-				cls && remove_rpro_installation 
+				cls && remove_rpro_installation
 			else
 				echo -e "\e[41m Error: Invalid choice\e[m" && sleep 2 && show_simple_menu
 			fi
 			;;
-		4) 
+		4)
 			if [[ $rpro_exists -eq 1 ]]; then
 				cls && show_licence_menu
 			else
 				echo -e "\e[41m Error: Invalid choice\e[m" && sleep 2 && show_simple_menu
 			fi
 			;;
-		5) 
+		5)
 			if [[ $rpro_exists -eq 1 ]]; then
 				cls && rpro_ssl_installer
 			else
 				echo -e "\e[41m Error: Invalid choice\e[m" && sleep 2 && show_simple_menu
 			fi
 			;;
-		6) 
+		6)
 
 			if [[ $rpro_exists -eq 1 ]]; then
 				cls && start_red5pro_service
@@ -2814,7 +2814,7 @@ simple_menu_read_options(){
 				echo -e "\e[41m Error: Invalid choice\e[m" && sleep 2 && show_simple_menu
 			fi
 			;;
-		7) 
+		7)
 
 			if [[ $rpro_exists -eq 1 ]]; then
 				cls && stop_red5pro_service
@@ -2870,18 +2870,18 @@ load_configuration()
 	# Set install location if not set
 
 	CURRENT_DIRECTORY=$PWD
-	
 
-	if [ -z ${DEFAULT_RPRO_INSTALL_LOCATION+x} ]; then 
+
+	if [ -z ${DEFAULT_RPRO_INSTALL_LOCATION+x} ]; then
 		DEFAULT_RPRO_PATH="$CURRENT_DIRECTORY/$DEFAULT_RPRO_FOLDER_NAME"
 	else
-		DEFAULT_RPRO_PATH="$DEFAULT_RPRO_INSTALL_LOCATION/$DEFAULT_RPRO_FOLDER_NAME"			
+		DEFAULT_RPRO_PATH="$DEFAULT_RPRO_INSTALL_LOCATION/$DEFAULT_RPRO_FOLDER_NAME"
 	fi
 
 
 	RED5PRO_DEFAULT_DOWNLOAD_FOLDER="$CURRENT_DIRECTORY/$RED5PRO_DEFAULT_DOWNLOAD_FOLDER_NAME"
 	[ ! -d foo ] && mkdir -p $RED5PRO_DEFAULT_DOWNLOAD_FOLDER && chmod ugo+w $RED5PRO_DEFAULT_DOWNLOAD_FOLDER
-	
+
 
 	RED5PRO_SSL_LETSENCRYPT_FOLDER="$CURRENT_DIRECTORY/$RED5PRO_SSL_LETSENCRYPT_FOLDER_NAME"
 
@@ -2944,15 +2944,15 @@ detect_system()
 	echo -e "* BackUp directory: \e[36m$RPRO_BACKUP_HOME\e[m"
 	write_log "BackUp directory: $RPRO_BACKUP_HOME"
 
-	
+
 	echo -e "* Install directory: \e[36m$DEFAULT_RPRO_PATH\e[m"
 	write_log "Install directory: $DEFAULT_RPRO_PATH"
 
-	
+
 	# echo -e "* Downloads directory: \e[36m$RED5PRO_DEFAULT_DOWNLOAD_FOLDER\e[m"
 	write_log "Downloads directory: $RED5PRO_DEFAULT_DOWNLOAD_FOLDER"
 
-	
+
 	if [[ $RPRO_OS_NAME == *"Ubuntu"* ]]; then
 	RPRO_OS_TYPE=$OS_DEB
 	else
@@ -2960,7 +2960,7 @@ detect_system()
 	fi
 
 	# Service installation
-	if $RED5PRO_INSTALL_AS_SERVICE; then			
+	if $RED5PRO_INSTALL_AS_SERVICE; then
 
 		# Service installer mode selection
 		if [ "$RED5PRO_SERVICE_VERSION" -eq "1" ]; then
@@ -2995,22 +2995,22 @@ utility_usage_mode()
 	write_log "Utility mode selected"
 
 	RPRO_MODE=1
-	
+
 	advance_menu
 	advance_menu_read_options
 }
 
 welcome_menu()
-{	
+{
 	cls
 
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	echo -e "\e[44m RED5 PRO INSTALLER - MAIN MENU \e[m"
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
 	detect_system
 
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -	
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
 	echo "                             		"
 	echo "1. BASIC MODE (Recommended)		"
@@ -3023,7 +3023,7 @@ welcome_menu()
 
 read_welcome_menu_options()
 {
-	
+
 	local choice
 	read -p "Enter choice [ 1 - 2 | X to exit] " choice
 	case $choice in
@@ -3066,7 +3066,7 @@ prerequisites_git()
 		sleep 2
 
 		install_git
-	fi 
+	fi
 }
 
 prerequisites_java()
@@ -3077,13 +3077,13 @@ prerequisites_java()
 	sleep 2
 	check_java
 
-	
+
 	if [ "$has_min_java_version" -eq 0 ]; then
 		echo "Installing latest java runtime environment..."
 		sleep 2
 
 		install_java
-	fi 
+	fi
 }
 
 prerequisites_update()
@@ -3107,7 +3107,7 @@ prerequisites_update_rhl()
 }
 
 prerequisites_unzip()
-{	
+{
 	check_unzip
 
 
@@ -3116,12 +3116,12 @@ prerequisites_unzip()
 		sleep 2
 
 		install_unzip
-	fi 
+	fi
 }
 
 prerequisites_wget()
 {
-	
+
 	check_wget
 
 
@@ -3130,12 +3130,12 @@ prerequisites_wget()
 		sleep 2
 
 		install_wget
-	fi 
+	fi
 }
 
 prerequisites_bc()
 {
-	
+
 	check_bc
 
 
@@ -3144,7 +3144,7 @@ prerequisites_bc()
 		sleep 2
 
 		install_bc
-	fi 
+	fi
 }
 
 prerequisites_jsvc()
@@ -3157,21 +3157,21 @@ prerequisites_jsvc()
 		sleep 2
 
 		install_jsvc
-	fi 
+	fi
 }
 
 
 configure_openssl_centos()
 {
 	check_current_rpro 1 1
-	
+
 	local red5pro_webrtc_plugin_conf="$DEFAULT_RPRO_PATH/conf/webrtc-plugin.properties"
 
 	# Patterns and replacements
 	local open_ssl_enabled_pattern="openssl.enabled=.*"
 	local open_ssl_replacement_value="openssl.enabled=false"
 	local version_str=$RED5PRO_VERSION
-	
+
 	lecho "Checking openssl settings.."
 
 	IFS='.'
@@ -3180,10 +3180,10 @@ configure_openssl_centos()
 	local ver_num=""
 	for i in "${ADDR[@]}"; do # access each element of array
 	    ver_num="$ver_num$i"
-	    count=$((count+1))	
+	    count=$((count+1))
 	    if [[ $count -eq 3 ]]; then
 		break
-	    fi	
+	    fi
 	done
 	IFS=' '
 
@@ -3195,7 +3195,7 @@ configure_openssl_centos()
                 sleep 1
                 sed -i -e "s|$open_ssl_enabled_pattern|$open_ssl_replacement_value|" "$red5pro_webrtc_plugin_conf"
         fi
-	
+
 }
 
 
@@ -3211,7 +3211,7 @@ postrequisites()
 	postrequisites_deb
 	else
 	postrequisites_rhl
-	fi	
+	fi
 }
 
 postrequisites_rhl()
@@ -3236,7 +3236,7 @@ postrequisites_deb()
 isinstalled()
 {
 	if isDebian; then
-	isinstalled_deb $1 
+	isinstalled_deb $1
 	else
 	isinstalled_rhl $1
 	fi
@@ -3287,14 +3287,14 @@ repo_has_required_java()
 
 repo_has_required_java_deb()
 {
-	local JAVA_REPO_VERSION=$(apt-cache policy default-jre | grep "Candidate:" | cut -d ":" -f3) 
+	local JAVA_REPO_VERSION=$(apt-cache policy default-jre | grep "Candidate:" | cut -d ":" -f3)
 	local REPO_VERSION=`echo $JAVA_REPO_VERSION | cut -f1 -d "-"`
 
 	#echo $MIN_JAVA_VERSION
 	#echo $REPO_VERSION
 
-	if (( $(echo "$REPO_VERSION < $MIN_JAVA_VERSION" |bc -l) )); then		
-		false		
+	if (( $(echo "$REPO_VERSION < $MIN_JAVA_VERSION" |bc -l) )); then
+		false
 	else
 		true
 	fi
@@ -3321,7 +3321,7 @@ load_configuration
 
 # Start application
 write_log "====================================="
-write_log "	NEW INSTALLER SESSION	
+write_log "	NEW INSTALLER SESSION
 
 	"
 main
