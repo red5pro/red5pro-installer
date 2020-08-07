@@ -329,7 +329,14 @@ install_java()
 install_java_deb()
 {
 	lecho "Installing Java for Debian";
-	apt-get install -y default-jre
+	
+	if [[ "$RPRO_OS_MAJ_VERSION" -eq 18 ]]; then
+		lecho "Installing Java for Ubuntu 18";
+		apt-get install -y openjdk-8-jre-headless
+	else
+		lecho "Installing Java for Ubuntu 16";
+		apt-get install -y default-jre		
+	fi
 }
 
 # Private
@@ -2887,6 +2894,7 @@ load_configuration()
 
 }
 
+
 detect_system()
 {
 
@@ -2907,6 +2915,8 @@ detect_system()
 	    RPRO_OS_NAME=$(uname -s)
 	    RPRO_OS_VERSION=$(uname -r)
 	fi
+
+	RPRO_OS_MAJ_VERSION=${RPRO_OS_VERSION%\.*}
 
 	case $(uname -m) in
 	x86_64)
@@ -3226,7 +3236,16 @@ postrequisites_rhl()
 postrequisites_deb()
 {
 	write_log "Installing additional dependencies for DEBIAN"
-	apt-get install -y ntp libva1 libva-drm1 libva-x11-1 libvdpau1
+
+
+	if [[ "$RPRO_OS_MAJ_VERSION" -eq 18 ]]; then
+		lecho "Installing additional dependencies for Ubuntu 18";
+		apt-get install -y ntp libva2 libva-drm2 libva-x11-2 libvdpau1
+	else
+		lecho "Installing additional dependencies for Ubuntu 16";
+		apt-get install -y ntp libva1 libva-drm1 libva-x11-1 libvdpau1
+	fi
+	
 }
 
 
@@ -3272,6 +3291,7 @@ isDebian()
 	false
 	fi
 }
+
 
 #################################################################################################
 ############################## repo_has_required_java FUNCTION ##################################
