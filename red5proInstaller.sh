@@ -1250,9 +1250,11 @@ red5pro_com_login_form()
 
 		# Check http code
 		local wget_status_ok=0
-		if [[ $wget_status == *"HTTP/1.1 200"* ]] 
-		then
-			wget_status_ok=1
+		if [[ $wget_status == *"HTTP/1.1 200"* ]]; then
+			
+			if [[ $wget_status != *"Invalid"* ]]; then
+				wget_status_ok=1
+			fi
 		fi
 		
 		# if 200 then proceed
