@@ -1126,7 +1126,7 @@ modify_jvm_memory()
 			alloc_phymem_string="-Xmx"$alloc_phymem_rounded"g"
 
 			sed -i -e "s/-Xmx2g/$alloc_phymem_string/g" $red5_sh_file # improve this
-			lecho "JVM memory size is set to $alloc_phymem_rounded Gb!"
+			lecho "JVM memory size is set to $alloc_phymem_rounded GB!"
 			sleep 1
 
 			if [ ! $# -eq 0 ];  then
@@ -1141,10 +1141,24 @@ eval_memory_to_allocate()
 {
 	local low_mem_response
 	local low_mem_message
+	local total_mem
+	local free_mem
+	local net_allocable
+	local phymem
+	local alloc_phymem
 
-	phymem=$(free -m|awk '/^Mem:/{print $2}') # Value in Mb
-	# echo "Total Memory in MB = $phymem"
-	local alloc_phymem=$(awk "BEGIN { pc=${phymem}*${RED5PRO_MEMORY_PCT}/100; print int(pc);}") # calculate percentage to allocate
+	total_mem=$(awk '/MemTotal/ {printf( "%.2f\n", $2 / 1024 )}' /proc/meminfo)
+	total_mem=$(printf "%.0f" $total_mem)
+
+	free_mem=$(awk '/MemFree/ {printf( "%.2f\n", $2 / 1024 )}' /proc/meminfo)
+	free_mem=$(printf "%.0f" $free_mem)
+
+	phymem=$free_mem # Assign free_mem or total_mem to this variable according to your requirements
+	net_allocable=$(bc <<< "scale=1;$phymem/1024") # Mb to Gb
+	net_allocable=$(printf "%.0f" $net_allocable) # Round off
+	lecho "Allocable memory is $net_allocable GB"
+
+	alloc_phymem=$(awk "BEGIN { pc=${phymem}*${RED5PRO_MEMORY_PCT}/100; print int(pc);}") # calculate percentage to allocate
 	alloc_phymem=$(bc <<< "scale=1;$alloc_phymem/1024") # Mb to Gb
 	alloc_phymem_rounded=$(printf "%.0f" $alloc_phymem) # Round off
 	
@@ -2946,6 +2960,15 @@ detect_system()
 	echo -e "* Kernel: \e[36m$os_bits\e[m"
 	write_log "Kernel: $os_bits"
 
+	total_mem=$(awk '/MemTotal/ {printf( "%.2f\n", $2 / 1024 )}' /proc/meminfo)
+	total_mem=$(printf "%.0f" $total_mem)
+	echo -e "* Total Memory: \e[36m$total_mem (MB)\e[m"
+	write_log "Total Memory: $total_mem  (MB)"
+
+	free_mem=$(awk '/MemFree/ {printf( "%.2f\n", $2 / 1024 )}' /proc/meminfo)
+	free_mem=$(printf "%.0f" $free_mem)
+	echo -e "* Free Memory: \e[36m$free_mem  (mb)\e[m"
+	write_log "Free Memory: $free_mem  (mb)"
 
 	empty_line
 
@@ -3345,7 +3368,6 @@ load_configuration
 
 # Start application
 write_log "====================================="
-write_log "	NEW INSTALLER SESSION	
+write_log "	NEW INSTALLER SESSION		"
 
-	"
 main
