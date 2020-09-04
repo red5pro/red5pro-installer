@@ -1698,7 +1698,9 @@ install_rpro_zip()
 		lecho "Red5 Pro service auto-install is disabled. You can manually register Red5 Pro as service from the menu.".
 	fi
 	
-
+	echo "                             	"
+	echo -e "\e[41mNOTE: To use WebRTC it is imperative that you have SSL configured on the Red5 Pro instance.For more information see https://www.red5pro.com/docs/server/ssl/overview/\e[m"
+	
 	# Moving to home directory	
 	cd ~
 
