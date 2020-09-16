@@ -13,8 +13,6 @@ The script presents a collection of menu-driven options to help achieve various 
 
 `Red5Pro` supports the following Linux distributions: Ubuntu 16.04 or Centos 7.x
 
-The script requires super user privileges to execute and carry out subtasks. Hence you must execute the script as a superuser on your linux system (sudo...).
-
 __NOTE 1__ : The entire content provided in the 'installer' directory of this repo is `required`.
 
 __NOTE 2__ : This installer cannot be used to deploy more than one installation of Red5 Pro on the same instance. To install a new distribution you need to uninstall the previous one.
@@ -34,6 +32,8 @@ From your server's command line enter the following commands:
 2. `cd red5pro-installer`
 3. `sudo chmod +x *.sh`
 4. `sudo ./red5proInstaller.sh`
+
+> `sudo` is required to initialize your script as a superuser. This may not be required on systems where you are logged in as `root`(superuser).
 
 You are now running the installer!
 

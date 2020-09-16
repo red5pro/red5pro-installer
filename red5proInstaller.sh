@@ -31,6 +31,7 @@ RPRO_SERVICE_INSTALLER=/usr/sbin/update-rc.d
 RPRO_IS_64_BIT=0
 RPRO_OS_NAME=
 RPRO_OS_VERSION=
+RPRO_OS_MAJ_VERSION=
 RPRO_MODE=0
 
 PID=/var/run/red5pro.pid
@@ -329,7 +330,14 @@ install_java()
 install_java_deb()
 {
 	lecho "Installing Java for Debian";
-	apt-get install -y default-jre
+	
+	if [[ "$RPRO_OS_MAJ_VERSION" -eq 18 ]]; then
+		lecho "Installing Java for Ubuntu 18";
+		apt-get install -y openjdk-8-jre-headless
+	else
+		lecho "Installing Java for Ubuntu 16";
+		apt-get install -y default-jre		
+	fi
 }
 
 # Private
@@ -521,7 +529,7 @@ letsencrypt_exists()
 {	
 	if [ -d "$RED5PRO_SSL_LETSENCRYPT_FOLDER" ]; then
 		
-		RED5PRO_SSL_LETSENCRYPT__SETUP_FILE="$RED5PRO_SSL_LETSENCRYPT_FOLDER/setup.py"
+		RED5PRO_SSL_LETSENCRYPT__SETUP_FILE="$RED5PRO_SSL_LETSENCRYPT_FOLDER/certbot-auto"
 
 		if [ -f "$RED5PRO_SSL_LETSENCRYPT__SETUP_FILE" ]; then
 			true
@@ -1118,7 +1126,7 @@ modify_jvm_memory()
 			alloc_phymem_string="-Xmx"$alloc_phymem_rounded"g"
 
 			sed -i -e "s/-Xmx2g/$alloc_phymem_string/g" $red5_sh_file # improve this
-			lecho "JVM memory size is set to $alloc_phymem_rounded Gb!"
+			lecho "JVM memory size is set to $alloc_phymem_rounded GB!"
 			sleep 1
 
 			if [ ! $# -eq 0 ];  then
@@ -1133,10 +1141,24 @@ eval_memory_to_allocate()
 {
 	local low_mem_response
 	local low_mem_message
+	local total_mem
+	local free_mem
+	local net_allocable
+	local phymem
+	local alloc_phymem
 
-	phymem=$(free -m|awk '/^Mem:/{print $2}') # Value in Mb
-	# echo "Total Memory in MB = $phymem"
-	local alloc_phymem=$(awk "BEGIN { pc=${phymem}*${RED5PRO_MEMORY_PCT}/100; print int(pc);}") # calculate percentage to allocate
+	total_mem=$(awk '/MemTotal/ {printf( "%.2f\n", $2 / 1024 )}' /proc/meminfo)
+	total_mem=$(printf "%.0f" $total_mem)
+
+	free_mem=$(awk '/MemFree/ {printf( "%.2f\n", $2 / 1024 )}' /proc/meminfo)
+	free_mem=$(printf "%.0f" $free_mem)
+
+	phymem=$free_mem # Assign free_mem or total_mem to this variable according to your requirements
+	net_allocable=$(bc <<< "scale=1;$phymem/1024") # Mb to Gb
+	net_allocable=$(printf "%.0f" $net_allocable) # Round off
+	lecho "Allocable memory is $net_allocable GB"
+
+	alloc_phymem=$(awk "BEGIN { pc=${phymem}*${RED5PRO_MEMORY_PCT}/100; print int(pc);}") # calculate percentage to allocate
 	alloc_phymem=$(bc <<< "scale=1;$alloc_phymem/1024") # Mb to Gb
 	alloc_phymem_rounded=$(printf "%.0f" $alloc_phymem) # Round off
 	
@@ -1242,9 +1264,11 @@ red5pro_com_login_form()
 
 		# Check http code
 		local wget_status_ok=0
-		if [[ $wget_status == *"HTTP/1.1 200"* ]] 
-		then
-			wget_status_ok=1
+		if [[ $wget_status == *"HTTP/1.1 200"* ]]; then
+			
+			if [[ $wget_status != *"Invalid"* ]]; then
+				wget_status_ok=1
+			fi
 		fi
 		
 		# if 200 then proceed
@@ -1674,7 +1698,9 @@ install_rpro_zip()
 		lecho "Red5 Pro service auto-install is disabled. You can manually register Red5 Pro as service from the menu.".
 	fi
 	
-
+	echo "                             	"
+	echo -e "\e[41mNOTE: To use WebRTC it is imperative that you have SSL configured on the Red5 Pro instance.For more information see https://www.red5pro.com/docs/server/ssl/overview/\e[m"
+	
 	# Moving to home directory	
 	cd ~
 
@@ -2887,6 +2913,7 @@ load_configuration()
 
 }
 
+
 detect_system()
 {
 
@@ -2907,6 +2934,8 @@ detect_system()
 	    RPRO_OS_NAME=$(uname -s)
 	    RPRO_OS_VERSION=$(uname -r)
 	fi
+
+	RPRO_OS_MAJ_VERSION=${RPRO_OS_VERSION%\.*}
 
 	case $(uname -m) in
 	x86_64)
@@ -2933,6 +2962,15 @@ detect_system()
 	echo -e "* Kernel: \e[36m$os_bits\e[m"
 	write_log "Kernel: $os_bits"
 
+	total_mem=$(awk '/MemTotal/ {printf( "%.2f\n", $2 / 1024 )}' /proc/meminfo)
+	total_mem=$(printf "%.0f" $total_mem)
+	echo -e "* Total Memory: \e[36m$total_mem (MB)\e[m"
+	write_log "Total Memory: $total_mem  (MB)"
+
+	free_mem=$(awk '/MemFree/ {printf( "%.2f\n", $2 / 1024 )}' /proc/meminfo)
+	free_mem=$(printf "%.0f" $free_mem)
+	echo -e "* Free Memory: \e[36m$free_mem  (mb)\e[m"
+	write_log "Free Memory: $free_mem  (mb)"
 
 	empty_line
 
@@ -3226,7 +3264,16 @@ postrequisites_rhl()
 postrequisites_deb()
 {
 	write_log "Installing additional dependencies for DEBIAN"
-	apt-get install -y ntp libva1 libva-drm1 libva-x11-1 libvdpau1
+
+
+	if [[ "$RPRO_OS_MAJ_VERSION" -eq 18 ]]; then
+		lecho "Installing additional dependencies for Ubuntu 18";
+		apt-get install -y ntp libva2 libva-drm2 libva-x11-2 libvdpau1
+	else
+		lecho "Installing additional dependencies for Ubuntu 16";
+		apt-get install -y ntp libva1 libva-drm1 libva-x11-1 libvdpau1
+	fi
+	
 }
 
 
@@ -3272,6 +3319,7 @@ isDebian()
 	false
 	fi
 }
+
 
 #################################################################################################
 ############################## repo_has_required_java FUNCTION ##################################
@@ -3322,7 +3370,6 @@ load_configuration
 
 # Start application
 write_log "====================================="
-write_log "	NEW INSTALLER SESSION	
+write_log "	NEW INSTALLER SESSION		"
 
-	"
 main
