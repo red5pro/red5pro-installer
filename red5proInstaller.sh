@@ -1168,7 +1168,7 @@ eval_memory_to_allocate()
 	else 
 		if [[ "$alloc_phymem_rounded" -eq 2 ]]; then	
 
-			low_mem_message="WARNING!: System memory is is barely enough for running this software"
+			low_mem_message="WARNING: System memory is the base minimum required for running Red5 Pro, and may not support a production environment."
 		fi
 	fi
 
@@ -1475,6 +1475,7 @@ register_rpro_as_service()
 	  then
 	    pause
 	fi
+
 }
 
 # Public
@@ -1766,6 +1767,11 @@ register_rpro_service()
 	else
 	   register_rpro_service_v2
 	fi	
+
+        lecho "Copying utility scripts."
+        sleep 1
+        cp $CURRENT_DIRECTORY/conf/*.sh ~/
+
 }
 
 # Public
