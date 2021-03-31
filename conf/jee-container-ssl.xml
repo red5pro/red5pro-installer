@@ -14,7 +14,7 @@
     </bean>
 
     <!-- Non-secured transports for HTTP and WS -->
-    <!-- 
+    <!--
     <bean id="tomcat.server" class="org.red5.server.tomcat.TomcatLoader" depends-on="context.loader,warDeployer" lazy-init="true">
         <property name="websocketEnabled" value="true" />
         <property name="webappFolder" value="${red5.root}/webapps" />
@@ -26,9 +26,19 @@
                     <property name="redirectPort" value="${https.port}" />
                     <property name="connectionProperties">
                         <map>
+                            <entry key="port" value="${http.port}" />
+                            <entry key="redirectPort" value="${https.port}" />
                             <entry key="maxHttpHeaderSize" value="${http.max_headers_size}"/>
                             <entry key="maxKeepAliveRequests" value="${http.max_keep_alive_requests}"/>
                             <entry key="keepAliveTimout" value="-1"/>
+                            <entry key="useExecutor" value="true"/>
+                            <entry key="maxThreads" value="${http.max_threads}"/>
+                            <entry key="acceptCount" value="100"/>
+                            <entry key="acceptorThreadCount" value="${http.acceptor_thread_count}"/>
+                            <entry key="processorCache" value="${http.processor_cache}"/>
+                            <entry key="connectionTimeout" value="20000"/>
+                            <entry key="maxConnections" value="-1"/>
+                            <entry key="relaxedQueryChars" value="[,]"/>
                         </map>
                     </property>
                 </bean>
@@ -89,6 +99,7 @@
                             <entry key="maxThreads" value="${http.max_threads}"/>
                             <entry key="acceptorThreadCount" value="${http.acceptor_thread_count}"/>
                             <entry key="processorCache" value="${http.processor_cache}"/>
+                            <entry key="relaxedQueryChars" value="[,]"/>
                         </map>
                     </property>
                 </bean>
