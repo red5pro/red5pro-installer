@@ -2040,7 +2040,7 @@ ExecStart=/usr/bin/jsvc -debug \\
 	-XX:MaxMetaspaceSize=128m -XX:+UseParNewGC -XX:+UseConcMarkSweepGC \\
 	-XX:InitialCodeCacheSize=8m -XX:ReservedCodeCacheSize=32m \\
 	-XX:CMSInitiatingOccupancyFraction=60 \\
-	-outfile \${RED5_HOME}/log/jsvc-service.log -errfile \${RED5_HOME}/log/jsvc-error.log \\
+	-outfile /dev/null -errfile /dev/null \\
 	-wait 60 \\
 	-umask 011 \\
 	-pidfile \${PID} org.red5.daemon.EngineLauncher 9999
