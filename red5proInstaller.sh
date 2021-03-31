@@ -2023,7 +2023,7 @@ After=syslog.target network.target
 Type=forking
 Environment=PID=$PID
 Environment=JAVA_HOME=$JAVA_ENV
-LimitNOFILE=65536
+LimitNOFILE=1000000
 Environment=RED5_HOME=$DEFAULT_RPRO_PATH
 WorkingDirectory=$DEFAULT_RPRO_PATH
 ExecStart=/usr/bin/jsvc -debug \\
