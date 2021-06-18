@@ -10,10 +10,10 @@ RPRO_SERVICE_NAME="red5pro.service"
 TEMP_FOLDER="$CURRENT_DIRECTORY/tmp"
 rpro_zip="$TEMP_FOLDER/$RED5PRO_DEFAULT_DOWNLOAD_NAME"
 
-jdk_version="jdk8"
-PACKAGES_1604=(language-pack-en default-jre unzip libva1 libva-drm1 libva-x11-1 libvdpau1 jsvc ntp git)
-PACKAGES_1804=(language-pack-en unzip libva2 libva-drm2 libva-x11-2 libvdpau1 jsvc ntp git)
-PACKAGES_2004=(language-pack-en unzip libva2 libva-drm2 libva-x11-2 libvdpau1 jsvc ntp git)
+PACKAGES_DEFAULT=(language-pack-en jsvc ntp git unzip libvdpau1)
+PACKAGES_1604=(default-jre libva1 libva-drm1 libva-x11-1)
+PACKAGES_1804=(libva2 libva-drm2 libva-x11-2)
+PACKAGES_2004=(libva2 libva-drm2 libva-x11-2)
 JDK_8=(openjdk-8-jre-headless)
 JDK_11=(openjdk-11-jdk)
 
@@ -303,7 +303,8 @@ detect_system()
     if [ -f /etc/lsb-release ]; then
         . /etc/lsb-release
         RPRO_OS_NAME=$DISTRIB_ID
-        RPRO_OS_VERSION=$DISTRIB_RELEASE
+        #RPRO_OS_VERSION=$DISTRIB_RELEASE
+        RPRO_OS_VERSION="16.04"
         elif [ -f /etc/debian_version ]; then
         RPRO_OS_NAME=Debian  # XXX or Ubuntu??
         RPRO_OS_VERSION=$(cat /etc/debian_version)
@@ -335,26 +336,69 @@ detect_system()
 ################################ INSTALL PACKAGES #################################
 ###################################################################################
 
-check_linux_ver(){
-    . /etc/lsb-release
+check_linux_and_java_versions(){
+    #. /etc/lsb-release
+    log_i "Checking the required JAVA version..."
+    sleep 2
+    jdk_version="jdk8"
     
-    case "${DISTRIB_RELEASE}" in
-        16.04) PACKAGES=("${PACKAGES_1604[@]}") ;;
+    red5pro_service_file="$RED5_HOME/red5pro.service"
+    
+    if grep -q "java-8-openjdk-amd64" $red5pro_service_file ; then
+        log_i "Found required JAVA version: java-8-openjdk-amd64"
+        jdk_version="jdk8"
+    else
+        if grep -q "java-11-openjdk-amd64" $red5pro_service_file ; then
+            log_i "Found required JAVA version: java-11-openjdk-amd64"
+            jdk_version="jdk11"
+        else
+            log_e "Not found JAVA version in the file $red5pro_service_file"
+            
+            printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+            echo -e "\e[35mPlease choose JAVA version manualy! \e[m"
+            printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+            echo "1. --- JAVA 8"
+            echo "2. --- JAVA 11"
+            echo "X. --- Exit"
+            echo " "
+            
+            read -p "Enter choice [ 1 - 2 | X to exit ] " choice
+            case $choice in
+                1) jdk_version="jdk8" ;;
+                2) jdk_version="jdk11" ;;
+                [xX]) pause ;;
+                *)
+                    log_i "Operation cancelled"
+                    pause
+                ;;
+            esac
+        fi
+    fi
+    
+    case "${RPRO_OS_VERSION}" in
+        16.04)
+            if [[ $jdk_version == "jdk11" ]]; then
+                log_e "Ubuntu 16.04 is not supporting Java version 11. Please use Ubuntu 18.04 or higher!!!"
+                pause
+            else
+                PACKAGES=("${PACKAGES_1604[@]}")
+            fi
+        ;;
         18.04)
             case "${jdk_version}" in
                 jdk8) PACKAGES=("${PACKAGES_1804[@]}" "${JDK_8[@]}") ;;
                 jdk11) PACKAGES=("${PACKAGES_1804[@]}" "${JDK_11[@]}") ;;
-                *) log_e "JDK version is not supported $jdk_version"; exit 1 ;;
+                *) log_e "JDK version is not supported $jdk_version"; pause ;;
             esac
         ;;
         20.04)
             case "${jdk_version}" in
                 jdk8) PACKAGES=("${PACKAGES_2004[@]}" "${JDK_8[@]}") ;;
                 jdk11) PACKAGES=("${PACKAGES_2004[@]}" "${JDK_11[@]}") ;;
-                *) log_e "JDK version is not supported $jdk_version"; exit 1 ;;
+                *) log_e "JDK version is not supported $jdk_version"; pause ;;
             esac
         ;;
-        *) log_e "Linux version is not supported $DISTRIB_RELEASE"; exit 1 ;;
+        *) log_e "Linux version is not supported $RPRO_OS_VERSION"; pause ;;
     esac
 }
 
@@ -423,14 +467,15 @@ auto_install_rpro()
             ;;
         esac
     fi
-
-    install_pkg
     
     case $1 in
         latest) download_latest ;;
         url) download_from_url ;;
         local) download_from_local ;;
     esac
+
+    PACKAGES=("${PACKAGES_DEFAULT[@]}")
+    install_pkg
     
     RED5ARCHIVE=$(ls $TEMP_FOLDER/red5pro*.zip | xargs -n 1 basename);
     RED5ARCHIVE_PATH=$TEMP_FOLDER/$RED5ARCHIVE
@@ -569,7 +614,7 @@ install_rpro_zip()
     fi
     
     log_i "Attempting to install Red5 Pro from zip"
-       
+    
     log_i "Unpacking archive $RED5ARCHIVE to install location..."
     
     if ! unzip $TEMP_FOLDER/$RED5ARCHIVE -d $TEMP_FOLDER/; then
@@ -612,6 +657,9 @@ install_rpro_zip()
         log_i "Red5 Pro installed at $RED5_HOME"
         red5_zip_install_success=1
     fi
+    
+    check_linux_and_java_versions
+    install_pkg
     
     echo "For Red5 Pro to autostart with operating system, it needs to be registered as a service"
     read -r -p "Do you want to register Red5 Pro service now? [y/N] " response
@@ -684,7 +732,7 @@ backup_rpro()
         
         log_i "Starting backup procedure..."
         sleep 2
-
+        
         stop_red5pro_service
         log_i "Backing up... "
         
@@ -704,6 +752,7 @@ backup_rpro()
                 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
                 chmod 777 $RPRO_BACKUP_FOLDER
                 rpro_backup_success=1
+                rm -r $RED5_HOME
             else
                 log_e "Something went wrong!! Perhaps files were not copied properly"
             fi
@@ -712,7 +761,7 @@ backup_rpro()
         fi
         
         printf "\n"
-	    read -r -p 'Press any [ Enter ] key to continue...'
+        read -r -p 'Press any [ Enter ] key to continue...'
         
     else
         log_e "Failed to create backup directory. Backup will be skipped..."
@@ -806,7 +855,7 @@ remove_rpro_installation()
                 [yY][eE][sS]|[yY])
                     stop_red5pro_service
                     unregister_rpro_service
-                    rm -rf $RED5_HOME
+                    rm -r $RED5_HOME
                     if [ ! -d "$RED5_HOME" ]; then
                         log_i "Red5 installation was removed"
                     fi
@@ -838,7 +887,7 @@ unregister_rpro_service()
         log_i "Service removed successfully"
     else
         log_w "Red5 Pro service was not found"
-        pause
+        sleep 2
     fi
     sleep 2
 }
@@ -1227,10 +1276,10 @@ isValidArchive(){
 }
 
 preparation(){
-
+    
     USER_HOME=$(eval echo "~${SUDO_USER}")
     RPRO_BACKUP_HOME="$USER_HOME/red5pro_backups"
-
+    
     if [ ! -f "$CURRENT_DIRECTORY/conf/jee-container-ssl.xml" ]; then
         log_e "File $CURRENT_DIRECTORY/conf/jee-container-ssl.xml was not found. Exit!!!"
         exit 1
@@ -1248,5 +1297,4 @@ export LC_CTYPE="en_US.UTF-8"
 validatePermissions
 preparation
 detect_system
-check_linux_ver
 main
