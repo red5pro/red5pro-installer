@@ -303,8 +303,7 @@ detect_system()
     if [ -f /etc/lsb-release ]; then
         . /etc/lsb-release
         RPRO_OS_NAME=$DISTRIB_ID
-        #RPRO_OS_VERSION=$DISTRIB_RELEASE
-        RPRO_OS_VERSION="16.04"
+        RPRO_OS_VERSION=$DISTRIB_RELEASE
         elif [ -f /etc/debian_version ]; then
         RPRO_OS_NAME=Debian  # XXX or Ubuntu??
         RPRO_OS_VERSION=$(cat /etc/debian_version)
