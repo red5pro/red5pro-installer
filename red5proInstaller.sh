@@ -79,13 +79,20 @@ welcome_menu()
     
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     
-    echo "                             		"
-    echo "1. BASIC MODE (Recommended)		"
-    echo "                             		"
-    echo "2. UTILITY MODE				"
-    echo "                             		"
-    echo "X. Exit					"
-    echo "                             		"
+    if [[ $RPRO_OS_NAME == *"Ubuntu"* ]]; then
+        echo "                             		"
+        echo "1. BASIC MODE (Recommended)		"
+        echo "                             		"
+        echo "2. UTILITY MODE				"
+        echo "                             		"
+        echo "X. Exit					"
+        echo "                             		"
+    else
+        log_e "Your Operating system is not supported, please use Ubuntu 16.04, 18.04 or 20.04."
+        printf "\n"
+        read -r -p 'Press any key to exit...'
+        exit
+    fi
 }
 
 read_welcome_menu_options()
@@ -308,9 +315,9 @@ detect_system()
         RPRO_OS_NAME=Debian  # XXX or Ubuntu??
         RPRO_OS_VERSION=$(cat /etc/debian_version)
         elif [ -f /etc/redhat-release ]; then
-        # TODO add code for Red Hat and CentOS here
-        RPRO_OS_VERSION=$(rpm -q --qf "%{VERSION}" $(rpm -q --whatprovides redhat-release))
-        RPRO_OS_NAME=$(rpm -q --qf "%{RELEASE}" $(rpm -q --whatprovides redhat-release))
+        . /etc/os-release
+        RPRO_OS_NAME=$ID
+        RPRO_OS_VERSION=$VERSION
     else
         RPRO_OS_NAME=$(uname -s)
         RPRO_OS_VERSION=$(uname -r)
@@ -328,7 +335,6 @@ detect_system()
     free_mem=$(awk '/MemFree/ {printf( "%.2f\n", $2 / 1024 )}' /proc/meminfo)
     free_mem=$(printf "%.0f" $free_mem)
 }
-
 
 
 ###################################################################################
@@ -429,11 +435,11 @@ install_pkg(){
         if [ $install_issuse -eq 0 ]; then
             break
         fi
-        if [ $i -ge 3 ]; then
-            log_e "Something wrong with packages installation!!! Exit."
-            pause
-        fi
     done
+    if [ $i -ge 3 ]; then
+        log_e "Something wrong with packages installation!!! Exit."
+        pause
+    fi
 }
 
 ###################################################################################
@@ -472,7 +478,7 @@ auto_install_rpro()
         url) download_from_url ;;
         local) download_from_local ;;
     esac
-
+    
     PACKAGES=("${PACKAGES_DEFAULT[@]}")
     install_pkg
     
