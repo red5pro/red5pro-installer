@@ -279,6 +279,8 @@ advance_menu()
     echo "1. --- CHECK EXISTING RED5 PRO INSTALLATION"
     echo "2. --- WHICH JAVA AM I USING ?		 "
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+    echo "3. --- LINUX SYSTEM OPTIMIZATION		 "
+    printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     echo "0. --- BACK					 "
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     echo "X. --- Exit					 "
@@ -290,11 +292,12 @@ advance_menu_read_options(){
     
     local choice
     
-    read -p "Enter choice [ 1 - 2 | 0 to go back | X to exit ] " choice
+    read -p "Enter choice [ 1 - 3 | 0 to go back | X to exit ] " choice
     
     case $choice in
         1) cls && check_current_rpro 0 ;;
         2) cls && check_java 1 ;;
+        3) cls && install_linux_optimization ;;
         0) cls && main ;;
         [xX])  exit 0;;
         *) echo -e "\e[41m Error: Invalid choice\e[m" && sleep 2 && show_utility_menu ;;
@@ -1237,6 +1240,63 @@ check_java()
         fi
     fi
     
+    pause
+}
+
+###################################################################################
+########################### UBUNTU Optimization ###################################
+###################################################################################
+
+install_linux_optimization(){
+    
+    log_i "Start Linux optimization..."
+    
+    log_name=$(logname)
+    config_files=("/etc/sysctl.conf" "/etc/security/limits.conf" "/etc/pam.d/common-session")
+    sysctl_params=("fs.file-max = 1000000" "kernel.pid_max = 999999" "kernel.threads-max = 999999" "vm.max_map_count = 1999999")
+    limits_params=("root soft nofile 1000000" "root hard nofile 1000000")
+    common_session_params=("session required pam_limits.so")
+    
+    if [[ "$log_name" != "root" ]]; then
+        limits_params+=("${log_name} soft nofile 1000000" "${log_name} hard nofile 1000000")
+    fi
+    
+    log_i "Adding optimization parameters to system config file: ${config_files[0]}"
+    for index in ${!sysctl_params[*]}
+    do
+        if ! grep -q "${sysctl_params[${index}]}" "${config_files[0]}"; then
+            echo "${sysctl_params[${index}]}" | sudo tee -a ${config_files[0]}
+        else
+            log_w "Parameter: ${sysctl_params[${index}]} exist!"
+        fi
+    done
+    sleep 0.5
+    
+    log_i "Adding optimization parameters to system config file: ${config_files[1]}"
+    for index in ${!limits_params[*]}
+    do
+        if ! grep -q "${limits_params[${index}]}" "${config_files[1]}"; then
+            echo "${limits_params[${index}]}" | sudo tee -a ${config_files[1]}
+        else
+            log_w "Parameter: ${limits_params[${index}]} exist!"
+        fi
+    done
+    sleep 0.5
+    
+    log_i "Adding optimization parameters to system config file: ${config_files[2]}"
+    for index in ${!common_session_params[*]}
+    do
+        if ! grep -q "${common_session_params[${index}]}" "${config_files[2]}"; then
+            echo "${common_session_params[${index}]}" | sudo tee -a ${config_files[2]}
+        else
+            log_w "Parameter: ${common_session_params[${index}]} exist!"
+        fi
+    done
+    sleep 0.5
+    ulimit -n 1000000
+    log_i "Loading sysctl settings..."
+    sysctl -p
+    log_i "LINUX SYSTEM OPTIMIZATION -- DONE"
     pause
 }
 
