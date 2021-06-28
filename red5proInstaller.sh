@@ -17,6 +17,12 @@ PACKAGES_2004=(libva2 libva-drm2 libva-x11-2)
 JDK_8=(openjdk-8-jre-headless)
 JDK_11=(openjdk-11-jdk)
 
+################### Red5 Pro optimization parameters #################################
+http_max_threads="2000"
+http_acceptor_thread_count="100"
+http_processor_cache="200"
+service_limitnofile="1000000"
+
 ######################################################################################
 #################################### LOGGERS #########################################
 ######################################################################################
@@ -1296,7 +1302,51 @@ install_linux_optimization(){
     ulimit -n 1000000
     log_i "Loading sysctl settings..."
     sysctl -p
-    log_i "LINUX SYSTEM OPTIMIZATION -- DONE"
+    log_i "Linux system optimization --- DONE"
+    
+    if is_service_installed; then
+        
+        log_i "Start Red5 Pro optimization..."
+        log_w "For optimize Red5 Pro we will need to restart the red5pro.service"
+        read -r -p "Do you wish to continue? [y/N] " response
+        case $response in
+            [yY][eE][sS]|[yY])
+                log_i "Optimization service file: $RPRO_SERVICE_LOCATION"
+                local service_limitnofile_pattern='LimitNOFILE=.*'
+                local service_limitnofile_new="LimitNOFILE=$service_limitnofile"
+                
+                sudo sed -i -e "s|$service_limitnofile_pattern|$service_limitnofile_new|" "$RPRO_SERVICE_LOCATION"
+                log_i "Added $service_limitnofile_new"
+                sleep 1
+                
+                log_i "Optimization config file: $RED5_HOME/conf/red5.properties"
+                local http_max_threads_pattern='http.max_threads=.*'
+                local http_max_threads_new="http.max_threads=$http_max_threads"
+                
+                local http_acceptor_thread_count_pattern='http.acceptor_thread_count=.*'
+                local http_acceptor_thread_count_new="http.acceptor_thread_count=$http_acceptor_thread_count"
+                
+                local http_processor_cache_pattern='http.processor_cache=.*'
+                local http_processor_cache_new="http.processor_cache=$http_processor_cache"
+                
+                sed -i -e "s|$http_max_threads_pattern|$http_max_threads_new|" -e "s|$http_acceptor_thread_count_pattern|$http_acceptor_thread_count_new|" -e "s|$http_processor_cache_pattern|$http_processor_cache_new|" $RED5_HOME/conf/red5.properties
+                
+                log_i "Added $http_max_threads_new"
+                log_i "Added $http_acceptor_thread_count_new"
+                log_i "Added $http_processor_cache_new"
+                
+                systemctl daemon-reload
+                stop_red5pro_service
+                start_red5pro_service
+                log_i "Red5 Pro optimization --- DONE"
+            ;;
+            *)
+                log_i "Red5 Pro optimization cancelled"
+                pause
+            ;;
+        esac
+        
+    fi
     pause
 }
 
@@ -1307,7 +1357,7 @@ install_linux_optimization(){
 validatePermissions()
 {
     if [[ $EUID -ne 0 ]]; then
-        echo "This script does not seem to have / has lost root permissions. Please re-run the script with 'sudo'"
+        log_w "This script does not seem to have / has lost root permissions. Please re-run the script with 'sudo'"
         exit 1
     fi
 }
