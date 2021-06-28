@@ -285,7 +285,7 @@ advance_menu()
     echo "1. --- CHECK EXISTING RED5 PRO INSTALLATION"
     echo "2. --- WHICH JAVA AM I USING ?		 "
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-    echo "3. --- LINUX SYSTEM OPTIMIZATION		 "
+    echo "3. --- LINUX SYSTEM AND RED5PRO OPTIMIZATION		 "
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     echo "0. --- BACK					 "
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
@@ -1345,7 +1345,6 @@ install_linux_optimization(){
                 pause
             ;;
         esac
-        
     fi
     pause
 }
