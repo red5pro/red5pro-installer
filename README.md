@@ -1,7 +1,7 @@
 # red5pro installer
 Installer for Red5 Pro Server
 
-> **NOTE**: if you are running CentOS 7, please verify that in /usr/local/red5pro/conf/webrtc-plugin.properties `openssl=false`. You may have to modify that file manually. This must be set for WebRTC to function on CentOS.
+> **NOTE**: As of Red5 Pro release 9.0, the installer can only be run on Ubuntu. If you have a downloaded server distribution version older than 9.0, then it can be run on Ubuntu 16.04 or 18.04; for version 9.0 or higher please choose Ubuntu 20.04
 
 
 ## INTRODUCTION
@@ -11,7 +11,7 @@ The script presents a collection of menu-driven options to help achieve various 
 
 ## REQUIREMENTS
 
-`Red5Pro` supports the following Linux distributions: Ubuntu 16.04 or Centos 7.x
+As of release 9.0, `Red5Pro Server` requires Ubuntu 20.04.
 
 __NOTE 1__ : The entire content provided in the 'installer' directory of this repo is `required`.
 
@@ -20,12 +20,6 @@ __NOTE 2__ : This installer cannot be used to deploy more than one installation 
 
 ## USAGE
 
- **CentOS only instructions:**
-> Most CentOS distributions do not include `git`, so you must install it manually. In your server's command line, run the following command:
-
-`sudo yum -y install git`
-
-**For both Ubuntu & CentOS:**
 From your server's command line enter the following commands:
 
 1. `git clone https://github.com/red5pro/red5pro-installer`
@@ -42,6 +36,7 @@ You are now running the installer!
 * (Press 2 if you have a custom build of red5pro)
 
 > On linux you can hit `CTRL + C` in the terminal anytime to interrupt/abort a script execution.
+
 ### INITIALIZATION
 
 As the script runs in the terminal, it detects the operating system details such as Distribution (OS name), Version (OS version), Kernel type (64/32 bit), User's home directory, Red5pro default backup directory (located inside the home directory) and the default install location (the current directory).
