@@ -88,7 +88,7 @@ welcome_menu()
         echo "X. Exit					"
         echo "                             		"
     else
-        log_e "Your Operating system is not supported, please use Ubuntu 16.04, 18.04 or 20.04."
+        log_e "Your Operating system is not supported, please use Ubuntu 16.04, 18.04, 20.04 or 22.04."
         printf "\n"
         read -r -p 'Press any key to exit...'
         exit
@@ -397,6 +397,13 @@ check_linux_and_java_versions(){
             esac
         ;;
         20.04)
+            case "${jdk_version}" in
+                jdk8) PACKAGES=("${PACKAGES_2004[@]}" "${JDK_8[@]}") ;;
+                jdk11) PACKAGES=("${PACKAGES_2004[@]}" "${JDK_11[@]}") ;;
+                *) log_e "JDK version is not supported $jdk_version"; pause ;;
+            esac
+        ;;
+        22.04)
             case "${jdk_version}" in
                 jdk8) PACKAGES=("${PACKAGES_2004[@]}" "${JDK_8[@]}") ;;
                 jdk11) PACKAGES=("${PACKAGES_2004[@]}" "${JDK_11[@]}") ;;
