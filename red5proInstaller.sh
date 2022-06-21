@@ -10,7 +10,7 @@ RPRO_SERVICE_NAME="red5pro.service"
 TEMP_FOLDER="$CURRENT_DIRECTORY/tmp"
 rpro_zip="$TEMP_FOLDER/$RED5PRO_DEFAULT_DOWNLOAD_NAME"
 
-PACKAGES_DEFAULT=(language-pack-en jsvc ntp git unzip libvdpau1)
+PACKAGES_DEFAULT=(language-pack-en jsvc ntp git unzip libvdpau1 wget)
 PACKAGES_1604=(default-jre libva1 libva-drm1 libva-x11-1)
 PACKAGES_1804=(libva2 libva-drm2 libva-x11-2)
 PACKAGES_2004=(libva2 libva-drm2 libva-x11-2)
