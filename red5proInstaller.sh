@@ -14,6 +14,7 @@ PACKAGES_DEFAULT=(language-pack-en jsvc ntp git unzip libvdpau1)
 PACKAGES_1604=(default-jre libva1 libva-drm1 libva-x11-1)
 PACKAGES_1804=(libva2 libva-drm2 libva-x11-2)
 PACKAGES_2004=(libva2 libva-drm2 libva-x11-2)
+PACKAGES_2204=(libva2 libva-drm2 libva-x11-2)
 JDK_8=(openjdk-8-jre-headless)
 JDK_11=(openjdk-11-jdk)
 
@@ -405,8 +406,8 @@ check_linux_and_java_versions(){
         ;;
         22.04)
             case "${jdk_version}" in
-                jdk8) PACKAGES=("${PACKAGES_2004[@]}" "${JDK_8[@]}") ;;
-                jdk11) PACKAGES=("${PACKAGES_2004[@]}" "${JDK_11[@]}") ;;
+                jdk8) PACKAGES=("${PACKAGES_2204[@]}" "${JDK_8[@]}") ;;
+                jdk11) PACKAGES=("${PACKAGES_2204[@]}" "${JDK_11[@]}") ;;
                 *) log_e "JDK version is not supported $jdk_version"; pause ;;
             esac
         ;;
