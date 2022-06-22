@@ -426,7 +426,8 @@ install_pkg(){
         for index in ${!PACKAGES[*]}
         do
             log_i "Install utility ${PACKAGES[$index]}"
-            apt-get install -y ${PACKAGES[$index]} &> /dev/null
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get install -yqq ${PACKAGES[$index]} &> /dev/null
         done
         
         for index in ${!PACKAGES[*]}
