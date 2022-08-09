@@ -4,7 +4,7 @@ RED5_HOME="/usr/local/red5pro"
 CURRENT_DIRECTORY=$(pwd)
 RPRO_SERVICE_LOCATION="/lib/systemd/system/red5pro.service"
 MIN_JAVA_VERSION="11"
-RED5PRO_DEFAULT_DOWNLOAD_NAME="red5pro_latest.zip"
+RED5PRO_DEFAULT_DOWNLOAD_NAME="red5pro-server-latest.zip"
 RPRO_SERVICE_NAME="red5pro.service"
 
 TEMP_FOLDER="$CURRENT_DIRECTORY/tmp"
