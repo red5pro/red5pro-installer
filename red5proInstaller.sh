@@ -537,7 +537,7 @@ download_latest()
         log_i "Attempting to log in with your credentials"
         
         # POST to site
-        wget --server-response --save-cookies cookies.txt --keep-session-cookies --post-data="email=$rpro_email&password=$rpro_passcode" "https://account.red5pro.com/login" 2>$TEMP_FOLDER/wsession.txt
+        wget --server-response --save-cookies cookies.txt --keep-session-cookies --post-data="email=$rpro_email&password=$rpro_passcode" "https://account.red5.net/login" 2>$TEMP_FOLDER/wsession.txt
         wget_status=$(< $TEMP_FOLDER/wsession.txt)
         
         # Check http code
@@ -547,7 +547,7 @@ download_latest()
                 
                 log_i "Attempting to download latest Red5 Pro archive file to $TEMP_FOLDER"
                 
-                wget --load-cookies cookies.txt --content-disposition -p  https://account.red5pro.com/download/red5 -O "$rpro_zip"
+                wget --load-cookies cookies.txt --content-disposition -p  https://account.red5.net/download/red5 -O "$rpro_zip"
                 
                 if [ -f $rpro_zip ] ; then
                     find "$TEMP_FOLDER" -type f -not \( -name '*zip' \) -delete
