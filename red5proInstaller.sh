@@ -553,7 +553,7 @@ download_latest()
                     find "$TEMP_FOLDER" -type f -not \( -name '*zip' \) -delete
                 else
                     log_e "Oops!! Seems like the archive was not downloaded properly to disk."
-                    log_e "Failed to download latest Red5 Pro distribution from 'red5pro.com'. Please contact support!"
+                    log_e "Failed to download latest Red5 Pro distribution from 'red5.net'. Please contact support!"
                     pause
                 fi
             else
