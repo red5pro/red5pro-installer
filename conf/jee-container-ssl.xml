@@ -72,6 +72,11 @@
                     <property name="protocol" value="org.apache.coyote.http11.Http11Nio2Protocol" />
                     <property name="address" value="${http.host}:${http.port}" />
                     <property name="redirectPort" value="${https.port}" />
+                    <property name="connectionProperties">
+                        <map>
+                            <entry key="useLowerCaseHeaders" value="false"/>
+                        </map>
+                    </property>
                 </bean>
                 <bean name="httpsConnector" class="org.red5.server.tomcat.TomcatConnector">
                     <property name="secure" value="true" />
@@ -100,6 +105,7 @@
                             <entry key="acceptorThreadCount" value="${http.acceptor_thread_count}"/>
                             <entry key="processorCache" value="${http.processor_cache}"/>
                             <entry key="relaxedQueryChars" value="[,]"/>
+                            <entry key="useLowerCaseHeaders" value="false"/>
                         </map>
                     </property>
                 </bean>
