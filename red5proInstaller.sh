@@ -4,16 +4,17 @@ RED5_HOME="/usr/local/red5pro"
 CURRENT_DIRECTORY=$(pwd)
 RPRO_SERVICE_LOCATION="/lib/systemd/system/red5pro.service"
 MIN_JAVA_VERSION="11"
-RED5PRO_DEFAULT_DOWNLOAD_NAME="red5pro-server-latest.zip"
+RED5PRO_DEFAULT_DOWNLOAD_NAME="red5pro_latest.zip"
 RPRO_SERVICE_NAME="red5pro.service"
 
 TEMP_FOLDER="$CURRENT_DIRECTORY/tmp"
 rpro_zip="$TEMP_FOLDER/$RED5PRO_DEFAULT_DOWNLOAD_NAME"
 
-PACKAGES_DEFAULT=(language-pack-en jsvc ntp git unzip libvdpau1)
+PACKAGES_DEFAULT=(language-pack-en jsvc ntp git unzip libvdpau1 wget)
 PACKAGES_1604=(default-jre libva1 libva-drm1 libva-x11-1)
 PACKAGES_1804=(libva2 libva-drm2 libva-x11-2)
 PACKAGES_2004=(libva2 libva-drm2 libva-x11-2)
+PACKAGES_2204=(libva2 libva-drm2 libva-x11-2)
 JDK_8=(openjdk-8-jre-headless)
 JDK_11=(openjdk-11-jdk)
 
@@ -88,7 +89,7 @@ welcome_menu()
         echo "X. Exit					"
         echo "                             		"
     else
-        log_e "Your Operating system is not supported, please use Ubuntu 16.04, 18.04 or 20.04."
+        log_e "Your Operating system is not supported, please use Ubuntu 16.04, 18.04, 20.04 or 22.04."
         printf "\n"
         read -r -p 'Press any key to exit...'
         exit
@@ -403,6 +404,13 @@ check_linux_and_java_versions(){
                 *) log_e "JDK version is not supported $jdk_version"; pause ;;
             esac
         ;;
+        22.04)
+            case "${jdk_version}" in
+                jdk8) PACKAGES=("${PACKAGES_2204[@]}" "${JDK_8[@]}") ;;
+                jdk11) PACKAGES=("${PACKAGES_2204[@]}" "${JDK_11[@]}") ;;
+                *) log_e "JDK version is not supported $jdk_version"; pause ;;
+            esac
+        ;;
         *) log_e "Linux version is not supported $RPRO_OS_VERSION"; pause ;;
     esac
 }
@@ -418,7 +426,8 @@ install_pkg(){
         for index in ${!PACKAGES[*]}
         do
             log_i "Install utility ${PACKAGES[$index]}"
-            apt-get install -y ${PACKAGES[$index]} &> /dev/null
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get install -yqq ${PACKAGES[$index]} &> /dev/null
         done
         
         for index in ${!PACKAGES[*]}
@@ -508,11 +517,11 @@ download_latest()
     local rpro_form_valid=1
     local try_login_response
     
-    log_i "Preparing to install Red5 Pro from 'red5pro.com'"
+    log_i "Preparing to install Red5 Pro from 'red5.net'"
     sleep 2
     
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-    echo "Please enter your 'red5pro.com' login details"
+    echo "Please enter your 'red5.net' login details"
     printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
     
     echo "Enter Email : "
@@ -678,7 +687,7 @@ install_rpro_zip()
     esac
     
     echo "                             	"
-    echo -e "\e[31mNOTE: To use WebRTC it is imperative that you have SSL configured on the Red5 Pro instance.For more information see https://www.red5pro.com/docs/server/ssl/overview/\e[m"
+    echo -e "\e[31mNOTE: To use WebRTC it is imperative that you have SSL configured on the Red5 Pro instance.For more information see https://www.red5.net/docs/installation/ssl/overview/\e[m"
     
     # Moving to home directory
     cd ~
@@ -1182,7 +1191,6 @@ config_ssl_properties()
 {
     local cert_path="/etc/letsencrypt/live/$SSL_DOMAIN"
     local red5pro_conf_properties="$RED5_HOME/conf/red5.properties"
-    local red5pro_conf_jee_container="$RED5_HOME/conf/jee-container.xml"
     
     log_i "Configure Red5 Pro to run with SSL. Config file: $red5pro_conf_properties.."
     
@@ -1203,8 +1211,22 @@ config_ssl_properties()
     
     sed -i -e "s|$https_port_pattern|$https_port_new|" -e "s|$rtmps_keystorepass_pattern|$rtmps_keystorepass_new|" -e "s|$rtmps_keystorefile_pattern|$rtmps_keystorefile_new|" -e "s|$rtmps_truststorepass_pattern|$rtmps_truststorepass_new|" -e "s|$rtmps_truststorefile_pattern|$rtmps_truststorefile_new|"  "$red5pro_conf_properties"
     
-    log_i "Copy original file with SSL: jee-container-ssl.xml to $red5pro_conf_jee_container"
-    cp -f "$CURRENT_DIRECTORY/conf/jee-container-ssl.xml" "$red5pro_conf_jee_container"
+    log_i "Configuring $RED5_HOME/conf/jee-container.xml"
+
+    local http1='<!-- Non-secured transports for HTTP and WS -->'
+    local http1_new='<!-- Non-secured transports for HTTP and WS --> <!--'
+
+    local http2='<!-- Secure transports for HTTPS and WSS -->'
+    local http2_new='--> <!-- Secure transports for HTTPS and WSS -->'
+
+    sed -i -e "s|$http1|$http1_new|" -e "s|$http2|$http2_new|" "$RED5_HOME/conf/jee-container.xml"
+
+    # Delete 1 line after <!-- Secure transports for HTTPS and WSS -->
+    sed -i '/Secure transports for HTTPS and WSS/{n;d}' "$RED5_HOME/conf/jee-container.xml"
+    # Delete first line before </beans>
+    sed -i '$!N;/\n.*beans>/!P;D' "$RED5_HOME/conf/jee-container.xml"
+    # Delete second line before </beans>
+    sed -i '$!N;/\n.*beans>/!P;D' "$RED5_HOME/conf/jee-container.xml"
 }
 
 ###################################################################################
@@ -1284,11 +1306,6 @@ preparation(){
     
     USER_HOME=$(eval echo "~${SUDO_USER}")
     RPRO_BACKUP_HOME="$USER_HOME/red5pro_backups"
-    
-    if [ ! -f "$CURRENT_DIRECTORY/conf/jee-container-ssl.xml" ]; then
-        log_e "File $CURRENT_DIRECTORY/conf/jee-container-ssl.xml was not found. Exit!!!"
-        exit 1
-    fi
     
     if [ -d $RED5_HOME ]; then
         rm -r $TEMP_FOLDER/*

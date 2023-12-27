@@ -1,7 +1,7 @@
-# red5pro installer
+# Red5pro installer
 Installer for Red5 Pro Server
 
-> **NOTE**: As of Red5 Pro release 9.0, the installer can only be run on Ubuntu. If you have a downloaded server distribution version older than 9.0, then it can be run on Ubuntu 16.04 or 18.04; for version 9.0 or higher please choose Ubuntu 20.04
+> **NOTE**: As of Red5 Pro release 12.0, the installer can only be run on Ubuntu. If you have a downloaded server distribution version older than 12.0, then it can be run on Ubuntu 16.04, 18.04 or 20.04; for version 12.0 or higher please choose Ubuntu 22.04
 
 
 ## INTRODUCTION
@@ -11,7 +11,7 @@ The script presents a collection of menu-driven options to help achieve various 
 
 ## REQUIREMENTS
 
-As of release 9.0, `Red5Pro Server` requires Ubuntu 20.04.
+As of release 12.0, `Red5Pro Server` requires Ubuntu 22.04.
 
 __NOTE 1__ : The entire content provided in the 'installer' directory of this repo is `required`.
 
@@ -54,12 +54,12 @@ The basic mode provides all the options commonly required to setup a new Red5 Pr
 
 #### 1. INSTALL LATEST RED5PRO
 
-Allows you to install Red5 Pro from the [https://www.red5pro.com](https://www.red5pro.com) website. You must have an existing account on red5pro.com to use this option. Before proceeding, the script checks for a few basic requirements:
+Allows you to install Red5 Pro from the [https://www.red5.net](https://www.red5.net) website. You must have an existing account on red5.net to use this option. Before proceeding, the script checks for a few basic requirements:
 
 * Java: Java (JRE / JDK 1.8 is required to install Red5pro)
 * unzip: Unzip utility is required to unpack zip archives.
 
-Once the requirements are met the script proceeds to 'obtaining the latest Red5pro from Red5pro.com'. At this point, it prompts you for site credentials (email  & password). This information is posted to the website to help authenticate your download. If authentication succeeds, it begins downloading the latest Red5 Pro archive file from red5pro.com.
+Once the requirements are met the script proceeds to 'obtaining the latest Red5pro from red5.net'. At this point, it prompts you for site credentials (email  & password). This information is posted to the website to help authenticate your download. If authentication succeeds, it begins downloading the latest Red5 Pro archive file from red5.net.
 
 __* If an existing script is found, the script tries to stop Red5 Pro, in case it was running, before it can continue.__
 
@@ -120,7 +120,7 @@ __2. VIEW LICENSE :__  Provides option to view an existing Red5 Pro Server licen
 
 This option allows you to install a free SSL certificate (Obtained via letsencrypt CA), on your Red5 Pro instance. Prior to using this option you need to make sure you have a valid DNS name that points to your instance.
 
-The installer script uses the [Red5 Pro SSL page](https://www.red5pro.com/docs/server/red5prossl.html) as guide to create a SSL installation automation.
+The installer script uses the [Red5 Pro SSL page](https://www.red5.net/docs/installation/ssl/overview/) as guide to create a SSL installation automation.
 
 > Installer supports newer builds (>=5.4.0 and onwards) as well as older builds (<=5.3.x) by checking for websocket implementation using the presence of the `websocket-x.x.x.jar` file in the plugins directory. New websocket implementation uses websockets classes from the tomcat plugin and the `websocket-x.x.x.jar` is no longer present in the newer builds.
 
