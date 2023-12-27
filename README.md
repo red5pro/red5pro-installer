@@ -1,7 +1,7 @@
 # Red5pro installer
 Installer for Red5 Pro Server
 
-> **NOTE**: As of Red5 Pro release 9.0, the installer can only be run on Ubuntu. If you have a downloaded server distribution version older than 9.0, then it can be run on Ubuntu 16.04 or 18.04; for version 9.0 or higher please choose Ubuntu 20.04
+> **NOTE**: As of Red5 Pro release 12.0, the installer can only be run on Ubuntu. If you have a downloaded server distribution version older than 12.0, then it can be run on Ubuntu 16.04, 18.04 or 20.04; for version 12.0 or higher please choose Ubuntu 22.04
 
 
 ## INTRODUCTION
@@ -11,7 +11,7 @@ The script presents a collection of menu-driven options to help achieve various 
 
 ## REQUIREMENTS
 
-As of release 9.0, `Red5Pro Server` requires Ubuntu 20.04.
+As of release 12.0, `Red5Pro Server` requires Ubuntu 22.04.
 
 __NOTE 1__ : The entire content provided in the 'installer' directory of this repo is `required`.
 
