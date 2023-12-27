@@ -1191,7 +1191,6 @@ config_ssl_properties()
 {
     local cert_path="/etc/letsencrypt/live/$SSL_DOMAIN"
     local red5pro_conf_properties="$RED5_HOME/conf/red5.properties"
-    local red5pro_conf_jee_container="$RED5_HOME/conf/jee-container.xml"
     
     log_i "Configure Red5 Pro to run with SSL. Config file: $red5pro_conf_properties.."
     
@@ -1212,8 +1211,22 @@ config_ssl_properties()
     
     sed -i -e "s|$https_port_pattern|$https_port_new|" -e "s|$rtmps_keystorepass_pattern|$rtmps_keystorepass_new|" -e "s|$rtmps_keystorefile_pattern|$rtmps_keystorefile_new|" -e "s|$rtmps_truststorepass_pattern|$rtmps_truststorepass_new|" -e "s|$rtmps_truststorefile_pattern|$rtmps_truststorefile_new|"  "$red5pro_conf_properties"
     
-    log_i "Copy original file with SSL: jee-container-ssl.xml to $red5pro_conf_jee_container"
-    cp -f "$CURRENT_DIRECTORY/conf/jee-container-ssl.xml" "$red5pro_conf_jee_container"
+    log_i "Configuring $RED5_HOME/conf/jee-container.xml"
+
+    local http1='<!-- Non-secured transports for HTTP and WS -->'
+    local http1_new='<!-- Non-secured transports for HTTP and WS --> <!--'
+
+    local http2='<!-- Secure transports for HTTPS and WSS -->'
+    local http2_new='--> <!-- Secure transports for HTTPS and WSS -->'
+
+    sed -i -e "s|$http1|$http1_new|" -e "s|$http2|$http2_new|" "$RED5_HOME/conf/jee-container.xml"
+
+    # Delete 1 line after <!-- Secure transports for HTTPS and WSS -->
+    sed -i '/Secure transports for HTTPS and WSS/{n;d}' "$RED5_HOME/conf/jee-container.xml"
+    # Delete first line before </beans>
+    sed -i '$!N;/\n.*beans>/!P;D' "$RED5_HOME/conf/jee-container.xml"
+    # Delete second line before </beans>
+    sed -i '$!N;/\n.*beans>/!P;D' "$RED5_HOME/conf/jee-container.xml"
 }
 
 ###################################################################################
@@ -1293,11 +1306,6 @@ preparation(){
     
     USER_HOME=$(eval echo "~${SUDO_USER}")
     RPRO_BACKUP_HOME="$USER_HOME/red5pro_backups"
-    
-    if [ ! -f "$CURRENT_DIRECTORY/conf/jee-container-ssl.xml" ]; then
-        log_e "File $CURRENT_DIRECTORY/conf/jee-container-ssl.xml was not found. Exit!!!"
-        exit 1
-    fi
     
     if [ -d $RED5_HOME ]; then
         rm -r $TEMP_FOLDER/*
