@@ -17,6 +17,7 @@ PACKAGES_2004=(libva2 libva-drm2 libva-x11-2)
 PACKAGES_2204=(libva2 libva-drm2 libva-x11-2)
 JDK_8=(openjdk-8-jre-headless)
 JDK_11=(openjdk-11-jdk)
+JDK_21=(openjdk-21-jdk)
 
 ######################################################################################
 #################################### LOGGERS #########################################
@@ -357,6 +358,9 @@ check_linux_and_java_versions(){
         if grep -q "java-11-openjdk-amd64" $red5pro_service_file ; then
             log_i "Found required JAVA version: java-11-openjdk-amd64"
             jdk_version="jdk11"
+        elif grep -q "java-21-openjdk-amd64" $red5pro_service_file ; then
+            log_i "Found required JAVA version: java-21-openjdk-amd64"
+            jdk_version="jdk21"
         else
             log_e "Not found JAVA version in the file $red5pro_service_file"
             
@@ -365,6 +369,7 @@ check_linux_and_java_versions(){
             printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
             echo "1. --- JAVA 8"
             echo "2. --- JAVA 11"
+            echo "3. --- JAVA 21"
             echo "X. --- Exit"
             echo " "
             
@@ -372,6 +377,7 @@ check_linux_and_java_versions(){
             case $choice in
                 1) jdk_version="jdk8" ;;
                 2) jdk_version="jdk11" ;;
+                2) jdk_version="jdk21" ;;
                 [xX]) pause ;;
                 *)
                     log_i "Operation cancelled"
@@ -394,6 +400,7 @@ check_linux_and_java_versions(){
             case "${jdk_version}" in
                 jdk8) PACKAGES=("${PACKAGES_1804[@]}" "${JDK_8[@]}") ;;
                 jdk11) PACKAGES=("${PACKAGES_1804[@]}" "${JDK_11[@]}") ;;
+                jdk21) PACKAGES=("${PACKAGES_1804[@]}" "${JDK_21[@]}") ;;
                 *) log_e "JDK version is not supported $jdk_version"; pause ;;
             esac
         ;;
@@ -401,6 +408,7 @@ check_linux_and_java_versions(){
             case "${jdk_version}" in
                 jdk8) PACKAGES=("${PACKAGES_2004[@]}" "${JDK_8[@]}") ;;
                 jdk11) PACKAGES=("${PACKAGES_2004[@]}" "${JDK_11[@]}") ;;
+                jdk21) PACKAGES=("${PACKAGES_2004[@]}" "${JDK_21[@]}") ;;
                 *) log_e "JDK version is not supported $jdk_version"; pause ;;
             esac
         ;;
@@ -408,6 +416,7 @@ check_linux_and_java_versions(){
             case "${jdk_version}" in
                 jdk8) PACKAGES=("${PACKAGES_2204[@]}" "${JDK_8[@]}") ;;
                 jdk11) PACKAGES=("${PACKAGES_2204[@]}" "${JDK_11[@]}") ;;
+                jdk21) PACKAGES=("${PACKAGES_2204[@]}" "${JDK_21[@]}") ;;
                 *) log_e "JDK version is not supported $jdk_version"; pause ;;
             esac
         ;;
@@ -1211,22 +1220,35 @@ config_ssl_properties()
     
     sed -i -e "s|$https_port_pattern|$https_port_new|" -e "s|$rtmps_keystorepass_pattern|$rtmps_keystorepass_new|" -e "s|$rtmps_keystorefile_pattern|$rtmps_keystorefile_new|" -e "s|$rtmps_truststorepass_pattern|$rtmps_truststorepass_new|" -e "s|$rtmps_truststorefile_pattern|$rtmps_truststorefile_new|"  "$red5pro_conf_properties"
     
-    log_i "Configuring $RED5_HOME/conf/jee-container.xml"
+    if grep -q "secure.enabled" "$RED5_HOME/conf/red5.properties"; then
+        log_i "secure.enabled exists in the $RED5_HOME/conf/red5.properties. Enable SSL using new configuration."
 
-    local http1='<!-- Non-secured transports for HTTP and WS -->'
-    local http1_new='<!-- Non-secured transports for HTTP and WS --> <!--'
+        local secure_enabled_pattern='secure.enabled=.*'
+        local secure_enabled_new="secure.enabled=true"
+        
+        local websocket_enabled_pattern='websocket.enabled=.*'
+        local websocket_enabled_new="websocket.enabled=true"
 
-    local http2='<!-- Secure transports for HTTPS and WSS -->'
-    local http2_new='--> <!-- Secure transports for HTTPS and WSS -->'
+        sed -i -e "s|$secure_enabled_pattern|$secure_enabled_new|" -e "s|$websocket_enabled_pattern|$websocket_enabled_new|" "$RED5_HOME/conf/red5.properties"
+    else
+        log_w "secure.enabled does not exist in the $RED5_HOME/conf/red5.properties. Enable SSL using old configuration."
+        log_i "Configuring $RED5_HOME/conf/jee-container.xml"
 
-    sed -i -e "s|$http1|$http1_new|" -e "s|$http2|$http2_new|" "$RED5_HOME/conf/jee-container.xml"
+        local http1='<!-- Non-secured transports for HTTP and WS -->'
+        local http1_new='<!-- Non-secured transports for HTTP and WS --> <!--'
 
-    # Delete 1 line after <!-- Secure transports for HTTPS and WSS -->
-    sed -i '/Secure transports for HTTPS and WSS/{n;d}' "$RED5_HOME/conf/jee-container.xml"
-    # Delete first line before </beans>
-    sed -i '$!N;/\n.*beans>/!P;D' "$RED5_HOME/conf/jee-container.xml"
-    # Delete second line before </beans>
-    sed -i '$!N;/\n.*beans>/!P;D' "$RED5_HOME/conf/jee-container.xml"
+        local http2='<!-- Secure transports for HTTPS and WSS -->'
+        local http2_new='--> <!-- Secure transports for HTTPS and WSS -->'
+
+        sed -i -e "s|$http1|$http1_new|" -e "s|$http2|$http2_new|" "$RED5_HOME/conf/jee-container.xml"
+        
+        # Delete 1 line after <!-- Secure transports for HTTPS and WSS -->
+        sed -i '/Secure transports for HTTPS and WSS/{n;d}' "$RED5_HOME/conf/jee-container.xml"
+        # Delete first line before </beans>
+        sed -i '$!N;/\n.*beans>/!P;D' "$RED5_HOME/conf/jee-container.xml"
+        # Delete second line before </beans>
+        sed -i '$!N;/\n.*beans>/!P;D' "$RED5_HOME/conf/jee-container.xml"
+    fi
 }
 
 ###################################################################################
@@ -1275,7 +1297,6 @@ validatePermissions()
 }
 
 function isEmailValid() {
-    #regex="^([A-Za-z]+[A-Za-z0-9]*((\.|\-|\_)?[A-Za-z]+[A-Za-z0-9]*){1,})@(([A-Za-z]+[A-Za-z0-9]*)+((\.|\-|\_)?([A-Za-z]+[A-Za-z0-9]*)+){1,})+\.([A-Za-z]{2,})+"
     regex="^([A-Za-z0-9]*((\.|\-|\_)?[A-Za-z]+[A-Za-z0-9]*){1,})@(([A-Za-z]+[A-Za-z0-9]*)+((\.|\-|\_)?([A-Za-z]+[A-Za-z0-9]*)+){1,})+\.([A-Za-z]{2,})+"
     [[ "${1}" =~ $regex ]]
 }
