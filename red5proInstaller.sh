@@ -11,12 +11,9 @@ TEMP_FOLDER="$CURRENT_DIRECTORY/tmp"
 rpro_zip="$TEMP_FOLDER/$RED5PRO_DEFAULT_DOWNLOAD_NAME"
 
 PACKAGES_DEFAULT=(language-pack-en jsvc ntp git unzip libvdpau1 wget)
-PACKAGES_1604=(default-jre libva1 libva-drm1 libva-x11-1)
-PACKAGES_1804=(libva2 libva-drm2 libva-x11-2)
-PACKAGES_2004=(libva2 libva-drm2 libva-x11-2)
 PACKAGES_2204=(libva2 libva-drm2 libva-x11-2)
-JDK_8=(openjdk-8-jre-headless)
-JDK_11=(openjdk-11-jdk)
+PACKAGES_2404=(libva2 libva-drm2 libva-x11-2)
+PACKAGES_2504=(libva2 libva-drm2 libva-x11-2)
 JDK_21=(openjdk-21-jdk)
 
 ######################################################################################
@@ -347,75 +344,48 @@ check_linux_and_java_versions(){
     #. /etc/lsb-release
     log_i "Checking the required JAVA version..."
     sleep 2
-    jdk_version="jdk8"
     
     red5pro_service_file="$RED5_HOME/red5pro.service"
     
-    if grep -q "java-8-openjdk-amd64" $red5pro_service_file ; then
-        log_i "Found required JAVA version: java-8-openjdk-amd64"
-        jdk_version="jdk8"
+    if grep -q "java-21-openjdk-amd64" $red5pro_service_file ; then
+        log_i "Found required JAVA version: java-21-openjdk-amd64"
+        jdk_version="jdk21"
     else
-        if grep -q "java-11-openjdk-amd64" $red5pro_service_file ; then
-            log_i "Found required JAVA version: java-11-openjdk-amd64"
-            jdk_version="jdk11"
-        elif grep -q "java-21-openjdk-amd64" $red5pro_service_file ; then
-            log_i "Found required JAVA version: java-21-openjdk-amd64"
-            jdk_version="jdk21"
-        else
-            log_e "Not found JAVA version in the file $red5pro_service_file"
-            
-            printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-            echo -e "\e[35mPlease choose JAVA version manualy! \e[m"
-            printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-            echo "1. --- JAVA 8"
-            echo "2. --- JAVA 11"
-            echo "3. --- JAVA 21"
-            echo "X. --- Exit"
-            echo " "
-            
-            read -p "Enter choice [ 1 - 2 | X to exit ] " choice
-            case $choice in
-                1) jdk_version="jdk8" ;;
-                2) jdk_version="jdk11" ;;
-                2) jdk_version="jdk21" ;;
-                [xX]) pause ;;
-                *)
-                    log_i "Operation cancelled"
-                    pause
-                ;;
-            esac
-        fi
+        log_e "Not found JAVA version in the file $red5pro_service_file"
+        
+        printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+        echo -e "\e[35mPlease choose JAVA version manualy! \e[m"
+        printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+        echo "1. --- JAVA 21"
+        echo "X. --- Exit"
+        echo " "
+        
+        read -p "Enter choice [ 1 - 2 | X to exit ] " choice
+        case $choice in
+            1) jdk_version="jdk21" ;;
+            [xX]) pause ;;
+            *)
+                log_i "Operation cancelled"
+                pause
+            ;;
+        esac
     fi
     
     case "${RPRO_OS_VERSION}" in
-        16.04)
-            if [[ $jdk_version == "jdk11" ]]; then
-                log_e "Ubuntu 16.04 is not supporting Java version 11. Please use Ubuntu 18.04 or higher!!!"
-                pause
-            else
-                PACKAGES=("${PACKAGES_1604[@]}")
-            fi
-        ;;
-        18.04)
-            case "${jdk_version}" in
-                jdk8) PACKAGES=("${PACKAGES_1804[@]}" "${JDK_8[@]}") ;;
-                jdk11) PACKAGES=("${PACKAGES_1804[@]}" "${JDK_11[@]}") ;;
-                jdk21) PACKAGES=("${PACKAGES_1804[@]}" "${JDK_21[@]}") ;;
-                *) log_e "JDK version is not supported $jdk_version"; pause ;;
-            esac
-        ;;
-        20.04)
-            case "${jdk_version}" in
-                jdk8) PACKAGES=("${PACKAGES_2004[@]}" "${JDK_8[@]}") ;;
-                jdk11) PACKAGES=("${PACKAGES_2004[@]}" "${JDK_11[@]}") ;;
-                jdk21) PACKAGES=("${PACKAGES_2004[@]}" "${JDK_21[@]}") ;;
-                *) log_e "JDK version is not supported $jdk_version"; pause ;;
-            esac
-        ;;
         22.04)
             case "${jdk_version}" in
-                jdk8) PACKAGES=("${PACKAGES_2204[@]}" "${JDK_8[@]}") ;;
-                jdk11) PACKAGES=("${PACKAGES_2204[@]}" "${JDK_11[@]}") ;;
+                jdk21) PACKAGES=("${PACKAGES_2204[@]}" "${JDK_21[@]}") ;;
+                *) log_e "JDK version is not supported $jdk_version"; pause ;;
+            esac
+        ;;
+        24.04)
+            case "${jdk_version}" in
+                jdk21) PACKAGES=("${PACKAGES_2204[@]}" "${JDK_21[@]}") ;;
+                *) log_e "JDK version is not supported $jdk_version"; pause ;;
+            esac
+        ;;
+        25.04)
+            case "${jdk_version}" in
                 jdk21) PACKAGES=("${PACKAGES_2204[@]}" "${JDK_21[@]}") ;;
                 *) log_e "JDK version is not supported $jdk_version"; pause ;;
             esac
