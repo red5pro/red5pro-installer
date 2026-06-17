@@ -54,7 +54,7 @@ The basic mode provides all the options commonly required to setup a new Red5 Pr
 
 #### 1. INSTALL LATEST RED5PRO
 
-Allows you to install Red5 Pro from the [https://www.red5.net](https://www.red5.net) website. You must have an existing account on red5.net to use this option. Before proceeding, the script checks for a few basic requirements:
+Allows you to install Red5 Pro from the [https://www.red5.net](https://www.red5.net/red5-pro/low-latency-streaming-software/) website. You must have an existing account on red5.net to use this option. Before proceeding, the script checks for a few basic requirements:
 
 * Java: Java (JRE / JDK 1.8 is required to install Red5pro)
 * unzip: Unzip utility is required to unpack zip archives.
